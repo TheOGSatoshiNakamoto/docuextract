@@ -8,6 +8,7 @@
     }
   },
   "rewrites": [
+    { "source": "/", "destination": "/docs/index.html" },
     { "source": "/v1/(.*)", "destination": "/api/v1/$1" }
   ],
   "headers": [
