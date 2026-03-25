@@ -72,11 +72,17 @@ export interface DetectResponse {
   confidence: number;
 }
 
+export interface UsageDayBreakdown {
+  date: string;              // ISO date YYYY-MM-DD
+  count: number;
+}
+
 export interface UsageResponse {
   used: number;
   limit: number;
   plan: Plan;
   period_end: string;        // ISO date
+  breakdown: UsageDayBreakdown[];
 }
 
 export interface HealthResponse {
