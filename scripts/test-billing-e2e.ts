@@ -43,20 +43,33 @@ function fail(step: string, err: unknown) {
 // ─── Step 1: Create test user ─────────────────────────────────────────────────
 
 async function createTestUser(): Promise<{ userId: string; apiKey: string }> {
-  log('1', 'Creating test user in Supabase...');
+  log('1', 'Creating test user via Supabase Auth...');
   const supabase = getSupabaseAdmin();
 
-  // Generate a raw API key (matches generate-api-key.ts format)
-  const apiKey = `dk_test_${crypto.randomBytes(24).toString('hex')}`;
+  const email = `test-billing-${Date.now()}@example.com`;
+  const password = crypto.randomBytes(16).toString('hex');
 
-  const { data, error } = await supabase.rpc('create_user_with_api_key', {
-    p_email: `test-billing-${Date.now()}@example.com`,
-    p_api_key: apiKey,
+  // Create an auth.users entry — migration 005 trigger auto-creates public.users
+  const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
   });
+  if (authError) throw new Error(`auth.admin.createUser failed: ${authError.message}`);
 
-  if (error) throw new Error(`create_user_with_api_key RPC failed: ${error.message}`);
-  pass(`User created: ${data}`);
-  return { userId: data as string, apiKey };
+  const userId = authData.user.id;
+
+  // Fetch the API key that the trigger generated
+  const { data: userData, error: userError } = await supabase
+    .from('users')
+    .select('api_key')
+    .eq('id', userId)
+    .single();
+  if (userError) throw new Error(`Failed to fetch generated API key: ${userError.message}`);
+
+  const apiKey = (userData as { api_key: string }).api_key;
+  pass(`User created: ${userId}`);
+  return { userId, apiKey };
 }
 
 // ─── Step 2: Verify /v1/health ────────────────────────────────────────────────
@@ -178,6 +191,8 @@ async function cleanupTestUser(userId: string) {
   await supabase.from('api_usage').delete().eq('user_id', userId);
   await supabase.from('rate_limits').delete().eq('user_id', userId);
   await supabase.from('users').delete().eq('id', userId);
+  // Remove the auth.users entry created in step 1
+  await supabase.auth.admin.deleteUser(userId);
   pass('Test user removed');
 }
 
