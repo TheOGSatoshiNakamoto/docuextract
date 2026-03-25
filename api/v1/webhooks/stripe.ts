@@ -131,6 +131,10 @@ async function handleSubscriptionDeleted(
 
 // ─── Main handler ─────────────────────────────────────────────────────────────
 
+// Disable Vercel's automatic body parsing so we receive the raw stream.
+// stripe.webhooks.constructEvent() needs the original bytes to verify the signature.
+export const config = { api: { bodyParser: false } };
+
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
   if (methodNotAllowed(req, res, ['POST'])) return;
 
