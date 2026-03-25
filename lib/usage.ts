@@ -48,6 +48,28 @@ export async function getUsageStats(user: User): Promise<UsageResponse> {
 }
 
 /**
+ * Returns the count of successful extractions for the current calendar month.
+ * Used to determine whether the next extraction is an overage.
+ */
+export async function getMonthlyUsageCount(userId: string): Promise<number> {
+  const supabase = getSupabaseAdmin();
+  const now = new Date();
+  const periodStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+  const periodEnd   = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
+
+  const { count, error } = await supabase
+    .from('api_usage')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('status', 'success')
+    .gte('created_at', periodStart.toISOString())
+    .lt('created_at', periodEnd.toISOString());
+
+  if (error) throw error;
+  return count ?? 0;
+}
+
+/**
  * Inserts a usage record into the api_usage table.
  *
  * This is intentionally fire-and-forget on the request path — failures are

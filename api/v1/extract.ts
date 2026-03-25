@@ -4,7 +4,8 @@ import { checkRateLimit, rateLimitHeaders } from '../../lib/ratelimit.js';
 import { processDocumentInput, ValidationError } from '../../lib/documents/input.js';
 import { detectDocumentType } from '../../lib/documents/detect.js';
 import { extractDocument, ExtractionError } from '../../lib/extraction/engine.js';
-import { logUsage } from '../../lib/usage.js';
+import { logUsage, getMonthlyUsageCount } from '../../lib/usage.js';
+import { reportUsageToStripe } from '../../lib/billing.js';
 import {
   methodNotAllowed,
   sendError,
@@ -117,7 +118,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return;
   }
 
-  // ── 7. Log successful usage ───────────────────────────────────────────────
+  // ── 7. Log successful usage and report overage to Stripe ─────────────────
   void logUsage({
     user_id: user.id, endpoint, document_type: documentType,
     model_used: result.modelUsed,
@@ -128,6 +129,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     status: 'success',
     error_message: null,
   });
+
+  // Overage reporting: fire-and-forget, never blocks the response.
+  // Free users are rate-limited at their cap — no Stripe reporting needed.
+  if (user.plan !== 'free' && user.stripe_customer_id) {
+    void (async () => {
+      try {
+        const monthlyCount = await getMonthlyUsageCount(user.id);
+        // monthlyCount reflects usage before this request (logUsage is async).
+        // If already at or beyond the limit, this request is an overage.
+        if (monthlyCount >= user.monthly_limit) {
+          await reportUsageToStripe(user.stripe_customer_id as string, 1);
+        }
+      } catch (err) {
+        console.error(JSON.stringify({
+          level: 'error', message: 'Overage check failed', userId: user.id, error: String(err),
+        }));
+      }
+    })();
+  }
 
   // ── 8. Respond ────────────────────────────────────────────────────────────
   res.status(200).json({
