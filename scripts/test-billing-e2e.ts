@@ -145,16 +145,22 @@ async function checkCheckout(apiKey: string) {
   pass(`Checkout URL returned: ${body.url.slice(0, 60)}...`);
 }
 
-// ─── Step 6: Portal endpoint (no Stripe customer yet → 400) ──────────────────
+// ─── Step 6: Portal endpoint ──────────────────────────────────────────────────
+// Step 5 (checkout) lazily creates a Stripe customer and saves it to Supabase,
+// so by this point the user has a stripe_customer_id and the portal returns 200.
 
 async function checkPortalNoCustomer(apiKey: string) {
-  log('6', 'Testing POST /v1/billing/portal without subscription (expects 400)...');
+  log('6', 'Testing POST /v1/billing/portal (customer exists after checkout → 200)...');
   const res = await fetch(`${API_BASE}/v1/billing/portal`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${apiKey}` },
   });
-  if (res.status !== 400) throw new Error(`Expected 400, got ${res.status}`);
-  pass('Portal returns 400 when no Stripe customer exists');
+  if (!res.ok) throw new Error(`Expected 200, got ${res.status}: ${await res.text()}`);
+  const body = await res.json() as { url: string };
+  if (!body.url?.startsWith('https://billing.stripe.com')) {
+    throw new Error(`Expected Stripe billing portal URL, got: ${body.url}`);
+  }
+  pass(`Portal URL returned: ${body.url.slice(0, 60)}...`);
 }
 
 // ─── Step 7: Simulate subscription webhook ────────────────────────────────────
