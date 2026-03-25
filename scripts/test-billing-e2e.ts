@@ -49,7 +49,8 @@ async function createTestUser(): Promise<{ userId: string; apiKey: string }> {
   const email = `test-billing-${Date.now()}@example.com`;
   const password = crypto.randomBytes(16).toString('hex');
 
-  // Create an auth.users entry — migration 005 trigger auto-creates public.users
+  // Create the auth.users entry (trigger in migration 005 may auto-create
+  // public.users, but we upsert explicitly below so we always have a known key)
   const { data: authData, error: authError } = await supabase.auth.admin.createUser({
     email,
     password,
@@ -58,16 +59,17 @@ async function createTestUser(): Promise<{ userId: string; apiKey: string }> {
   if (authError) throw new Error(`auth.admin.createUser failed: ${authError.message}`);
 
   const userId = authData.user.id;
+  const apiKey = `dk_test_${crypto.randomBytes(24).toString('hex')}`;
 
-  // Fetch the API key that the trigger generated
-  const { data: userData, error: userError } = await supabase
-    .from('users')
-    .select('api_key')
-    .eq('id', userId)
-    .single();
-  if (userError) throw new Error(`Failed to fetch generated API key: ${userError.message}`);
+  // Explicit upsert so the test always has a known API key regardless of
+  // whether the trigger fired (ON CONFLICT updates the key if trigger ran first)
+  const { error: upsertError } = await supabase.rpc('create_user_with_api_key', {
+    p_user_id: userId,
+    p_email: email,
+    p_api_key: apiKey,
+  });
+  if (upsertError) throw new Error(`public.users upsert failed: ${upsertError.message}`);
 
-  const apiKey = (userData as { api_key: string }).api_key;
   pass(`User created: ${userId}`);
   return { userId, apiKey };
 }
