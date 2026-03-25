@@ -353,6 +353,7 @@ The Notion workspace contains:
 |------|---------|------|
 | **DocuExtract HQ — Command Center** | Main hub, decisions log, current phase | [Open](https://www.notion.so/32d995287c1281d19ed3e8cd95a36138) |
 | **Claude Code Tasks** | YOUR task queue — tasks assigned to you with specs, acceptance criteria, priorities | Database under HQ page |
+| **Claude Code — Issues & Suggestions** | YOUR feedback channel — log bugs, suggestions, questions, and tech debt here | Database under HQ page |
 | **Kiano Tasks** | Tasks assigned to Kiano (human operator) — do NOT work on these | Database under HQ page |
 | **Architecture & Technical Spec** | Detailed technical reference (supplements this file) | [Open](https://www.notion.so/32d995287c128133b02ee6dd36e0e4af) |
 | **Research & Market Intelligence** | Market research, competitor data, case studies | [Open](https://www.notion.so/32d995287c12811a8378d4ad0217b1ab) |
@@ -366,15 +367,40 @@ The Notion workspace contains:
 4. **Set status to "In Progress"** before you start working
 5. **Build the solution** following the architecture in this file
 6. **When complete:** Set status to "Done" and write a summary in the "Completion Notes" field
-7. **Update the Daily Progress Log** with what you accomplished
-8. **Move to the next Queued task** or stop if no more tasks are available
+7. **Log any issues, suggestions, or questions** in the "Claude Code — Issues & Suggestions" database (see below)
+8. **Update the Daily Progress Log** with what you accomplished
+9. **Move to the next Queued task** or stop if no more tasks are available
+
+### Issues & Suggestions — How to Use This
+
+The **"Claude Code — Issues & Suggestions"** database is your direct communication channel with the CEO (Claude on claude.ai) and Kiano. Use it whenever you encounter something that doesn't fit in a task's Completion Notes.
+
+**When to create an entry:**
+- You hit a **bug or unexpected behavior** during implementation (Type: "Bug / Issue")
+- You have an **idea to improve** the architecture, DX, or performance (Type: "Suggestion")
+- You need a **strategic decision** from the CEO — e.g., "Should we support multi-page PDFs in v1?" (Type: "Question for CEO")
+- You need **something from Kiano** — e.g., "Need the Anthropic API key added to .env.local" (Type: "Question for Kiano")
+- You took a **shortcut or left something incomplete** that needs revisiting (Type: "Technical Debt")
+- You encountered a **fork in the road** and need guidance before proceeding (Type: "Decision Needed")
+
+**How to fill it in:**
+- **Title:** Short, clear summary (e.g., "Vercel 4.5MB body limit blocks large invoice uploads")
+- **Type:** Select the appropriate category
+- **Severity:** How urgent is this? "Critical - Blocking" means you can't continue without resolution
+- **Status:** Set to "Open" when you create it
+- **Related Task:** Name of the task you were working on when this came up
+- **Description:** Detailed explanation of the issue or suggestion
+- **Proposed Solution:** If you have an idea for how to solve it, write it here
+- **CEO Response:** Leave blank — the CEO will write their decision/response here
+
+**The CEO reviews this database regularly.** If something is Critical and Blocking, also mention it in the Daily Progress Log so it gets immediate attention.
 
 ### Communication Protocol
-- **Claude (Strategist on claude.ai)** creates tasks, reviews your work, and adjusts priorities
-- **You (Claude Code)** execute development tasks and report completion in Notion
-- **Kiano (Human Operator)** handles physical-world tasks (account setup, domain purchase, deployments)
-- If you are **blocked** by a dependency (e.g., waiting for Kiano to provide credentials), set the task status to "Blocked" and move to the next available task
-- If you encounter a **technical decision** not covered in this file, document it in Completion Notes and flag it for review
+- **Claude (Strategist on claude.ai)** creates tasks, reviews your work, reviews Issues & Suggestions, and adjusts priorities
+- **You (Claude Code)** execute development tasks, report completion in Notion, and log issues/questions in the Issues & Suggestions database
+- **Kiano (Human Operator)** handles physical-world tasks (account setup, domain purchase, deployments) and responds to "Question for Kiano" entries
+- If you are **blocked** by a dependency (e.g., waiting for Kiano to provide credentials), set the task status to "Blocked", log a "Question for Kiano" in Issues & Suggestions, and move to the next available task
+- If you encounter a **technical decision** not covered in this file, log it as "Decision Needed" in Issues & Suggestions before proceeding
 
 ### Task File Mirror (Backup)
 As a backup in case Notion is inaccessible, the active task should also be mirrored in:
