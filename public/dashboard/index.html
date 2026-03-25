@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — DocuExtract</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --bg-card: #161b27;
+      --bg-code: #1e2435;
+      --border: #2a3147;
+      --text: #e2e8f0;
+      --text-muted: #8892a4;
+      --accent: #6c8ef5;
+      --accent-dim: #3d5099;
+      --accent-hover: #5a7ef0;
+      --green: #4ade80;
+      --green-bg: rgba(74,222,128,0.1);
+      --red: #f87171;
+      --red-bg: rgba(248,113,113,0.1);
+      --yellow: #facc15;
+      --orange: #fb923c;
+      --purple: #c084fc;
+      --sidebar-width: 240px;
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'SF Mono', 'Fira Code', Consolas, monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font-sans); background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.6; min-height: 100vh; }
+
+    /* ── Auth view ── */
+    #auth-view {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: radial-gradient(ellipse at 50% 0%, rgba(108,142,245,0.08) 0%, transparent 70%);
+    }
+
+    .auth-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .auth-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .auth-logo span { font-size: 17px; font-weight: 700; color: var(--text); }
+
+    .auth-tabs {
+      display: flex;
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 4px;
+      margin-bottom: 24px;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      background: none;
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 500;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .auth-tab.active { background: var(--bg-card); color: var(--text); }
+
+    .auth-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+    .auth-sub { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
+
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+    .field input {
+      width: 100%;
+      padding: 11px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: var(--font-sans);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .field input:focus { border-color: var(--accent); }
+    .field input::placeholder { color: var(--text-muted); }
+
+    .btn-full {
+      width: 100%;
+      padding: 12px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-top: 4px;
+    }
+    .btn-full:hover:not(:disabled) { background: var(--accent-hover); }
+    .btn-full:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .auth-error {
+      margin-top: 14px;
+      padding: 10px 14px;
+      background: var(--red-bg);
+      border: 1px solid rgba(248,113,113,0.25);
+      border-radius: 8px;
+      color: var(--red);
+      font-size: 13px;
+      display: none;
+    }
+
+    .auth-success {
+      margin-top: 14px;
+      padding: 10px 14px;
+      background: var(--green-bg);
+      border: 1px solid rgba(74,222,128,0.25);
+      border-radius: 8px;
+      color: var(--green);
+      font-size: 13px;
+      display: none;
+    }
+
+    /* ── App view ── */
+    #app-view { display: none; min-height: 100vh; }
+
+    /* ── Topbar ── */
+    .topbar {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      height: 56px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topbar-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text);
+      flex-shrink: 0;
+    }
+
+    .topbar-logo .logo-icon { width: 26px; height: 26px; font-size: 13px; }
+
+    .topbar-user {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-email { font-size: 13px; color: var(--text-muted); }
+
+    .btn-signout {
+      padding: 6px 12px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      transition: color 0.15s, background 0.15s;
+    }
+    .btn-signout:hover { color: var(--text); background: rgba(255,255,255,0.1); }
+
+    /* ── Layout ── */
+    .app-layout {
+      display: flex;
+      min-height: calc(100vh - 56px);
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      padding: 20px 0;
+      flex-shrink: 0;
+      position: sticky;
+      top: 56px;
+      height: calc(100vh - 56px);
+      overflow-y: auto;
+    }
+
+    .sidebar-section { margin-bottom: 4px; }
+    .sidebar-label {
+      padding: 6px 20px 4px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 20px;
+      color: var(--text-muted);
+      font-size: 14px;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      font-family: var(--font-sans);
+      border-radius: 0;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+    .nav-item.active { color: var(--text); background: rgba(108,142,245,0.1); border-right: 2px solid var(--accent); }
+    .nav-item .nav-icon { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
+
+    .sidebar-docs {
+      margin-top: auto;
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      margin-top: 20px;
+    }
+
+    .sidebar-docs a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      font-size: 13px;
+      text-decoration: none;
+    }
+    .sidebar-docs a:hover { color: var(--accent); }
+
+    /* ── Content ── */
+    .content {
+      flex: 1;
+      padding: 32px;
+      overflow-x: hidden;
+      min-width: 0;
+    }
+
+    /* ── Page header ── */
+    .page-header { margin-bottom: 28px; }
+    .page-header h1 { font-size: 22px; font-weight: 700; }
+    .page-header p { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
+
+    /* ── Stats grid ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .stat-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+    .stat-value { font-size: 28px; font-weight: 700; line-height: 1; }
+    .stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+
+    .stat-bar-wrap { margin-top: 10px; }
+    .stat-bar { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .stat-bar-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.5s; }
+    .stat-bar-fill.warn { background: var(--yellow); }
+    .stat-bar-fill.danger { background: var(--red); }
+
+    /* ── Card ── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .card-title { font-size: 14px; font-weight: 600; }
+    .card-sub { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+    .card-body { padding: 20px; }
+
+    /* ── API key display ── */
+    .key-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .key-display {
+      flex: 1;
+      padding: 11px 14px;
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      min-width: 0;
+    }
+
+    .btn-sm {
+      padding: 8px 14px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.15s, background 0.15s;
+      flex-shrink: 0;
+    }
+    .btn-sm:hover { color: var(--text); background: rgba(255,255,255,0.1); }
+    .btn-sm.success { color: var(--green); border-color: var(--green); }
+    .btn-sm.danger { color: var(--red); border-color: rgba(248,113,113,0.4); background: var(--red-bg); }
+
+    .key-warning {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* ── Code snippet ── */
+    pre.snippet {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 16px 18px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.7;
+      overflow-x: auto;
+      white-space: pre;
+      color: #86efac;
+      position: relative;
+    }
+
+    .snippet-copy {
+      position: absolute;
+      top: 10px; right: 10px;
+      padding: 4px 10px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+    .snippet-copy:hover { color: var(--text); }
+
+    /* ── Usage chart ── */
+    .chart-wrap {
+      overflow-x: auto;
+      padding: 4px 0 8px;
+    }
+
+    .chart-svg { display: block; }
+
+    /* ── Usage table ── */
+    .usage-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .usage-table th {
+      text-align: left;
+      padding: 10px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .usage-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(42,49,71,0.5);
+      vertical-align: middle;
+    }
+
+    .usage-table tr:last-child td { border-bottom: none; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .badge-success { background: var(--green-bg); color: var(--green); }
+    .badge-error { background: var(--red-bg); color: var(--red); }
+    .badge-limited { background: rgba(250,204,21,0.1); color: var(--yellow); }
+    .badge-type { background: rgba(108,142,245,0.12); color: var(--accent); }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    /* ── Billing plans ── */
+    .plans-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+    }
+
+    .plan-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      transition: border-color 0.2s;
+    }
+
+    .plan-card.current {
+      border-color: var(--accent);
+      background: rgba(108,142,245,0.06);
+    }
+
+    .plan-name { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+    .plan-price { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+    .plan-price span { font-size: 13px; font-weight: 400; color: var(--text-muted); }
+    .plan-limit { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; }
+
+    .badge-current {
+      display: inline-block;
+      padding: 2px 8px;
+      background: rgba(108,142,245,0.15);
+      color: var(--accent);
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .btn-plan {
+      width: 100%;
+      padding: 9px;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      transition: background 0.15s, opacity 0.15s;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+    }
+
+    .btn-plan:hover:not(:disabled) { background: rgba(255,255,255,0.12); }
+    .btn-plan.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn-plan.primary:hover:not(:disabled) { background: var(--accent-hover); }
+    .btn-plan:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .billing-portal-row {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .billing-portal-row p { font-size: 13px; color: var(--text-muted); }
+
+    /* ── Spinner ── */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: var(--text);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+    }
+
+    /* ── Loading screen ── */
+    #loading-view {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      flex-direction: column;
+      gap: 16px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    /* ── Section visibility ── */
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .content { padding: 20px 16px; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .auth-box { padding: 28px 20px; }
+      .plans-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Loading -->
+<div id="loading-view">
+  <div class="spinner" style="width:24px;height:24px;border-width:3px;"></div>
+  Loading…
+</div>
+
+<!-- Auth view -->
+<div id="auth-view" style="display:none;">
+  <div class="auth-box">
+    <a href="/" class="auth-logo">
+      <div class="logo-icon">📄</div>
+      <span>DocuExtract</span>
+    </a>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Sign In</button>
+      <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Create Account</button>
+    </div>
+
+    <!-- Login form -->
+    <div id="login-form">
+      <h2 class="auth-title">Welcome back</h2>
+      <p class="auth-sub">Sign in to your DocuExtract account.</p>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="you@example.com" />
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="••••••••"
+               onkeydown="if(event.key==='Enter') doLogin()" />
+      </div>
+      <button class="btn-full" id="login-btn" onclick="doLogin()">Sign In</button>
+      <div class="auth-error" id="login-error"></div>
+    </div>
+
+    <!-- Signup form -->
+    <div id="signup-form" style="display:none;">
+      <h2 class="auth-title">Get started free</h2>
+      <p class="auth-sub">100 free extractions/month. No credit card required.</p>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="signup-email" placeholder="you@example.com" />
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="signup-password" placeholder="At least 8 characters"
+               onkeydown="if(event.key==='Enter') doSignup()" />
+      </div>
+      <button class="btn-full" id="signup-btn" onclick="doSignup()">Create Account</button>
+      <div class="auth-error" id="signup-error"></div>
+      <div class="auth-success" id="signup-success"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- App view -->
+<div id="app-view">
+  <!-- Topbar -->
+  <div class="topbar">
+    <a href="/" class="topbar-logo">
+      <div class="logo-icon">📄</div>
+      DocuExtract
+    </a>
+    <div class="topbar-user">
+      <span class="user-email" id="user-email"></span>
+      <button class="btn-signout" onclick="doSignOut()">Sign out</button>
+    </div>
+  </div>
+
+  <!-- Layout -->
+  <div class="app-layout">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Account</div>
+        <button class="nav-item active" id="nav-home" onclick="showSection('home')">
+          <span class="nav-icon">🏠</span> Overview
+        </button>
+        <button class="nav-item" id="nav-keys" onclick="showSection('keys')">
+          <span class="nav-icon">🔑</span> API Keys
+        </button>
+        <button class="nav-item" id="nav-usage" onclick="showSection('usage')">
+          <span class="nav-icon">📊</span> Usage
+        </button>
+        <button class="nav-item" id="nav-billing" onclick="showSection('billing')">
+          <span class="nav-icon">💳</span> Billing
+        </button>
+      </div>
+      <div class="sidebar-docs">
+        <a href="/playground/">🎮 Playground</a>
+        <a href="/docs/" style="margin-top:10px;">📖 Documentation</a>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+
+      <!-- Home section -->
+      <div class="section active" id="section-home">
+        <div class="page-header">
+          <h1>Overview</h1>
+          <p>Your DocuExtract account at a glance.</p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Extractions this month</div>
+            <div class="stat-value" id="stat-used">—</div>
+            <div class="stat-sub" id="stat-limit-sub">of — included</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar">
+                <div class="stat-bar-fill" id="stat-bar-fill" style="width:0%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Current Plan</div>
+            <div class="stat-value" id="stat-plan" style="font-size:20px;text-transform:capitalize;">—</div>
+            <div class="stat-sub">Resets monthly</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Period End</div>
+            <div class="stat-value" id="stat-period" style="font-size:18px;">—</div>
+            <div class="stat-sub">Next billing date</div>
+          </div>
+        </div>
+
+        <!-- Quick start -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Quick Start</div>
+              <div class="card-sub">Make your first API call with your API key pre-filled.</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+              <button class="btn-sm active" id="qs-curl-tab" onclick="showQS('curl')" style="background:rgba(108,142,245,0.15);color:var(--accent);border-color:var(--accent);">curl</button>
+              <button class="btn-sm" id="qs-js-tab" onclick="showQS('js')">JavaScript</button>
+              <button class="btn-sm" id="qs-py-tab" onclick="showQS('py')">Python</button>
+            </div>
+            <div style="position:relative;">
+              <pre class="snippet" id="qs-curl">curl https://docuextract-azure.vercel.app/v1/extract \
+  -H "Authorization: Bearer <span id="qs-key-curl">YOUR_API_KEY</span>" \
+  -H "Content-Type: application/json" \
+  -d '{"document":"https://example.com/invoice.pdf","type":"invoice"}'</pre>
+              <pre class="snippet" id="qs-js" style="display:none;">import DocuExtract from 'docuextract';
+
+const dex = new DocuExtract('<span id="qs-key-js">YOUR_API_KEY</span>');
+const result = await dex.extract('https://example.com/invoice.pdf', {
+  type: 'invoice'
+});
+console.log(result.data);</pre>
+              <pre class="snippet" id="qs-py" style="display:none;">from docuextract import DocuExtract
+
+dex = DocuExtract('<span id="qs-key-py">YOUR_API_KEY</span>')
+result = dex.extract('https://example.com/invoice.pdf', type='invoice')
+print(result.data)</pre>
+              <button class="snippet-copy" onclick="copyQS()">Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- API Keys section -->
+      <div class="section" id="section-keys">
+        <div class="page-header">
+          <h1>API Keys</h1>
+          <p>Use your API key to authenticate requests. Keep it secret.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Your API Key</div>
+              <div class="card-sub">Include in the Authorization header as a Bearer token.</div>
+            </div>
+            <button class="btn-sm" id="reveal-btn" onclick="toggleReveal()">Show</button>
+          </div>
+          <div class="card-body">
+            <div class="key-row">
+              <div class="key-display" id="key-display">dex_live_••••••••••••••••••••••••••••••••••••••••••••••••••</div>
+              <button class="btn-sm" id="copy-key-btn" onclick="copyKey()">Copy</button>
+            </div>
+            <p class="key-warning" style="margin-top:14px;">
+              ⚠️ Treat your API key like a password. Never expose it in client-side code or public repos.
+            </p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Regenerate Key</div>
+              <div class="card-sub">Generate a new API key. Your current key will be permanently invalidated.</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <button class="btn-sm danger" id="regen-btn" onclick="confirmRegen()">Regenerate API Key</button>
+            <p class="key-warning" style="margin-top:12px;">
+              Any integrations using your current key will stop working immediately. Update them with the new key.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Usage section -->
+      <div class="section" id="section-usage">
+        <div class="page-header">
+          <h1>Usage</h1>
+          <p>Extractions this billing period.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Daily Extractions</div>
+          </div>
+          <div class="card-body">
+            <div class="chart-wrap">
+              <svg class="chart-svg" id="usage-chart" width="700" height="160"></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Recent Calls</div>
+          </div>
+          <div id="usage-table-wrap">
+            <div class="empty-state">Loading…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Billing section -->
+      <div class="section" id="section-billing">
+        <div class="page-header">
+          <h1>Billing</h1>
+          <p>Manage your plan and payment method.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Plans</div>
+          </div>
+          <div class="card-body">
+            <div class="plans-grid" id="plans-grid">
+              <!-- Populated dynamically -->
+            </div>
+
+            <div class="billing-portal-row">
+              <p>Need to update your payment method or download invoices?</p>
+              <button class="btn-sm" onclick="openBillingPortal()">Manage Billing →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /app-layout -->
+</div><!-- /app-view -->
+
+<script>
+// ── Config ──────────────────────────────────────────────────────────────────
+const SUPABASE_URL  = 'https://jdvogyzrawcwxlrambpd.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impkdm9neXpyYXdjd3hscmFtYnBkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNTEzMzYsImV4cCI6MjA4OTkyNzMzNn0.6GTbR0nAq5LjhAULpvfI6X1mLWtyfqPP6oSbNXyXLMo';
+const API_BASE      = 'https://docuextract-azure.vercel.app/v1';
+
+const PLANS = [
+  { id: 'free',    name: 'Free',    price: '$0',   period: '',     limit: '100/mo',   extractions: 100 },
+  { id: 'starter', name: 'Starter', price: '$49',  period: '/mo',  limit: '2,500/mo', extractions: 2500 },
+  { id: 'pro',     name: 'Pro',     price: '$99',  period: '/mo',  limit: '10,000/mo',extractions: 10000 },
+  { id: 'scale',   name: 'Scale',   price: '$249', period: '/mo',  limit: '50,000/mo',extractions: 50000 },
+];
+
+// ── Supabase client ──────────────────────────────────────────────────────────
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// ── App state ────────────────────────────────────────────────────────────────
+let currentUser    = null;
+let userProfile    = null;  // row from public.users
+let usageData      = [];    // rows from api_usage
+let keyRevealed    = false;
+
+// ── Bootstrap ────────────────────────────────────────────────────────────────
+async function boot() {
+  const { data: { session } } = await db.auth.getSession();
+  if (session) {
+    await loadApp(session.user);
+  } else {
+    showView('auth');
+  }
+
+  db.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      await loadApp(session.user);
+    } else if (event === 'SIGNED_OUT') {
+      showView('auth');
+    }
+  });
+}
+
+async function loadApp(user) {
+  currentUser = user;
+  document.getElementById('user-email').textContent = user.email;
+  showView('app');
+
+  // Load profile + usage in parallel
+  await Promise.all([loadProfile(), loadUsage()]);
+  renderHome();
+  renderKeys();
+  renderBilling();
+}
+
+// ── Data loaders ─────────────────────────────────────────────────────────────
+async function loadProfile() {
+  const { data, error } = await db
+    .from('users')
+    .select('api_key, plan, monthly_limit, stripe_customer_id, stripe_subscription_id, created_at')
+    .eq('id', currentUser.id)
+    .single();
+
+  if (!error && data) userProfile = data;
+}
+
+async function loadUsage() {
+  const start = new Date();
+  start.setDate(1); start.setHours(0,0,0,0);
+
+  const { data, error } = await db
+    .from('api_usage')
+    .select('endpoint, document_type, model_used, processing_time_ms, confidence_score, status, created_at')
+    .eq('user_id', currentUser.id)
+    .gte('created_at', start.toISOString())
+    .order('created_at', { ascending: false })
+    .limit(200);
+
+  if (!error && data) usageData = data;
+}
+
+// ── Render home ───────────────────────────────────────────────────────────────
+function renderHome() {
+  if (!userProfile) return;
+
+  const successCount = usageData.filter(r => r.status === 'success').length;
+  const limit = userProfile.monthly_limit;
+  const pct = Math.min(100, (successCount / limit) * 100);
+
+  document.getElementById('stat-used').textContent = successCount.toLocaleString();
+  document.getElementById('stat-limit-sub').textContent = `of ${limit.toLocaleString()} included`;
+  document.getElementById('stat-plan').textContent = userProfile.plan;
+
+  const fill = document.getElementById('stat-bar-fill');
+  fill.style.width = pct + '%';
+  fill.className = 'stat-bar-fill' + (pct > 90 ? ' danger' : pct > 70 ? ' warn' : '');
+
+  // Period end = end of current month
+  const end = new Date(); end.setMonth(end.getMonth() + 1); end.setDate(0);
+  document.getElementById('stat-period').textContent = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+  // Quick start code snippets — inject actual API key
+  const key = userProfile.api_key;
+  ['curl', 'js', 'py'].forEach(id => {
+    const el = document.getElementById(`qs-key-${id}`);
+    if (el) el.textContent = key;
+  });
+}
+
+// ── Render keys ───────────────────────────────────────────────────────────────
+function renderKeys() {
+  if (!userProfile) return;
+  updateKeyDisplay();
+}
+
+function updateKeyDisplay() {
+  const el = document.getElementById('key-display');
+  if (!userProfile) return;
+  const key = userProfile.api_key;
+  el.textContent = keyRevealed ? key : key.replace(/(?<=dex_live_).+/, '•'.repeat(40));
+}
+
+function toggleReveal() {
+  keyRevealed = !keyRevealed;
+  document.getElementById('reveal-btn').textContent = keyRevealed ? 'Hide' : 'Show';
+  updateKeyDisplay();
+}
+
+function copyKey() {
+  if (!userProfile) return;
+  navigator.clipboard.writeText(userProfile.api_key).then(() => {
+    const btn = document.getElementById('copy-key-btn');
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('success');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('success'); }, 2000);
+  });
+}
+
+async function confirmRegen() {
+  if (!confirm('Are you sure? Your current API key will stop working immediately.')) return;
+  const btn = document.getElementById('regen-btn');
+  btn.disabled = true;
+  btn.textContent = 'Regenerating…';
+
+  const { data, error } = await db.rpc('regenerate_my_api_key');
+  if (error) {
+    alert('Failed to regenerate key: ' + error.message);
+  } else {
+    userProfile.api_key = data;
+    keyRevealed = true;
+    updateKeyDisplay();
+    document.getElementById('reveal-btn').textContent = 'Hide';
+    // Update quick start snippets
+    ['curl', 'js', 'py'].forEach(id => {
+      const el = document.getElementById(`qs-key-${id}`);
+      if (el) el.textContent = data;
+    });
+    alert('New API key generated. Update your integrations now.');
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Regenerate API Key';
+}
+
+// ── Quick start ───────────────────────────────────────────────────────────────
+let activeQS = 'curl';
+function showQS(lang) {
+  ['curl','js','py'].forEach(id => {
+    document.getElementById(`qs-${id}`).style.display = id === lang ? 'block' : 'none';
+    const tab = document.getElementById(`qs-${id}-tab`);
+    if (id === lang) {
+      tab.style.background = 'rgba(108,142,245,0.15)';
+      tab.style.color = 'var(--accent)';
+      tab.style.borderColor = 'var(--accent)';
+    } else {
+      tab.style.background = '';
+      tab.style.color = '';
+      tab.style.borderColor = '';
+    }
+  });
+  activeQS = lang;
+}
+
+function copyQS() {
+  const pre = document.getElementById(`qs-${activeQS}`);
+  navigator.clipboard.writeText(pre.textContent);
+}
+
+// ── Render usage ──────────────────────────────────────────────────────────────
+function renderUsage() {
+  renderChart();
+  renderUsageTable();
+}
+
+function renderChart() {
+  // Build daily counts
+  const now = new Date();
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const today = now.getDate();
+
+  const counts = {};
+  usageData.filter(r => r.status === 'success').forEach(r => {
+    const d = new Date(r.created_at).getDate();
+    counts[d] = (counts[d] || 0) + 1;
+  });
+
+  const maxVal = Math.max(1, ...Object.values(counts));
+  const svgW = Math.max(700, daysInMonth * 28);
+  const svgH = 160;
+  const barW = Math.max(16, svgW / daysInMonth - 6);
+  const maxBarH = 90;
+  const baseY = 120;
+
+  const svg = document.getElementById('usage-chart');
+  svg.setAttribute('width', svgW);
+  svg.setAttribute('viewBox', `0 0 ${svgW} ${svgH}`);
+  svg.innerHTML = '';
+
+  // Grid lines
+  for (let i = 0; i <= 4; i++) {
+    const y = baseY - (maxBarH * i / 4);
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', 0); line.setAttribute('x2', svgW);
+    line.setAttribute('y1', y); line.setAttribute('y2', y);
+    line.setAttribute('stroke', '#2a3147'); line.setAttribute('stroke-width', '1');
+    svg.appendChild(line);
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const count = counts[day] || 0;
+    const barH = count > 0 ? Math.max(4, (count / maxVal) * maxBarH) : 2;
+    const x = ((day - 1) / daysInMonth) * svgW + (svgW / daysInMonth - barW) / 2;
+    const y = baseY - barH;
+    const isPast = day <= today;
+
+    // Bar
+    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', x); rect.setAttribute('y', y);
+    rect.setAttribute('width', barW); rect.setAttribute('height', barH);
+    rect.setAttribute('rx', 3);
+    rect.setAttribute('fill', isPast ? (count > 0 ? '#6c8ef5' : '#2a3147') : '#1e2435');
+    if (count > 0) {
+      rect.setAttribute('title', `Day ${day}: ${count}`);
+    }
+    svg.appendChild(rect);
+
+    // Day label (every 5 days)
+    if (day === 1 || day % 5 === 0 || day === today) {
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', x + barW / 2);
+      text.setAttribute('y', baseY + 16);
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('font-size', '10');
+      text.setAttribute('fill', '#8892a4');
+      text.setAttribute('font-family', 'var(--font-sans)');
+      text.textContent = day;
+      svg.appendChild(text);
+    }
+  }
+}
+
+function renderUsageTable() {
+  const wrap = document.getElementById('usage-table-wrap');
+  const recent = usageData.slice(0, 50);
+
+  if (recent.length === 0) {
+    wrap.innerHTML = '<div class="empty-state">No API calls this month. Make your first extraction to see data here.</div>';
+    return;
+  }
+
+  const rows = recent.map(r => {
+    const dt = new Date(r.created_at);
+    const time = dt.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    const statusBadge = r.status === 'success' ? 'badge-success' : r.status === 'rate_limited' ? 'badge-limited' : 'badge-error';
+    const type = r.document_type ? `<span class="badge badge-type">${fmt(r.document_type)}</span>` : '—';
+    const model = r.model_used.includes('haiku') ? 'Haiku' : r.model_used.includes('sonnet') ? 'Sonnet' : r.model_used;
+    const ms = r.processing_time_ms != null ? `${r.processing_time_ms}ms` : '—';
+    return `<tr>
+      <td>${time}</td>
+      <td>${type}</td>
+      <td>${model}</td>
+      <td><span class="badge ${statusBadge}">${r.status.replace('_', ' ')}</span></td>
+      <td style="color:var(--text-muted)">${ms}</td>
+    </tr>`;
+  }).join('');
+
+  wrap.innerHTML = `<table class="usage-table">
+    <thead><tr>
+      <th>Time</th><th>Type</th><th>Model</th><th>Status</th><th>Time</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function fmt(s) { return s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()); }
+
+// ── Render billing ────────────────────────────────────────────────────────────
+function renderBilling() {
+  if (!userProfile) return;
+  const current = userProfile.plan;
+  const grid = document.getElementById('plans-grid');
+
+  grid.innerHTML = PLANS.map(p => {
+    const isCurrent = p.id === current;
+    const isDowngrade = PLANS.findIndex(x => x.id === p.id) < PLANS.findIndex(x => x.id === current);
+    const label = isCurrent ? 'Current Plan' : p.id === 'free' ? 'Downgrade' : 'Upgrade';
+    const btnClass = isCurrent ? '' : (isDowngrade ? '' : 'primary');
+    return `<div class="plan-card ${isCurrent ? 'current' : ''}">
+      <div class="plan-name">${p.name}</div>
+      <div class="plan-price">${p.price}<span>${p.period}</span></div>
+      <div class="plan-limit">${p.limit} extractions</div>
+      ${isCurrent ? '<div class="badge-current">Current Plan</div>' : ''}
+      <button class="btn-plan ${btnClass}"
+              ${isCurrent ? 'disabled' : ''}
+              onclick="selectPlan('${p.id}')">
+        ${label}
+      </button>
+    </div>`;
+  }).join('');
+}
+
+async function selectPlan(planId) {
+  if (!userProfile) return;
+  if (planId === userProfile.plan) return;
+  if (planId === 'free') {
+    alert('To downgrade to Free, please contact support.');
+    return;
+  }
+
+  const btn = event.currentTarget || document.querySelector(`[onclick="selectPlan('${planId}')"]`);
+  if (btn) { btn.disabled = true; btn.textContent = 'Loading…'; }
+
+  try {
+    const resp = await fetch(`${API_BASE}/billing/checkout`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${userProfile.api_key}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ plan: planId }),
+    });
+    const data = await resp.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert(data.message || 'Failed to create checkout session.');
+    }
+  } catch {
+    alert('Network error. Please try again.');
+  }
+
+  renderBilling();
+}
+
+async function openBillingPortal() {
+  if (!userProfile) return;
+  const btn = event.currentTarget;
+  btn.disabled = true; btn.textContent = 'Loading…';
+
+  try {
+    const resp = await fetch(`${API_BASE}/billing/portal`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${userProfile.api_key}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    const data = await resp.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert(data.message || 'Billing portal not available. Upgrade to a paid plan first.');
+    }
+  } catch {
+    alert('Network error. Please try again.');
+  }
+
+  btn.disabled = false; btn.textContent = 'Manage Billing →';
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function showSection(name) {
+  ['home','keys','usage','billing'].forEach(s => {
+    document.getElementById(`section-${s}`).classList.toggle('active', s === name);
+    document.getElementById(`nav-${s}`).classList.toggle('active', s === name);
+  });
+  if (name === 'usage') renderUsage();
+}
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+let authTab = 'login';
+
+function switchAuthTab(tab) {
+  authTab = tab;
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+  document.getElementById('login-form').style.display = tab === 'login' ? '' : 'none';
+  document.getElementById('signup-form').style.display = tab === 'signup' ? '' : 'none';
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+  const btn   = document.getElementById('login-btn');
+  errEl.style.display = 'none';
+  btn.disabled = true; btn.textContent = 'Signing in…';
+
+  const { error } = await db.auth.signInWithPassword({ email, password: pass });
+  if (error) {
+    errEl.textContent = error.message;
+    errEl.style.display = 'block';
+  }
+  btn.disabled = false; btn.textContent = 'Sign In';
+}
+
+async function doSignup() {
+  const email = document.getElementById('signup-email').value.trim();
+  const pass  = document.getElementById('signup-password').value;
+  const errEl = document.getElementById('signup-error');
+  const sucEl = document.getElementById('signup-success');
+  const btn   = document.getElementById('signup-btn');
+  errEl.style.display = 'none'; sucEl.style.display = 'none';
+  btn.disabled = true; btn.textContent = 'Creating account…';
+
+  const { error } = await db.auth.signUp({ email, password: pass });
+  if (error) {
+    errEl.textContent = error.message;
+    errEl.style.display = 'block';
+  } else {
+    sucEl.textContent = 'Account created! Check your email to confirm, then sign in.';
+    sucEl.style.display = 'block';
+  }
+  btn.disabled = false; btn.textContent = 'Create Account';
+}
+
+async function doSignOut() {
+  await db.auth.signOut();
+}
+
+// ── View management ───────────────────────────────────────────────────────────
+function showView(name) {
+  document.getElementById('loading-view').style.display = 'none';
+  document.getElementById('auth-view').style.display  = name === 'auth'  ? '' : 'none';
+  document.getElementById('app-view').style.display   = name === 'app'   ? '' : 'none';
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+boot();
+</script>
+
+</body>
+</html>
