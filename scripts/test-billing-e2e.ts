@@ -61,8 +61,8 @@ async function createTestUser(): Promise<{ userId: string; apiKey: string }> {
   const userId = authData.user.id;
   const apiKey = `dk_test_${crypto.randomBytes(24).toString('hex')}`;
 
-  // Explicit upsert so the test always has a known API key regardless of
-  // whether the trigger fired (ON CONFLICT updates the key if trigger ran first)
+  // Upsert into public.users — if trigger already ran, ON CONFLICT DO NOTHING
+  // means the trigger's key wins; if trigger didn't run, our key is inserted.
   const { error: upsertError } = await supabase.rpc('create_user_with_api_key', {
     p_user_id: userId,
     p_email: email,
@@ -70,8 +70,17 @@ async function createTestUser(): Promise<{ userId: string; apiKey: string }> {
   });
   if (upsertError) throw new Error(`public.users upsert failed: ${upsertError.message}`);
 
+  // Always read the actual key back — the trigger may have stored a different one
+  const { data: userData, error: fetchError } = await supabase
+    .from('users')
+    .select('api_key')
+    .eq('id', userId)
+    .single();
+  if (fetchError) throw new Error(`Failed to fetch actual API key: ${fetchError.message}`);
+
+  const actualApiKey = (userData as { api_key: string }).api_key;
   pass(`User created: ${userId}`);
-  return { userId, apiKey };
+  return { userId, apiKey: actualApiKey };
 }
 
 // ─── Step 2: Verify /v1/health ────────────────────────────────────────────────
