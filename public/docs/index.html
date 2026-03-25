@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DocuExtract API Documentation</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --bg-card: #161b27;
+      --bg-code: #1e2435;
+      --border: #2a3147;
+      --text: #e2e8f0;
+      --text-muted: #8892a4;
+      --accent: #6c8ef5;
+      --accent-dim: #3d5099;
+      --green: #4ade80;
+      --red: #f87171;
+      --yellow: #facc15;
+      --orange: #fb923c;
+      --purple: #c084fc;
+      --sidebar-width: 260px;
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'SF Mono', 'Fira Code', Consolas, monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    /* ── Layout ── */
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      overflow-y: auto;
+      padding: 24px 0;
+      z-index: 10;
+    }
+
+    .sidebar-logo {
+      padding: 0 20px 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .sidebar-logo a {
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .logo-text {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .logo-badge {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 400;
+      margin-top: 1px;
+    }
+
+    .nav-group {
+      padding: 0 12px;
+      margin-bottom: 8px;
+    }
+
+    .nav-group-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      padding: 6px 8px;
+      margin-bottom: 2px;
+    }
+
+    .nav-link {
+      display: block;
+      padding: 6px 8px;
+      border-radius: 6px;
+      text-decoration: none;
+      color: var(--text-muted);
+      font-size: 14px;
+      transition: all 0.15s;
+    }
+
+    .nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+    .nav-link.active { color: var(--accent); background: rgba(108,142,245,0.1); }
+
+    .nav-method {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 3px;
+      margin-right: 6px;
+    }
+    .method-get  { background: rgba(74,222,128,0.15); color: var(--green); }
+    .method-post { background: rgba(108,142,245,0.15); color: var(--accent); }
+
+    /* ── Main Content ── */
+    .main {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      max-width: 860px;
+      padding: 48px 56px 120px;
+    }
+
+    section {
+      padding-top: 80px;
+      margin-top: -80px;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 40px 0 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      margin: 28px 0 10px;
+    }
+
+    p {
+      color: #b4bfcc;
+      margin-bottom: 16px;
+      line-height: 1.7;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Callouts ── */
+    .callout {
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin: 20px 0;
+      font-size: 14px;
+      border-left: 3px solid;
+    }
+
+    .callout-info { background: rgba(108,142,245,0.08); border-color: var(--accent); }
+    .callout-warn { background: rgba(250,204,21,0.08); border-color: var(--yellow); color: #d4ae20; }
+    .callout-tip  { background: rgba(74,222,128,0.08); border-color: var(--green); }
+
+    .callout strong { display: block; margin-bottom: 4px; }
+
+    /* ── Code blocks ── */
+    .code-block {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin: 16px 0;
+      overflow: hidden;
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: rgba(255,255,255,0.02);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .code-lang {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .copy-btn {
+      font-size: 12px;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: all 0.15s;
+    }
+    .copy-btn:hover { color: var(--text); background: rgba(255,255,255,0.1); }
+
+    pre {
+      padding: 18px 20px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    code { font-family: var(--font-mono); font-size: 0.9em; }
+
+    p code, li code {
+      background: var(--bg-code);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #c9d1e0;
+      border: 1px solid var(--border);
+    }
+
+    /* ── Syntax colors ── */
+    .kw  { color: #c084fc; }   /* keyword */
+    .str { color: #86efac; }   /* string */
+    .num { color: #fdba74; }   /* number */
+    .cmt { color: #4b5e7e; font-style: italic; }  /* comment */
+    .fn  { color: #93c5fd; }   /* function */
+    .key { color: #6c8ef5; }   /* json key */
+    .url { color: #fdba74; }   /* url/path */
+    .hdr { color: #a5b4fc; }   /* header */
+    .val { color: #86efac; }   /* value */
+    .mt  { color: #94a3b8; }   /* meta */
+
+    /* ── Tabs ── */
+    .tabs {
+      margin: 16px 0;
+    }
+
+    .tab-list {
+      display: flex;
+      gap: 4px;
+      padding: 0 0 0 2px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0;
+    }
+
+    .tab-btn {
+      font-size: 13px;
+      padding: 7px 14px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      border-radius: 6px 6px 0 0;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+      margin-bottom: -1px;
+    }
+
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .tab-panel .code-block { border-radius: 0 8px 8px 8px; margin-top: 0; }
+
+    /* ── Tables ── */
+    .table-wrap { overflow-x: auto; margin: 16px 0; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th {
+      text-align: left;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.03);
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      vertical-align: top;
+    }
+
+    td code { font-size: 12px; }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* ── Endpoint header ── */
+    .endpoint-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      margin: 16px 0 24px;
+    }
+
+    .badge-method {
+      font-weight: 700;
+      font-size: 12px;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .badge-get  { background: rgba(74,222,128,0.2); color: var(--green); }
+    .badge-post { background: rgba(108,142,245,0.2); color: var(--accent); }
+
+    .badge-path { color: var(--text); }
+
+    /* ── Error codes ── */
+    .error-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 12px 0;
+    }
+
+    .error-code {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--red);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .error-desc { color: #b4bfcc; font-size: 14px; }
+
+    /* ── Pricing table ── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .plan-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    .plan-card.featured { border-color: var(--accent-dim); }
+
+    .plan-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .plan-price { font-size: 24px; font-weight: 800; color: var(--text); margin-bottom: 2px; }
+    .plan-price span { font-size: 13px; font-weight: 400; color: var(--text-muted); }
+    .plan-calls { font-size: 13px; color: var(--text-muted); margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+    .plan-features { list-style: none; }
+    .plan-features li { font-size: 13px; color: #b4bfcc; padding: 3px 0; }
+    .plan-features li::before { content: '✓ '; color: var(--green); }
+
+    /* ── Steps ── */
+    .steps { counter-reset: step; }
+
+    .step {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .step-num {
+      width: 32px; height: 32px;
+      background: var(--accent-dim);
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .step-content h3 { margin-top: 0; }
+
+    /* ── Divider ── */
+    hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+    /* ── Mobile ── */
+    .menu-toggle {
+      display: none;
+      position: fixed;
+      top: 16px; left: 16px;
+      z-index: 20;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    @media (max-width: 768px) {
+      .menu-toggle { display: flex; align-items: center; }
+      .sidebar { transform: translateX(-100%); transition: transform 0.2s; }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; padding: 56px 20px 80px; }
+      .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+      h1 { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<div class="layout">
+
+  <!-- ── Sidebar ── -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <a href="#introduction">
+        <div class="logo-icon">📄</div>
+        <div>
+          <div class="logo-text">DocuExtract</div>
+          <div class="logo-badge">API Reference v1</div>
+        </div>
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Getting Started</div>
+      <a href="#introduction" class="nav-link active">Introduction</a>
+      <a href="#quickstart" class="nav-link">Quick Start</a>
+      <a href="#authentication" class="nav-link">Authentication</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Endpoints</div>
+      <a href="#extract" class="nav-link">
+        <span class="nav-method method-post">POST</span>/v1/extract
+      </a>
+      <a href="#detect" class="nav-link">
+        <span class="nav-method method-post">POST</span>/v1/detect
+      </a>
+      <a href="#usage" class="nav-link">
+        <span class="nav-method method-get">GET</span>/v1/usage
+      </a>
+      <a href="#health" class="nav-link">
+        <span class="nav-method method-get">GET</span>/v1/health
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Billing</div>
+      <a href="#checkout" class="nav-link">
+        <span class="nav-method method-post">POST</span>/v1/billing/checkout
+      </a>
+      <a href="#portal" class="nav-link">
+        <span class="nav-method method-post">POST</span>/v1/billing/portal
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Reference</div>
+      <a href="#document-types" class="nav-link">Document Types</a>
+      <a href="#errors" class="nav-link">Error Codes</a>
+      <a href="#pricing" class="nav-link">Pricing</a>
+    </div>
+  </nav>
+
+  <!-- ── Main ── -->
+  <main class="main">
+
+    <!-- Introduction -->
+    <section id="introduction">
+      <h1>DocuExtract API</h1>
+      <p>Send a document, get JSON back. No templates. No training. Works in 5 minutes.</p>
+      <p>DocuExtract converts unstructured documents — invoices, receipts, contracts, resumes, bank statements — into clean, validated JSON using Claude AI. You send a document (image, PDF, or URL), specify what you want extracted, and receive structured data in seconds.</p>
+
+      <div class="callout callout-info">
+        <strong>Base URL</strong>
+        <code>https://docuextract-azure.vercel.app/v1</code>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Feature</th><th>Detail</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Authentication</td><td>Bearer token (API key)</td></tr>
+            <tr><td>Request format</td><td>JSON (<code>Content-Type: application/json</code>)</td></tr>
+            <tr><td>Response format</td><td>JSON</td></tr>
+            <tr><td>Max file size</td><td>10 MB</td></tr>
+            <tr><td>Supported formats</td><td>PDF, PNG, JPG, WEBP (base64 or URL)</td></tr>
+            <tr><td>Default model</td><td>Claude Haiku 4.5 (fast)</td></tr>
+            <tr><td>Accurate model</td><td>Claude Sonnet 4.6 (complex documents)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <hr />
+
+    <!-- Quick Start -->
+    <section id="quickstart">
+      <h2>Quick Start</h2>
+      <p>Extract structured data from a document in 3 steps.</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h3>Get your API key</h3>
+            <p>Sign up at <a href="https://docuextract-azure.vercel.app">docuextract-azure.vercel.app</a> to get your free API key. It looks like <code>dex_live_xxxxxxxxxxxxxxxx</code>.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h3>Make your first extraction</h3>
+            <p>Send a document URL (or base64) to <code>/v1/extract</code>:</p>
+
+            <div class="tabs">
+              <div class="tab-list">
+                <button class="tab-btn active" onclick="switchTab(this, 'qs-curl')">curl</button>
+                <button class="tab-btn" onclick="switchTab(this, 'qs-js')">JavaScript</button>
+                <button class="tab-btn" onclick="switchTab(this, 'qs-py')">Python</button>
+              </div>
+
+              <div id="qs-curl" class="tab-panel active">
+                <div class="code-block">
+                  <div class="code-header">
+                    <span class="code-lang">bash</span>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                  </div>
+                  <pre><span class="fn">curl</span> <span class="url">https://docuextract-azure.vercel.app/v1/extract</span> \
+  <span class="hdr">-H</span> <span class="str">"Authorization: Bearer dex_live_YOUR_KEY"</span> \
+  <span class="hdr">-H</span> <span class="str">"Content-Type: application/json"</span> \
+  <span class="hdr">-d</span> <span class="str">'{
+    "document": "https://example.com/invoice.pdf",
+    "type": "invoice"
+  }'</span></pre>
+                </div>
+              </div>
+
+              <div id="qs-js" class="tab-panel">
+                <div class="code-block">
+                  <div class="code-header">
+                    <span class="code-lang">javascript</span>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                  </div>
+                  <pre><span class="kw">const</span> response = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'https://docuextract-azure.vercel.app/v1/extract'</span>, {
+  method: <span class="str">'POST'</span>,
+  headers: {
+    <span class="str">'Authorization'</span>: <span class="str">'Bearer dex_live_YOUR_KEY'</span>,
+    <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>,
+  },
+  body: <span class="fn">JSON.stringify</span>({
+    document: <span class="str">'https://example.com/invoice.pdf'</span>,
+    type: <span class="str">'invoice'</span>,
+  }),
+});
+
+<span class="kw">const</span> result = <span class="kw">await</span> response.<span class="fn">json</span>();
+console.<span class="fn">log</span>(result.data);
+<span class="cmt">// { vendor_name: "Acme Corp", total_amount: 1250.00, ... }</span></pre>
+                </div>
+              </div>
+
+              <div id="qs-py" class="tab-panel">
+                <div class="code-block">
+                  <div class="code-header">
+                    <span class="code-lang">python</span>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                  </div>
+                  <pre><span class="kw">import</span> requests
+
+response = requests.<span class="fn">post</span>(
+    <span class="str">'https://docuextract-azure.vercel.app/v1/extract'</span>,
+    headers={
+        <span class="str">'Authorization'</span>: <span class="str">'Bearer dex_live_YOUR_KEY'</span>,
+        <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>,
+    },
+    json={
+        <span class="str">'document'</span>: <span class="str">'https://example.com/invoice.pdf'</span>,
+        <span class="str">'type'</span>: <span class="str">'invoice'</span>,
+    }
+)
+
+result = response.<span class="fn">json</span>()
+<span class="fn">print</span>(result[<span class="str">'data'</span>])
+<span class="cmt"># {'vendor_name': 'Acme Corp', 'total_amount': 1250.0, ...}</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h3>Use the structured data</h3>
+            <p>The response contains the extracted fields, confidence score, and processing metadata:</p>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">json</span>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              </div>
+              <pre>{
+  <span class="key">"data"</span>: {
+    <span class="key">"vendor_name"</span>: <span class="str">"Acme Corp"</span>,
+    <span class="key">"invoice_number"</span>: <span class="str">"INV-2024-0847"</span>,
+    <span class="key">"invoice_date"</span>: <span class="str">"2024-03-15"</span>,
+    <span class="key">"due_date"</span>: <span class="str">"2024-04-15"</span>,
+    <span class="key">"subtotal"</span>: <span class="num">1000.00</span>,
+    <span class="key">"tax_amount"</span>: <span class="num">250.00</span>,
+    <span class="key">"total_amount"</span>: <span class="num">1250.00</span>,
+    <span class="key">"currency"</span>: <span class="str">"USD"</span>,
+    <span class="key">"line_items"</span>: [
+      { <span class="key">"description"</span>: <span class="str">"Consulting services"</span>, <span class="key">"quantity"</span>: <span class="num">10</span>, <span class="key">"unit_price"</span>: <span class="num">100.00</span>, <span class="key">"total"</span>: <span class="num">1000.00</span> }
+    ]
+  },
+  <span class="key">"metadata"</span>: {
+    <span class="key">"type"</span>: <span class="str">"invoice"</span>,
+    <span class="key">"confidence"</span>: <span class="num">0.96</span>,
+    <span class="key">"model"</span>: <span class="str">"claude-haiku-4-5-20251001"</span>,
+    <span class="key">"processing_time_ms"</span>: <span class="num">1847</span>,
+    <span class="key">"page_count"</span>: <span class="num">1</span>
+  }
+}</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr />
+
+    <!-- Authentication -->
+    <section id="authentication">
+      <h2>Authentication</h2>
+      <p>All API endpoints (except <code>GET /v1/health</code>) require authentication via a Bearer token in the <code>Authorization</code> header.</p>
+
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">http</span></div>
+        <pre><span class="hdr">Authorization: Bearer dex_live_xxxxxxxxxxxxxxxxxxxxxxxx</span></pre>
+      </div>
+
+      <h3>API Key Format</h3>
+      <p>API keys start with <code>dex_live_</code> followed by 32 random characters. Keys are generated when you sign up and can be regenerated from your dashboard.</p>
+
+      <div class="callout callout-warn">
+        <strong>Keep your API key secret</strong>
+        Never expose your API key in client-side code or public repositories. Use environment variables to store it securely.
+      </div>
+
+      <h3>Rate Limit Headers</h3>
+      <p>Every authenticated response includes rate limit information:</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Header</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>X-RateLimit-Limit-Minute</code></td><td>Maximum requests per minute for your plan</td></tr>
+            <tr><td><code>X-RateLimit-Remaining-Minute</code></td><td>Remaining requests this minute</td></tr>
+            <tr><td><code>X-RateLimit-Limit-Month</code></td><td>Maximum extractions per month for your plan</td></tr>
+            <tr><td><code>X-RateLimit-Remaining-Month</code></td><td>Remaining extractions this month</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <hr />
+
+    <!-- Extract -->
+    <section id="extract">
+      <h2>POST /v1/extract</h2>
+      <p>Extract structured data from a document. This is the core endpoint.</p>
+
+      <div class="endpoint-badge">
+        <span class="badge-method badge-post">POST</span>
+        <span class="badge-path">https://docuextract-azure.vercel.app/v1/extract</span>
+      </div>
+
+      <h3>Request Body</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>document</code></td><td>string</td><td>Yes</td><td>Document as base64-encoded string or a publicly accessible URL</td></tr>
+            <tr><td><code>type</code></td><td>string</td><td>No</td><td>Document type hint. One of: <code>invoice</code>, <code>receipt</code>, <code>bank_statement</code>, <code>resume</code>, <code>contract</code>, <code>form</code>, <code>id_document</code>. Auto-detected if omitted.</td></tr>
+            <tr><td><code>model</code></td><td>string</td><td>No</td><td><code>"fast"</code> (default) or <code>"accurate"</code>. Fast uses Claude Haiku; accurate uses Claude Sonnet for complex/multi-page documents.</td></tr>
+            <tr><td><code>schema</code></td><td>object</td><td>No</td><td>Custom JSON schema describing the fields to extract. When provided, the extraction is guided by your schema.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Examples</h3>
+
+      <div class="tabs">
+        <div class="tab-list">
+          <button class="tab-btn active" onclick="switchTab(this, 'ext-curl')">curl</button>
+          <button class="tab-btn" onclick="switchTab(this, 'ext-js')">JavaScript</button>
+          <button class="tab-btn" onclick="switchTab(this, 'ext-py')">Python</button>
+          <button class="tab-btn" onclick="switchTab(this, 'ext-schema')">Custom Schema</button>
+        </div>
+
+        <div id="ext-curl" class="tab-panel active">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="cmt"># Extract from URL</span>
+<span class="fn">curl</span> <span class="url">https://docuextract-azure.vercel.app/v1/extract</span> \
+  <span class="hdr">-H</span> <span class="str">"Authorization: Bearer dex_live_YOUR_KEY"</span> \
+  <span class="hdr">-H</span> <span class="str">"Content-Type: application/json"</span> \
+  <span class="hdr">-d</span> <span class="str">'{
+    "document": "https://example.com/receipt.jpg",
+    "type": "receipt"
+  }'</span>
+
+<span class="cmt"># Extract from base64 (accurate mode for complex docs)</span>
+<span class="fn">curl</span> <span class="url">https://docuextract-azure.vercel.app/v1/extract</span> \
+  <span class="hdr">-H</span> <span class="str">"Authorization: Bearer dex_live_YOUR_KEY"</span> \
+  <span class="hdr">-H</span> <span class="str">"Content-Type: application/json"</span> \
+  <span class="hdr">-d</span> <span class="str">'{
+    "document": "data:application/pdf;base64,JVBERi0xLj...",
+    "model": "accurate"
+  }'</span></pre>
+          </div>
+        </div>
+
+        <div id="ext-js" class="tab-panel">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">javascript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="kw">import</span> fs <span class="kw">from</span> <span class="str">'fs'</span>;
+
+<span class="cmt">// Extract from a local file (base64)</span>
+<span class="kw">const</span> fileBuffer = fs.<span class="fn">readFileSync</span>(<span class="str">'invoice.pdf'</span>);
+<span class="kw">const</span> base64 = <span class="str">`data:application/pdf;base64,<span class="kw">${</span>fileBuffer.<span class="fn">toString</span>(<span class="str">'base64'</span>)<span class="kw">}</span>`</span>;
+
+<span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'https://docuextract-azure.vercel.app/v1/extract'</span>, {
+  method: <span class="str">'POST'</span>,
+  headers: {
+    <span class="str">'Authorization'</span>: <span class="str">`Bearer <span class="kw">${</span>process.env.DOCUEXTRACT_KEY<span class="kw">}</span>`</span>,
+    <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>,
+  },
+  body: <span class="fn">JSON.stringify</span>({
+    document: base64,
+    type: <span class="str">'invoice'</span>,
+  }),
+});
+
+<span class="kw">const</span> { data, metadata } = <span class="kw">await</span> res.<span class="fn">json</span>();
+console.<span class="fn">log</span>(<span class="str">`Extracted <span class="kw">${</span>Object.<span class="fn">keys</span>(data).length<span class="kw">}</span> fields at <span class="kw">${</span>metadata.confidence * <span class="num">100</span><span class="kw">}</span>% confidence`</span>);</pre>
+          </div>
+        </div>
+
+        <div id="ext-py" class="tab-panel">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="kw">import</span> requests, base64, os
+
+<span class="cmt"># Extract from a local file (base64)</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">'invoice.pdf'</span>, <span class="str">'rb'</span>) <span class="kw">as</span> f:
+    b64 = <span class="str">'data:application/pdf;base64,'</span> + base64.<span class="fn">b64encode</span>(f.<span class="fn">read</span>()).<span class="fn">decode</span>()
+
+resp = requests.<span class="fn">post</span>(
+    <span class="str">'https://docuextract-azure.vercel.app/v1/extract'</span>,
+    headers={<span class="str">'Authorization'</span>: <span class="str">f"Bearer {os.environ['DOCUEXTRACT_KEY']}"</span>},
+    json={<span class="str">'document'</span>: b64, <span class="str">'type'</span>: <span class="str">'invoice'</span>},
+)
+
+result = resp.<span class="fn">json</span>()
+<span class="fn">print</span>(result[<span class="str">'data'</span>][<span class="str">'total_amount'</span>])  <span class="cmt"># 1250.00</span></pre>
+          </div>
+        </div>
+
+        <div id="ext-schema" class="tab-panel">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="cmt"># Custom schema: extract only what you need</span>
+<span class="fn">curl</span> <span class="url">https://docuextract-azure.vercel.app/v1/extract</span> \
+  <span class="hdr">-H</span> <span class="str">"Authorization: Bearer dex_live_YOUR_KEY"</span> \
+  <span class="hdr">-H</span> <span class="str">"Content-Type: application/json"</span> \
+  <span class="hdr">-d</span> <span class="str">'{
+    "document": "https://example.com/contract.pdf",
+    "schema": {
+      "party_names": "array of party names in this contract",
+      "effective_date": "contract start date in ISO format",
+      "termination_date": "contract end date in ISO format",
+      "governing_law": "jurisdiction for disputes"
+    }
+  }'</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h3>Response</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">json</span></div>
+        <pre>{
+  <span class="key">"data"</span>: { <span class="cmt">/* extracted fields — structure varies by document type */</span> },
+  <span class="key">"metadata"</span>: {
+    <span class="key">"type"</span>: <span class="str">"invoice"</span>,          <span class="cmt">// detected or provided document type</span>
+    <span class="key">"confidence"</span>: <span class="num">0.96</span>,         <span class="cmt">// 0.0 – 1.0 overall confidence score</span>
+    <span class="key">"model"</span>: <span class="str">"claude-haiku-4-5-20251001"</span>,
+    <span class="key">"processing_time_ms"</span>: <span class="num">1847</span>,  <span class="cmt">// total server-side latency</span>
+    <span class="key">"page_count"</span>: <span class="num">1</span>
+  }
+}</pre>
+      </div>
+
+      <h3>Invoice Response Example</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">json</span></div>
+        <pre>{
+  <span class="key">"data"</span>: {
+    <span class="key">"vendor_name"</span>: <span class="str">"Acme Corp"</span>,
+    <span class="key">"vendor_address"</span>: <span class="str">"123 Business St, San Francisco, CA 94102"</span>,
+    <span class="key">"vendor_email"</span>: <span class="str">"billing@acme.com"</span>,
+    <span class="key">"customer_name"</span>: <span class="str">"Jane Smith"</span>,
+    <span class="key">"invoice_number"</span>: <span class="str">"INV-2024-0847"</span>,
+    <span class="key">"invoice_date"</span>: <span class="str">"2024-03-15"</span>,
+    <span class="key">"due_date"</span>: <span class="str">"2024-04-15"</span>,
+    <span class="key">"subtotal"</span>: <span class="num">1000.00</span>,
+    <span class="key">"tax_amount"</span>: <span class="num">250.00</span>,
+    <span class="key">"total_amount"</span>: <span class="num">1250.00</span>,
+    <span class="key">"currency"</span>: <span class="str">"USD"</span>,
+    <span class="key">"payment_terms"</span>: <span class="str">"Net 30"</span>,
+    <span class="key">"line_items"</span>: [
+      {
+        <span class="key">"description"</span>: <span class="str">"Consulting services - March 2024"</span>,
+        <span class="key">"quantity"</span>: <span class="num">10</span>,
+        <span class="key">"unit_price"</span>: <span class="num">100.00</span>,
+        <span class="key">"total"</span>: <span class="num">1000.00</span>
+      }
+    ]
+  },
+  <span class="key">"metadata"</span>: {
+    <span class="key">"type"</span>: <span class="str">"invoice"</span>,
+    <span class="key">"confidence"</span>: <span class="num">0.96</span>,
+    <span class="key">"model"</span>: <span class="str">"claude-haiku-4-5-20251001"</span>,
+    <span class="key">"processing_time_ms"</span>: <span class="num">1847</span>,
+    <span class="key">"page_count"</span>: <span class="num">1</span>
+  }
+}</pre>
+      </div>
+    </section>
+
+    <hr />
+
+    <!-- Detect -->
+    <section id="detect">
+      <h2>POST /v1/detect</h2>
+      <p>Detect the type of a document without extracting its data. Useful when you need to route documents to different processing pipelines.</p>
+
+      <div class="endpoint-badge">
+        <span class="badge-method badge-post">POST</span>
+        <span class="badge-path">https://docuextract-azure.vercel.app/v1/detect</span>
+      </div>
+
+      <h3>Request Body</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>document</code></td><td>string</td><td>Yes</td><td>Document as base64-encoded string or a publicly accessible URL</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tabs">
+        <div class="tab-list">
+          <button class="tab-btn active" onclick="switchTab(this, 'det-curl')">curl</button>
+          <button class="tab-btn" onclick="switchTab(this, 'det-js')">JavaScript</button>
+          <button class="tab-btn" onclick="switchTab(this, 'det-py')">Python</button>
+        </div>
+        <div id="det-curl" class="tab-panel active">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="fn">curl</span> <span class="url">https://docuextract-azure.vercel.app/v1/detect</span> \
+  <span class="hdr">-H</span> <span class="str">"Authorization: Bearer dex_live_YOUR_KEY"</span> \
+  <span class="hdr">-H</span> <span class="str">"Content-Type: application/json"</span> \
+  <span class="hdr">-d</span> <span class="str">'{"document": "https://example.com/document.pdf"}'</span></pre>
+          </div>
+        </div>
+        <div id="det-js" class="tab-panel">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">javascript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'https://docuextract-azure.vercel.app/v1/detect'</span>, {
+  method: <span class="str">'POST'</span>,
+  headers: {
+    <span class="str">'Authorization'</span>: <span class="str">`Bearer <span class="kw">${</span>process.env.DOCUEXTRACT_KEY<span class="kw">}</span>`</span>,
+    <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>,
+  },
+  body: <span class="fn">JSON.stringify</span>({ document: <span class="str">'https://example.com/document.pdf'</span> }),
+});
+
+<span class="kw">const</span> { type, confidence } = <span class="kw">await</span> res.<span class="fn">json</span>();
+<span class="cmt">// type: "invoice", confidence: 0.98</span></pre>
+          </div>
+        </div>
+        <div id="det-py" class="tab-panel">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre>resp = requests.<span class="fn">post</span>(
+    <span class="str">'https://docuextract-azure.vercel.app/v1/detect'</span>,
+    headers={<span class="str">'Authorization'</span>: <span class="str">f"Bearer {os.environ['DOCUEXTRACT_KEY']}"</span>},
+    json={<span class="str">'document'</span>: <span class="str">'https://example.com/document.pdf'</span>}
+)
+<span class="fn">print</span>(resp.<span class="fn">json</span>())  <span class="cmt"># {'type': 'invoice', 'confidence': 0.98}</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h3>Response</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">json</span></div>
+        <pre>{
+  <span class="key">"type"</span>: <span class="str">"invoice"</span>,      <span class="cmt">// detected document type</span>
+  <span class="key">"confidence"</span>: <span class="num">0.98</span>   <span class="cmt">// 0.0 – 1.0</span>
+}</pre>
+      </div>
+    </section>
+
+    <hr />
+
+    <!-- Usage -->
+    <section id="usage">
+      <h2>GET /v1/usage</h2>
+      <p>Retrieve your current usage statistics for the billing period.</p>
+
+      <div class="endpoint-badge">
+        <span class="badge-method badge-get">GET</span>
+        <span class="badge-path">https://docuextract-azure.vercel.app/v1/usage</span>
+      </div>
+
+      <div class="tabs">
+        <div class="tab-list">
+          <button class="tab-btn active" onclick="switchTab(this, 'use-curl')">curl</button>
+          <button class="tab-btn" onclick="switchTab(this, 'use-js')">JavaScript</button>
+          <button class="tab-btn" onclick="switchTab(this, 'use-py')">Python</button>
+        </div>
+        <div id="use-curl" class="tab-panel active">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="fn">curl</span> <span class="url">https://docuextract-azure.vercel.app/v1/usage</span> \
+  <span class="hdr">-H</span> <span class="str">"Authorization: Bearer dex_live_YOUR_KEY"</span></pre>
+          </div>
+        </div>
+        <div id="use-js" class="tab-panel">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">javascript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'https://docuextract-azure.vercel.app/v1/usage'</span>, {
+  headers: { <span class="str">'Authorization'</span>: <span class="str">`Bearer <span class="kw">${</span>process.env.DOCUEXTRACT_KEY<span class="kw">}</span>`</span> },
+});
+<span class="kw">const</span> usage = <span class="kw">await</span> res.<span class="fn">json</span>();</pre>
+          </div>
+        </div>
+        <div id="use-py" class="tab-panel">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre>resp = requests.<span class="fn">get</span>(
+    <span class="str">'https://docuextract-azure.vercel.app/v1/usage'</span>,
+    headers={<span class="str">'Authorization'</span>: <span class="str">f"Bearer {os.environ['DOCUEXTRACT_KEY']}"</span>}
+)
+<span class="fn">print</span>(resp.<span class="fn">json</span>())</pre>
+          </div>
+        </div>
+      </div>
+
+      <h3>Response</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">json</span></div>
+        <pre>{
+  <span class="key">"used"</span>: <span class="num">847</span>,
+  <span class="key">"limit"</span>: <span class="num">10000</span>,
+  <span class="key">"plan"</span>: <span class="str">"pro"</span>,
+  <span class="key">"period_end"</span>: <span class="str">"2024-04-24"</span>,
+  <span class="key">"breakdown"</span>: [
+    { <span class="key">"date"</span>: <span class="str">"2024-03-24"</span>, <span class="key">"count"</span>: <span class="num">42</span> },
+    { <span class="key">"date"</span>: <span class="str">"2024-03-25"</span>, <span class="key">"count"</span>: <span class="num">67</span> }
+  ]
+}</pre>
+      </div>
+    </section>
+
+    <hr />
+
+    <!-- Health -->
+    <section id="health">
+      <h2>GET /v1/health</h2>
+      <p>Health check endpoint. No authentication required. Use this to verify the API is reachable.</p>
+
+      <div class="endpoint-badge">
+        <span class="badge-method badge-get">GET</span>
+        <span class="badge-path">https://docuextract-azure.vercel.app/v1/health</span>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="fn">curl</span> <span class="url">https://docuextract-azure.vercel.app/v1/health</span></pre>
+      </div>
+
+      <h3>Response</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">json</span></div>
+        <pre>{ <span class="key">"status"</span>: <span class="str">"ok"</span>, <span class="key">"version"</span>: <span class="str">"1.0.0"</span> }</pre>
+      </div>
+    </section>
+
+    <hr />
+
+    <!-- Checkout -->
+    <section id="checkout">
+      <h2>POST /v1/billing/checkout</h2>
+      <p>Create a Stripe Checkout session to subscribe to a paid plan. Returns a URL to redirect your user to for payment.</p>
+
+      <div class="endpoint-badge">
+        <span class="badge-method badge-post">POST</span>
+        <span class="badge-path">https://docuextract-azure.vercel.app/v1/billing/checkout</span>
+      </div>
+
+      <h3>Request Body</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>plan</code></td><td>string</td><td>Yes</td><td>Plan to subscribe to. One of: <code>starter</code>, <code>pro</code>, <code>scale</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tabs">
+        <div class="tab-list">
+          <button class="tab-btn active" onclick="switchTab(this, 'chk-curl')">curl</button>
+          <button class="tab-btn" onclick="switchTab(this, 'chk-js')">JavaScript</button>
+        </div>
+        <div id="chk-curl" class="tab-panel active">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="fn">curl</span> <span class="url">https://docuextract-azure.vercel.app/v1/billing/checkout</span> \
+  <span class="hdr">-H</span> <span class="str">"Authorization: Bearer dex_live_YOUR_KEY"</span> \
+  <span class="hdr">-H</span> <span class="str">"Content-Type: application/json"</span> \
+  <span class="hdr">-d</span> <span class="str">'{"plan": "pro"}'</span></pre>
+          </div>
+        </div>
+        <div id="chk-js" class="tab-panel">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">javascript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'https://docuextract-azure.vercel.app/v1/billing/checkout'</span>, {
+  method: <span class="str">'POST'</span>,
+  headers: {
+    <span class="str">'Authorization'</span>: <span class="str">`Bearer <span class="kw">${</span>API_KEY<span class="kw">}</span>`</span>,
+    <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>,
+  },
+  body: <span class="fn">JSON.stringify</span>({ plan: <span class="str">'pro'</span> }),
+});
+<span class="kw">const</span> { url } = <span class="kw">await</span> res.<span class="fn">json</span>();
+window.<span class="fn">location</span>.<span class="fn">href</span> = url;  <span class="cmt">// redirect to Stripe Checkout</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h3>Response</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">json</span></div>
+        <pre>{ <span class="key">"url"</span>: <span class="str">"https://checkout.stripe.com/c/pay/cs_live_..."</span> }</pre>
+      </div>
+
+      <p>Redirect the user to this URL. After payment, Stripe redirects back to your dashboard. The subscription is activated immediately via webhook.</p>
+    </section>
+
+    <hr />
+
+    <!-- Portal -->
+    <section id="portal">
+      <h2>POST /v1/billing/portal</h2>
+      <p>Create a Stripe Billing Portal session. Returns a URL where your user can manage their subscription (upgrade, downgrade, cancel, update payment method).</p>
+
+      <div class="endpoint-badge">
+        <span class="badge-method badge-post">POST</span>
+        <span class="badge-path">https://docuextract-azure.vercel.app/v1/billing/portal</span>
+      </div>
+
+      <div class="callout callout-info">
+        Requires the user to have an active Stripe subscription. If the user is on the free plan, this will return a 400 error.
+      </div>
+
+      <div class="tabs">
+        <div class="tab-list">
+          <button class="tab-btn active" onclick="switchTab(this, 'prt-curl')">curl</button>
+          <button class="tab-btn" onclick="switchTab(this, 'prt-js')">JavaScript</button>
+        </div>
+        <div id="prt-curl" class="tab-panel active">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="fn">curl</span> <span class="url">https://docuextract-azure.vercel.app/v1/billing/portal</span> \
+  <span class="hdr">-H</span> <span class="str">"Authorization: Bearer dex_live_YOUR_KEY"</span> \
+  <span class="hdr">-X</span> POST</pre>
+          </div>
+        </div>
+        <div id="prt-js" class="tab-panel">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">javascript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'https://docuextract-azure.vercel.app/v1/billing/portal'</span>, {
+  method: <span class="str">'POST'</span>,
+  headers: { <span class="str">'Authorization'</span>: <span class="str">`Bearer <span class="kw">${</span>API_KEY<span class="kw">}</span>`</span> },
+});
+<span class="kw">const</span> { url } = <span class="kw">await</span> res.<span class="fn">json</span>();
+window.<span class="fn">location</span>.<span class="fn">href</span> = url;  <span class="cmt">// redirect to Stripe Portal</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <h3>Response</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">json</span></div>
+        <pre>{ <span class="key">"url"</span>: <span class="str">"https://billing.stripe.com/p/session/..."</span> }</pre>
+      </div>
+    </section>
+
+    <hr />
+
+    <!-- Document Types -->
+    <section id="document-types">
+      <h2>Document Types</h2>
+      <p>DocuExtract automatically detects document types, or you can specify one explicitly. Each type has a specialized extraction prompt tuned for that document's structure.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Type</th><th>Description</th><th>Key Fields Extracted</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><code>invoice</code></td>
+              <td>Vendor invoices and billing statements</td>
+              <td>vendor name, invoice number, dates, line items, totals, payment terms</td>
+            </tr>
+            <tr>
+              <td><code>receipt</code></td>
+              <td>Purchase receipts from retail, restaurants, etc.</td>
+              <td>merchant name, date, items purchased, subtotal, tax, total, payment method</td>
+            </tr>
+            <tr>
+              <td><code>bank_statement</code></td>
+              <td>Bank and credit card statements</td>
+              <td>account number, period, opening/closing balance, transactions</td>
+            </tr>
+            <tr>
+              <td><code>resume</code></td>
+              <td>CVs and resumes</td>
+              <td>name, contact info, work experience, education, skills</td>
+            </tr>
+            <tr>
+              <td><code>contract</code></td>
+              <td>Legal agreements and contracts</td>
+              <td>parties, effective date, termination date, key obligations, governing law</td>
+            </tr>
+            <tr>
+              <td><code>form</code></td>
+              <td>Filled forms (applications, surveys, intake forms)</td>
+              <td>all labeled fields and their values</td>
+            </tr>
+            <tr>
+              <td><code>id_document</code></td>
+              <td>ID cards, passports, driver's licenses</td>
+              <td>name, date of birth, expiry, document number, issuing authority</td>
+            </tr>
+            <tr>
+              <td><code>unknown</code></td>
+              <td>Fallback for unrecognized types</td>
+              <td>best-effort extraction of all visible structured data</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <hr />
+
+    <!-- Errors -->
+    <section id="errors">
+      <h2>Error Codes</h2>
+      <p>All errors return a JSON response with <code>error</code> and <code>message</code> fields, plus an appropriate HTTP status code.</p>
+
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">json</span></div>
+        <pre>{
+  <span class="key">"error"</span>: <span class="str">"invalid_api_key"</span>,
+  <span class="key">"message"</span>: <span class="str">"Invalid or missing API key."</span>
+}</pre>
+      </div>
+
+      <h3>4xx Client Errors</h3>
+
+      <div class="error-card">
+        <div class="error-code">401 — invalid_api_key</div>
+        <div class="error-desc">The API key is missing, malformed, or revoked. Check your <code>Authorization</code> header.</div>
+      </div>
+
+      <div class="error-card">
+        <div class="error-code">400 — invalid_request</div>
+        <div class="error-desc">A required field is missing or a field value is invalid (e.g., unknown document type).</div>
+      </div>
+
+      <div class="error-card">
+        <div class="error-code">400 — file_too_large</div>
+        <div class="error-desc">The document exceeds the 10 MB size limit.</div>
+      </div>
+
+      <div class="error-card">
+        <div class="error-code">400 — unsupported_format</div>
+        <div class="error-desc">The file format is not supported. Use PDF, PNG, JPG, or WEBP.</div>
+      </div>
+
+      <div class="error-card">
+        <div class="error-code">400 — invalid_url</div>
+        <div class="error-desc">The document URL is not accessible or returned a non-200 status.</div>
+      </div>
+
+      <div class="error-card">
+        <div class="error-code">429 — rate_limit_exceeded</div>
+        <div class="error-desc">You've exceeded your per-minute or per-month rate limit. Check the <code>X-RateLimit-*</code> headers. Upgrade your plan for higher limits.</div>
+      </div>
+
+      <div class="error-card">
+        <div class="error-code">405 — method_not_allowed</div>
+        <div class="error-desc">The HTTP method used is not allowed for this endpoint.</div>
+      </div>
+
+      <h3>5xx Server Errors</h3>
+
+      <div class="error-card">
+        <div class="error-code">500 — extraction_failed</div>
+        <div class="error-desc">The AI extraction failed after retrying. This is rare — try again. If it persists, the document may be corrupted or unreadable.</div>
+      </div>
+
+      <div class="error-card">
+        <div class="error-code">500 — internal_error</div>
+        <div class="error-desc">Unexpected server error. Please try again. If it persists, contact support.</div>
+      </div>
+
+      <h3>Handling Errors</h3>
+      <div class="tabs">
+        <div class="tab-list">
+          <button class="tab-btn active" onclick="switchTab(this, 'err-js')">JavaScript</button>
+          <button class="tab-btn" onclick="switchTab(this, 'err-py')">Python</button>
+        </div>
+        <div id="err-js" class="tab-panel active">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">javascript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'https://docuextract-azure.vercel.app/v1/extract'</span>, { <span class="cmt">/* ... */</span> });
+
+<span class="kw">if</span> (!res.ok) {
+  <span class="kw">const</span> { error, message } = <span class="kw">await</span> res.<span class="fn">json</span>();
+
+  <span class="kw">if</span> (res.status === <span class="num">429</span>) {
+    <span class="cmt">// Respect rate limits</span>
+    <span class="kw">const</span> remaining = res.headers.<span class="fn">get</span>(<span class="str">'X-RateLimit-Remaining-Month'</span>);
+    console.<span class="fn">error</span>(<span class="str">`Rate limited. Monthly remaining: <span class="kw">${</span>remaining<span class="kw">}</span>`</span>);
+  } <span class="kw">else</span> {
+    console.<span class="fn">error</span>(<span class="str">`Error <span class="kw">${</span>error<span class="kw">}</span>: <span class="kw">${</span>message<span class="kw">}</span>`</span>);
+  }
+  <span class="kw">return</span>;
+}
+
+<span class="kw">const</span> result = <span class="kw">await</span> res.<span class="fn">json</span>();</pre>
+          </div>
+        </div>
+        <div id="err-py" class="tab-panel">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre>resp = requests.<span class="fn">post</span>(<span class="str">'https://docuextract-azure.vercel.app/v1/extract'</span>, <span class="cmt"># ...</span>)
+
+<span class="kw">if not</span> resp.ok:
+    err = resp.<span class="fn">json</span>()
+    <span class="kw">if</span> resp.status_code == <span class="num">429</span>:
+        <span class="fn">print</span>(<span class="str">f"Rate limited: {err['message']}"</span>)
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(<span class="str">f"Error {err['error']}: {err['message']}"</span>)
+<span class="kw">else</span>:
+    result = resp.<span class="fn">json</span>()</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr />
+
+    <!-- Pricing -->
+    <section id="pricing">
+      <h2>Pricing</h2>
+      <p>Simple, transparent pricing. No credit multipliers, no enterprise-gating. Upgrade or downgrade any time.</p>
+
+      <div class="pricing-grid">
+        <div class="plan-card">
+          <div class="plan-name">Free</div>
+          <div class="plan-price">$0<span>/mo</span></div>
+          <div class="plan-calls">100 extractions/mo</div>
+          <ul class="plan-features">
+            <li>10 req/min rate limit</li>
+            <li>Haiku model only</li>
+            <li>No credit card required</li>
+          </ul>
+        </div>
+        <div class="plan-card featured">
+          <div class="plan-name">Starter</div>
+          <div class="plan-price">$49<span>/mo</span></div>
+          <div class="plan-calls">2,500 extractions/mo</div>
+          <ul class="plan-features">
+            <li>30 req/min rate limit</li>
+            <li>Haiku + Sonnet</li>
+            <li>Email support</li>
+          </ul>
+        </div>
+        <div class="plan-card">
+          <div class="plan-name">Pro</div>
+          <div class="plan-price">$99<span>/mo</span></div>
+          <div class="plan-calls">10,000 extractions/mo</div>
+          <ul class="plan-features">
+            <li>60 req/min rate limit</li>
+            <li>Haiku + Sonnet</li>
+            <li>Priority support</li>
+          </ul>
+        </div>
+        <div class="plan-card">
+          <div class="plan-name">Scale</div>
+          <div class="plan-price">$249<span>/mo</span></div>
+          <div class="plan-calls">50,000 extractions/mo</div>
+          <ul class="plan-features">
+            <li>120 req/min rate limit</li>
+            <li>All models + Priority</li>
+            <li>SLA + dedicated support</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Overage Pricing</h3>
+      <p>When you exceed your monthly quota, additional extractions are billed at <strong>$0.05 per extraction</strong>. Overage is metered via Stripe and billed at the end of your billing period. Free plan users are rate-limited at their cap — no overages.</p>
+
+      <div class="callout callout-tip">
+        <strong>Tip</strong>
+        Monitor your usage with <code>GET /v1/usage</code> or check the <code>X-RateLimit-Remaining-Month</code> header on every response.
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // Tab switching
+  function switchTab(btn, panelId) {
+    const tabsEl = btn.closest('.tabs');
+    tabsEl.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    tabsEl.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(panelId).classList.add('active');
+  }
+
+  // Copy button
+  async function copyCode(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre');
+    try {
+      await navigator.clipboard.writeText(pre.innerText);
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 1500);
+    } catch {}
+  }
+
+  // Active nav link on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-link');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => link.classList.remove('active'));
+        const active = document.querySelector(`.nav-link[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+
+  // Close sidebar on mobile when link clicked
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+      document.querySelector('.sidebar').classList.remove('open');
+    });
+  });
+</script>
+
+</body>
+</html>
