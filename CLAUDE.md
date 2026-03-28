@@ -1,7 +1,7 @@
-# CLAUDE.md — DocuExtract API
+# CLAUDE.md — DocuExtract
 
 > **Read this file in full before starting ANY task.** This is your single source of truth.
-> Last updated: 2026-03-24
+> Last updated: 2026-03-28
 
 ---
 
@@ -39,52 +39,69 @@ Every SaaS company, fintech, logistics platform, and accounting tool needs to ex
 
 ## 🏗️ Architecture
 
+### Single-Project Deployment
+
+DocuExtract is a **single Next.js 14 App Router application** deployed as **one Vercel project**. Both the user-facing UI (landing page, playground, docs, dashboard) and the API (extraction, billing, webhooks) are served from the same deployment.
+
+| Attribute | Value |
+|-----------|-------|
+| **Framework** | Next.js 14+ (App Router) |
+| **Deployment** | Single Vercel project |
+| **Root Directory** | Repo root (project root IS the Next.js app) |
+| **UI Routes** | `/`, `/playground`, `/docs`, `/login`, `/dashboard/*` |
+| **API Routes** | `/v1/extract`, `/v1/detect`, `/v1/usage`, `/v1/health`, `/v1/billing/*`, `/v1/webhooks/*` |
+| **Current URL** | TBD (new deployment replaces `docuextract-azure.vercel.app`) |
+| **Future Domain** | `docuextract.dev` (serves both UI and API from one deployment) |
+
+The previous two-project architecture (separate API serverless functions + separate Next.js dashboard) has been retired. The old `docuextract-azure.vercel.app` deployment will be decommissioned once the new unified deployment is live.
+
+**Why single project:** Same-origin means no CORS configuration, one set of environment variables, one deployment pipeline, one `package.json`, and simpler debugging. API route handlers in Next.js have the same capabilities as raw Vercel serverless functions.
+
 ### Tech Stack
 | Layer | Technology | Why |
 |-------|-----------|-----|
-| **API Runtime** | Vercel Serverless Functions (Node.js) | Zero-config deployment, auto-scaling, edge network |
+| **App Framework** | Next.js 14+ (App Router) on Vercel | Unified UI + API, React pages, route handlers, SSR |
 | **Database** | Supabase (PostgreSQL + Auth + Storage) | Free tier generous, built-in auth, file storage for docs |
 | **AI Engine** | Claude API (Haiku 4.5 for speed, Sonnet 4.6 for complex docs) | Best-in-class document extraction, consistent JSON output |
 | **Billing** | Stripe (Subscriptions + Metered Billing) | Industry standard, usage-based billing support |
-| **Docs** | Mintlify or custom MDX on Vercel | Developer-friendly, searchable |
-| **Monitoring** | Sentry (free tier) | Error tracking, performance monitoring |
-| **Domain** | TBD (e.g., docuextract.com or extractapi.dev) | Short, memorable, developer-oriented |
+| **Monitoring** | Sentry (free tier) — planned | Error tracking, performance monitoring |
+| **Domain** | docuextract.dev (pending purchase by Kiano) | Short, memorable, developer-oriented |
 
 ### System Flow
 ```
-Developer Request
+Developer Request (POST /v1/extract)
        ↓
-[Vercel API Gateway]
-  - Validate API key (Supabase lookup)
-  - Check rate limits
+[Next.js Route Handler — src/app/v1/extract/route.ts]
+  - Validate API key (Supabase lookup via bcrypt hash)
+  - Check rate limits (atomic SQL counters)
   - Log request
        ↓
-[Input Processing]
-  - Accept: base64, URL, or Supabase Storage reference
+[Input Processing — src/lib/documents/]
+  - Accept: base64 or URL
   - Detect document type (invoice, receipt, contract, etc.)
   - Validate file size (<10MB) and format (PDF, PNG, JPG, WEBP)
        ↓
-[Extraction Engine]
+[Extraction Engine — src/lib/extraction/]
   - Build specialized system prompt based on document type
   - If custom schema provided, inject schema into prompt
-  - Call Claude API (Haiku 4.5 default, Sonnet 4.6 for complex)
+  - Call Claude API (Haiku 4.5 default, Sonnet 4.6 for "accurate" mode)
   - Parse response, validate JSON structure
   - Retry once if malformed output
        ↓
-[Post-Processing]
+[Post-Processing — src/lib/extraction/postprocess.ts]
   - Apply validation rules (dates, currencies, totals)
   - Calculate confidence score per field
   - Normalize data formats (ISO dates, standardized currencies)
        ↓
 [Response]
   - Return clean JSON with extracted data
-  - Include metadata: confidence, processing_time, document_type
-  - Log usage to Supabase (for billing metering)
-  - Report usage event to Stripe
+  - Include metadata: confidence, processing_time, document_type, model
+  - Log usage to Supabase (fire-and-forget, non-blocking)
+  - Report overage usage to Stripe if user exceeds plan limit
        ↓
-[Async]
-  - Stripe handles invoicing at period end
-  - Usage dashboard updates in real-time
+[Async Billing]
+  - Stripe aggregates usage and charges at period end
+  - Webhooks sync subscription changes back to Supabase
 ```
 
 ### Database Schema (Supabase PostgreSQL)
@@ -108,9 +125,9 @@ CREATE TABLE public.users (
 CREATE TABLE public.api_usage (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES public.users(id),
-  endpoint TEXT NOT NULL, -- /v1/extract, /v1/detect, etc.
-  document_type TEXT, -- invoice, receipt, contract, etc.
-  model_used TEXT NOT NULL, -- haiku-4.5, sonnet-4.6
+  endpoint TEXT NOT NULL,
+  document_type TEXT,
+  model_used TEXT NOT NULL,
   input_tokens INTEGER,
   output_tokens INTEGER,
   processing_time_ms INTEGER,
@@ -129,7 +146,7 @@ CREATE TABLE public.rate_limits (
   month_reset_at TIMESTAMPTZ
 );
 
--- Webhook events (Stripe)
+-- Webhook events (Stripe idempotency)
 CREATE TABLE public.webhook_events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   stripe_event_id TEXT UNIQUE NOT NULL,
@@ -140,17 +157,30 @@ CREATE TABLE public.webhook_events (
 );
 ```
 
+**Applied Migrations (001-009):**
+- 001: Initial schema (users, api_usage, rate_limits, webhook_events)
+- 002: API key functions (generate_api_key, lookup_user_by_api_key)
+- 003: RLS policies
+- 004: Rate limit atomic increment function (check_and_increment_rate_limit)
+- 005: Auth trigger (handle_new_auth_user — auto-creates users row on signup) + regenerate_my_api_key RPC
+- 006: create_user_with_api_key RPC
+- 007: Fixed create_user_with_api_key signature (FK-safe)
+- 008: Made handle_new_auth_user trigger defensive (EXCEPTION WHEN OTHERS)
+- 009: Fixed lookup_user_by_api_key search_path to include 'extensions' (pgcrypto crypt() visibility)
+
 ### API Endpoints
 
+All API routes are Next.js Route Handlers under `src/app/v1/`.
+
 ```
-BASE URL: https://api.docuextract.com/v1
+BASE URL: https://docuextract.dev (or current Vercel deployment URL)
 
 Authentication: Bearer token (API key) in Authorization header
 
 POST /v1/extract
   - Main extraction endpoint
   - Body: { document: <base64|url>, type?: <string>, schema?: <object>, model?: "fast"|"accurate" }
-  - Returns: { data: {...}, confidence: 0.96, type: "invoice", processing_time_ms: 1200 }
+  - Returns: { data: {...}, metadata: { type, confidence, model, processing_time_ms, page_count } }
 
 POST /v1/detect
   - Detect document type without extraction
@@ -158,15 +188,28 @@ POST /v1/detect
   - Returns: { type: "invoice", confidence: 0.98 }
 
 GET /v1/usage
-  - Get current usage stats
-  - Returns: { used: 847, limit: 5000, plan: "pro", period_end: "2026-04-24" }
+  - Get current usage stats (requires auth)
+  - Returns: { used, limit, plan, period_end, breakdown: [...] }
 
 GET /v1/health
   - Health check (no auth required)
   - Returns: { status: "ok", version: "1.0.0" }
+
+POST /v1/billing/checkout
+  - Create Stripe Checkout session (requires auth)
+  - Body: { plan: "starter"|"pro"|"scale" }
+  - Returns: { url: "https://checkout.stripe.com/..." }
+
+POST /v1/billing/portal
+  - Create Stripe Billing Portal session (requires auth)
+  - Returns: { url: "https://billing.stripe.com/..." }
+
+POST /v1/webhooks/stripe
+  - Stripe webhook handler (signature verified, no Bearer auth)
+  - Handles: subscription.created/updated/deleted, invoice.payment_succeeded/failed
 ```
 
-### Pricing Tiers (Stripe Products)
+### Pricing Tiers (Stripe Products — Test Mode)
 
 | Tier | Price | Extractions/month | Rate Limit | Model Access |
 |------|-------|-------------------|------------|-------------|
@@ -176,271 +219,332 @@ GET /v1/health
 | **Scale** | $249/mo | 50,000 | 120/min | Haiku + Sonnet + Priority |
 | **Overage** | $0.05/extraction beyond plan limit | — | — | — |
 
+**Stripe Price IDs (test mode):**
+- Starter: price_1TEmTpKtX9wthBvgToGOwsi1
+- Pro: price_1TEmajKtX9wthBvgQ2Fq8Few
+- Scale: price_1TEmmwKtX9wthBvgNCP9f71m
+- Overage: price_1TEmf0KtX9wthBvg7kOfbAyc
+
 ---
 
 ## 📁 Project Structure
 
+Single Next.js application at the repo root. All dependencies in one `package.json`.
+
 ```
 docuextract/
-├── CLAUDE.md                    # THIS FILE — master context
-├── README.md                    # Public repo README
-├── package.json                 # Root package config
-├── vercel.json                  # Vercel deployment config
-├── .env.local                   # Local environment variables (NEVER commit)
-├── .env.example                 # Template for env vars
+├── CLAUDE.md                        # THIS FILE — master context
+├── README.md                        # Public repo README
+├── package.json                     # Single package.json — all deps merged (Next.js, Anthropic, Supabase, Stripe, etc.)
+├── next.config.js                   # Next.js configuration
+├── tsconfig.json                    # TypeScript strict mode config
+├── tailwind.config.js               # Tailwind CSS config
+├── vercel.json                      # { "framework": "nextjs" }
+├── .env.local                       # Environment variables (NEVER commit)
+├── .env.example                     # Template for env vars
+├── openapi.yaml                     # OpenAPI 3.0 spec (for RapidAPI listing)
 │
-├── api/                         # Vercel serverless functions
-│   └── v1/
-│       ├── extract.ts           # POST /v1/extract — main extraction
-│       ├── detect.ts            # POST /v1/detect — document type detection
-│       ├── usage.ts             # GET /v1/usage — usage stats
-│       ├── health.ts            # GET /v1/health — health check
-│       └── webhooks/
-│           └── stripe.ts        # POST /v1/webhooks/stripe — Stripe webhooks
-│
-├── lib/                         # Shared library code
-│   ├── auth.ts                  # API key validation, user lookup
-│   ├── billing.ts               # Stripe integration, usage reporting
-│   ├── claude.ts                # Claude API client, prompt management
-│   ├── extraction/
-│   │   ├── engine.ts            # Core extraction logic
-│   │   ├── prompts.ts           # System prompts per document type
-│   │   ├── schemas.ts           # Output schemas and validation
-│   │   └── postprocess.ts       # Data normalization, confidence scoring
-│   ├── documents/
-│   │   ├── input.ts             # Input processing (base64, URL, storage)
-│   │   ├── detect.ts            # Document type detection
-│   │   └── validate.ts          # File size, format validation
-│   ├── ratelimit.ts             # Rate limiting logic
-│   ├── usage.ts                 # Usage tracking and metering
-│   ├── errors.ts                # Standardized error responses
-│   └── types.ts                 # TypeScript type definitions
-│
-├── supabase/
-│   └── migrations/
-│       ├── 001_initial_schema.sql
-│       ├── 002_api_key_functions.sql
-│       └── 003_rls_policies.sql
-│
-├── scripts/
-│   ├── seed-stripe.ts           # Create Stripe products/prices
-│   └── generate-api-key.ts      # Utility to generate API keys
-│
-├── docs/                        # API documentation (Mintlify or MDX)
-│   ├── introduction.mdx
-│   ├── quickstart.mdx
-│   ├── authentication.mdx
-│   ├── extract.mdx
-│   ├── detect.mdx
-│   ├── pricing.mdx
-│   └── errors.mdx
-│
-├── sdk/                         # Client SDKs
-│   ├── javascript/
-│   │   ├── package.json
-│   │   └── src/index.ts
-│   └── python/
-│       ├── setup.py
-│       └── docuextract/client.py
-│
-├── dashboard/                   # Developer dashboard (Next.js on Vercel)
+├── src/
 │   ├── app/
-│   │   ├── page.tsx             # Landing page
-│   │   ├── dashboard/
-│   │   │   ├── page.tsx         # Main dashboard
-│   │   │   ├── usage/page.tsx   # Usage analytics
-│   │   │   ├── keys/page.tsx    # API key management
-│   │   │   └── billing/page.tsx # Billing & plan management
+│   │   ├── layout.tsx               # Root layout. NO AUTH. <html>, <body>, global CSS, metadata.
+│   │   ├── page.tsx                 # Landing page (public). React component.
+│   │   │
 │   │   ├── playground/
-│   │   │   └── page.tsx         # Interactive API playground
-│   │   └── docs/
-│   │       └── page.tsx         # Embedded documentation
-│   └── components/
+│   │   │   └── page.tsx             # Interactive playground (public).
+│   │   │
+│   │   ├── docs/
+│   │   │   └── page.tsx             # API documentation (public).
+│   │   │
+│   │   ├── auth/
+│   │   │   └── callback/
+│   │   │       └── route.ts         # Supabase Auth callback (GET). Exchanges code for session.
+│   │   │
+│   │   ├── (auth)/                  # Route group. Auth boundary. No URL segment added.
+│   │   │   ├── layout.tsx           # Auth layout. Checks session. Redirects if unauthenticated.
+│   │   │   ├── login/
+│   │   │   │   └── page.tsx         # Login/signup page.
+│   │   │   └── dashboard/
+│   │   │       ├── page.tsx         # Dashboard home (protected).
+│   │   │       ├── keys/
+│   │   │       │   └── page.tsx     # API key management (protected).
+│   │   │       ├── usage/
+│   │   │       │   └── page.tsx     # Usage analytics (protected).
+│   │   │       └── billing/
+│   │   │           └── page.tsx     # Billing management (protected).
+│   │   │
+│   │   └── v1/                      # API route handlers (server-only)
+│   │       ├── extract/
+│   │       │   └── route.ts         # POST /v1/extract — main extraction
+│   │       ├── detect/
+│   │       │   └── route.ts         # POST /v1/detect — document type detection
+│   │       ├── usage/
+│   │       │   └── route.ts         # GET /v1/usage — usage stats
+│   │       ├── health/
+│   │       │   └── route.ts         # GET /v1/health — health check
+│   │       ├── billing/
+│   │       │   ├── checkout/
+│   │       │   │   └── route.ts     # POST /v1/billing/checkout
+│   │       │   └── portal/
+│   │       │       └── route.ts     # POST /v1/billing/portal
+│   │       └── webhooks/
+│   │           └── stripe/
+│   │               └── route.ts     # POST /v1/webhooks/stripe
+│   │
+│   ├── lib/                         # Server-only shared logic
+│   │   ├── auth.ts                  # API key validation, user lookup, 60s cache
+│   │   ├── billing.ts               # Stripe client, checkout, portal, metered usage
+│   │   ├── claude.ts                # Claude API client, retry logic, model selection
+│   │   ├── extraction/
+│   │   │   ├── engine.ts            # Core extraction orchestration
+│   │   │   ├── prompts.ts           # System prompts per document type (8 types + generic)
+│   │   │   ├── schemas.ts           # Output schemas and per-type normalization
+│   │   │   └── postprocess.ts       # Date/currency normalization, confidence scoring
+│   │   ├── documents/
+│   │   │   ├── input.ts             # Input processing (base64, URL)
+│   │   │   ├── detect.ts            # Document type detection via Claude
+│   │   │   └── validate.ts          # File size, format, MIME validation
+│   │   ├── ratelimit.ts             # Atomic rate limiting (per-minute + per-month)
+│   │   ├── usage.ts                 # Usage logging + stats retrieval
+│   │   ├── errors.ts                # Standardized error responses
+│   │   └── types.ts                 # TypeScript type definitions
+│   │
+│   └── components/                  # Client-side React components
 │       ├── Navbar.tsx
 │       ├── Sidebar.tsx
 │       ├── UsageChart.tsx
-│       └── PlaygroundForm.tsx
+│       ├── PlaygroundForm.tsx
+│       └── ...
 │
-├── tasks/                       # Task specs for Claude Code
-│   ├── CURRENT_TASK.md          # Active task being worked on
-│   ├── completed/               # Completed task specs
-│   └── backlog/                 # Upcoming task specs
+├── supabase/
+│   └── migrations/                  # SQL migrations 001-009 (all applied)
+│
+├── sdk/
+│   ├── javascript/                  # npm-ready, TypeScript, fetch-based
+│   └── python/                      # PyPI-ready, requests-based
+│
+├── scripts/
+│   ├── seed-stripe.ts
+│   ├── generate-api-key.ts
+│   └── test-billing-e2e.ts
 │
 └── tests/
-    ├── api/
-    │   ├── extract.test.ts
-    │   ├── detect.test.ts
-    │   └── auth.test.ts
-    └── lib/
-        ├── extraction.test.ts
-        └── postprocess.test.ts
+    └── fixtures/                    # 14 sample documents (invoices, receipts, resumes, business cards)
 ```
+
+### Key Architectural Patterns
+
+**Root Layout (`src/app/layout.tsx`) — NO Auth**
+- Contains ONLY: `<html>`, `<body>`, global CSS imports, metadata (title, description, OG tags)
+- Must NEVER contain Supabase Auth provider, session wrapper, or authentication logic
+- This keeps all top-level routes (`/`, `/playground`, `/docs`, `/v1/*`) public by default
+
+**Auth Route Group (`src/app/(auth)/layout.tsx`) — Dashboard Only**
+- Wraps ONLY dashboard routes in Supabase Auth
+- The `(auth)` prefix does NOT add a URL segment — `/dashboard` and `/login` are the actual URLs
+- Initializes Supabase browser client
+- Checks for active session on mount
+- If no session and route is NOT `/login` → redirect to `/login`
+- If session exists and route IS `/login` → redirect to `/dashboard`
+- Passes user/session data to children via React context
+- Listens for `onAuthStateChange` for real-time session updates
+
+**Auth Callback Route (`/auth/callback/route.ts`)**
+- Next.js API route (GET) that handles Supabase email confirmation redirect
+- Extracts `code` query parameter
+- Calls `supabase.auth.exchangeCodeForSession(code)`
+- Redirects to `/dashboard` on success, `/login?error=confirmation_failed` on failure
+
+**API Route Handlers (`src/app/v1/*/route.ts`) — Server-Only**
+- These are Next.js Route Handlers, NOT pages. They export `GET`, `POST`, etc. functions.
+- They replace the old `api/v1/*.ts` Vercel serverless functions
+- They import from `src/lib/` which contains all server-only logic
+- They run server-side only — never bundled into the client
+
+**Server-Only Enforcement (`src/lib/`)**
+- Every file in `src/lib/` MUST include `import 'server-only'` at the top
+- This prevents accidental import of server code (API keys, secrets) into client components
+- This replaces the old two-project separation as the security boundary
+
+### Supabase Dashboard Configuration (after deployment)
+Set in Supabase Dashboard > Authentication > URL Configuration:
+- **Site URL**: The deployed Vercel URL (e.g., `https://docuextract.dev`)
+- **Redirect URLs**: `https://<deployment-url>/auth/callback`
 
 ---
 
 ## 🔑 Environment Variables
 
-```env
-# Supabase
-SUPABASE_URL=https://xxxx.supabase.co
-SUPABASE_ANON_KEY=eyJ...
-SUPABASE_SERVICE_ROLE_KEY=eyJ... # Server-side only, never expose
+Single `.env.local` file at the repo root. One Vercel project, one set of environment variables.
 
-# Claude API
+```env
+# Supabase — server-side (DO NOT prefix with NEXT_PUBLIC_)
+SUPABASE_URL=https://jdvogyzrawcwxlrambpd.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=eyJ...
+
+# Supabase — client-side (NEXT_PUBLIC_ prefix required for browser access)
+NEXT_PUBLIC_SUPABASE_URL=https://jdvogyzrawcwxlrambpd.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+
+# Claude API — server-side only (DO NOT prefix with NEXT_PUBLIC_)
 ANTHROPIC_API_KEY=sk-ant-...
 
-# Stripe
-STRIPE_SECRET_KEY=sk_live_...
+# Stripe — server-side only (DO NOT prefix with NEXT_PUBLIC_)
+STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
-STRIPE_PRICE_STARTER=price_...
-STRIPE_PRICE_PRO=price_...
-STRIPE_PRICE_SCALE=price_...
+STRIPE_PRICE_STARTER=price_1TEmTpKtX9wthBvgToGOwsi1
+STRIPE_PRICE_PRO=price_1TEmajKtX9wthBvgQ2Fq8Few
+STRIPE_PRICE_SCALE=price_1TEmmwKtX9wthBvgNCP9f71m
+STRIPE_PRICE_OVERAGE=price_1TEmf0KtX9wthBvg7kOfbAyc
 
-# App
-API_BASE_URL=https://api.docuextract.com
-DASHBOARD_URL=https://docuextract.com
+# Stripe — client-side (for Checkout redirect)
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+
+# App URL (for Supabase auth redirects and internal references)
+NEXT_PUBLIC_APP_URL=https://<vercel-deployment-url>
+
+# Vercel (for log access during debugging)
+VERCEL_TOKEN=vcp_...
 ```
+
+**CRITICAL SECURITY RULE:** Never prefix secret variables with `NEXT_PUBLIC_`. Variables without the prefix are server-only and invisible to the browser. Variables WITH the prefix are bundled into client JavaScript and visible to anyone. The following must NEVER have `NEXT_PUBLIC_`:
+- `ANTHROPIC_API_KEY`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+Server-only enforcement is handled by adding `import 'server-only'` to all files in `src/lib/`. This causes a build error if any client component tries to import server code.
 
 ---
 
 ## 🧪 Testing Strategy
 
 - **Unit tests**: Each lib/ module has corresponding test file
-- **Integration tests**: Test full API flow with mock Claude responses
-- **Manual testing**: Use Playground to test with real documents
-- **Test documents**: Store sample invoices/receipts in tests/fixtures/
+- **E2E billing test**: `scripts/test-billing-e2e.ts`
+- **Manual testing**: Playground for real document extraction
+- **Test documents**: 14 samples in tests/fixtures/
 
 ---
 
 ## 📏 Code Standards
 
-- **Language**: TypeScript (strict mode)
-- **Runtime**: Node.js 20+ (Vercel default)
+- **Language**: TypeScript (strict mode) for everything
+- **Framework**: Next.js 14+ App Router
+- **Runtime**: Node.js 20+
 - **Formatting**: Prettier (default config)
-- **Linting**: ESLint with TypeScript plugin
-- **Error handling**: All API responses use standardized error format from lib/errors.ts
-- **Logging**: Structured JSON logs for Vercel observability
-- **Comments**: Explain WHY, not WHAT. Code should be self-documenting.
+- **CSS**: Tailwind CSS for UI components
+- **Error handling**: All API route handlers use standardized error format from src/lib/errors.ts
+- **Logging**: Structured JSON logs. Use VERCEL_TOKEN for log access.
+- **Comments**: Explain WHY, not WHAT.
+- **Server isolation**: Every file in `src/lib/` starts with `import 'server-only'`
 
 ---
 
 ## 🚨 Critical Rules for Claude Code
 
 1. **NEVER commit .env files or API keys.** Use .env.example as template.
-2. **NEVER skip input validation.** Every endpoint validates all inputs before processing.
-3. **ALWAYS handle Claude API errors gracefully.** Retry once on malformed output, return clear error to user.
-4. **ALWAYS log usage to Supabase** on every extraction call (success or failure).
-5. **ALWAYS report usage to Stripe** for metered billing.
-6. **ALWAYS return standardized error responses** using lib/errors.ts format.
+2. **NEVER skip input validation.** Every route handler validates all inputs.
+3. **ALWAYS handle Claude API errors gracefully.** Retry once on malformed output.
+4. **ALWAYS log usage to Supabase** on every extraction call. Fire-and-forget.
+5. **ALWAYS report overage usage to Stripe** when user exceeds plan limit.
+6. **ALWAYS return standardized error responses** using src/lib/errors.ts.
 7. **NEVER expose Supabase service role key** in client-side code.
-8. **Keep serverless functions lean** — import only what's needed, cold starts matter.
-9. **Use Haiku 4.5 as default model** — only use Sonnet when user explicitly requests "accurate" mode.
-10. **All money values in cents** internally (Stripe convention), convert for display only.
+8. **Keep route handlers lean** — import only what's needed.
+9. **Use Haiku 4.5 as default model** — Sonnet only when user requests "accurate".
+10. **All money values in cents** internally (Stripe convention).
+11. **Root layout (src/app/layout.tsx) must NEVER contain auth wrappers.** Auth goes ONLY in `(auth)/layout.tsx`.
+12. **Never add NEXT_PUBLIC_ prefix to ANTHROPIC_API_KEY, STRIPE_SECRET_KEY, or SUPABASE_SERVICE_ROLE_KEY.** Add `import 'server-only'` to ALL files in `src/lib/`.
+13. **Present implementation plans to Kiano** before large architectural changes.
 
 ---
 
-## 📋 Notion Command Center (Project Management Hub)
+## 🔌 Platform Access (MCP Tools)
 
-> **This project is managed through a Notion workspace. You MUST check it for tasks and updates.**
+You have direct MCP access to these platforms. **Use them instead of asking Kiano.**
+
+| Platform | What You Can Do |
+|----------|----------------|
+| **Notion** | Read/write tasks, update statuses, log issues |
+| **Supabase** | Run SQL, manage tables, deploy migrations |
+| **Stripe** | Create products/prices, manage subscriptions, configure webhooks |
+| **Vercel** | Deploy the single project, configure env vars, check status, read logs |
+| **GitHub** | Read repo contents, manage files |
+
+**Only flag for Kiano when:** signup/payment required, domain purchase, physical-world tasks.
+
+---
+
+## 📋 Notion Command Center
+
+> **Check Notion for tasks and updates at every session start.**
 
 ### Workspace Link
 **🔗 https://www.notion.so/DocuExtract-HQ-Command-Center-32d995287c1281d19ed3e8cd95a36138**
 
 ### Workspace Structure
-The Notion workspace contains:
 
-| Page | Purpose | Link |
-|------|---------|------|
-| **DocuExtract HQ — Command Center** | Main hub, decisions log, current phase | [Open](https://www.notion.so/32d995287c1281d19ed3e8cd95a36138) |
-| **Claude Code Tasks** | YOUR task queue — tasks assigned to you with specs, acceptance criteria, priorities | Database under HQ page |
-| **Claude Code — Issues & Suggestions** | YOUR feedback channel — log bugs, suggestions, questions, and tech debt here | Database under HQ page |
-| **Kiano Tasks** | Tasks assigned to Kiano (human operator) — do NOT work on these | Database under HQ page |
-| **Architecture & Technical Spec** | Detailed technical reference (supplements this file) | [Open](https://www.notion.so/32d995287c128133b02ee6dd36e0e4af) |
-| **Research & Market Intelligence** | Market research, competitor data, case studies | [Open](https://www.notion.so/32d995287c12811a8378d4ad0217b1ab) |
-| **Daily Progress Log** | Where you log what you completed each session | [Open](https://www.notion.so/32d995287c1281738f76c6e3876d75e3) |
+| Page | Purpose |
+|------|---------|
+| **Claude Code Tasks** | YOUR task queue with specs and acceptance criteria |
+| **Claude Code — Issues & Suggestions** | YOUR feedback channel for bugs, questions, decisions |
+| **Kiano Tasks** | Tasks for Kiano — do NOT work on these |
+| **Architecture & Technical Spec** | Technical reference |
+| **Research & Market Intelligence** | Market research and competitor data |
+| **Daily Progress Log** | Log what you completed each session |
 
-### Your Workflow (Claude Code)
+### Your Workflow
+1. Read this CLAUDE.md
+2. Check "Claude Code Tasks" for Queued/In Progress tasks
+3. Pick highest priority Queued task with no unresolved dependencies
+4. Set status to "In Progress"
+5. Build following this file's architecture
+6. Set status to "Done" with completion notes
+7. Log issues/questions in Issues & Suggestions database
+8. Update the Daily Progress Log
+9. Move to next task
 
-1. **Start of session:** Read this CLAUDE.md file, then check the "Claude Code Tasks" database in Notion for tasks with Status = "Queued" or "In Progress"
-2. **Pick the highest priority Queued task** (P0 > P1 > P2 > P3) that has no unresolved dependencies
-3. **Read the full task spec** by opening the task page in Notion — it contains acceptance criteria and detailed instructions
-4. **Set status to "In Progress"** before you start working
-5. **Build the solution** following the architecture in this file
-6. **When complete:** Set status to "Done" and write a summary in the "Completion Notes" field
-7. **Log any issues, suggestions, or questions** in the "Claude Code — Issues & Suggestions" database (see below)
-8. **Update the Daily Progress Log** with what you accomplished
-9. **Move to the next Queued task** or stop if no more tasks are available
-
-### Issues & Suggestions — How to Use This
-
-The **"Claude Code — Issues & Suggestions"** database is your direct communication channel with the CEO (Claude on claude.ai) and Kiano. Use it whenever you encounter something that doesn't fit in a task's Completion Notes.
-
-**When to create an entry:**
-- You hit a **bug or unexpected behavior** during implementation (Type: "Bug / Issue")
-- You have an **idea to improve** the architecture, DX, or performance (Type: "Suggestion")
-- You need a **strategic decision** from the CEO — e.g., "Should we support multi-page PDFs in v1?" (Type: "Question for CEO")
-- You need **something from Kiano** — e.g., "Need the Anthropic API key added to .env.local" (Type: "Question for Kiano")
-- You took a **shortcut or left something incomplete** that needs revisiting (Type: "Technical Debt")
-- You encountered a **fork in the road** and need guidance before proceeding (Type: "Decision Needed")
-
-**How to fill it in:**
-- **Title:** Short, clear summary (e.g., "Vercel 4.5MB body limit blocks large invoice uploads")
-- **Type:** Select the appropriate category
-- **Severity:** How urgent is this? "Critical - Blocking" means you can't continue without resolution
-- **Status:** Set to "Open" when you create it
-- **Related Task:** Name of the task you were working on when this came up
-- **Description:** Detailed explanation of the issue or suggestion
-- **Proposed Solution:** If you have an idea for how to solve it, write it here
-- **CEO Response:** Leave blank — the CEO will write their decision/response here
-
-**The CEO reviews this database regularly.** If something is Critical and Blocking, also mention it in the Daily Progress Log so it gets immediate attention.
-
-### Communication Protocol
-- **Claude (Strategist on claude.ai)** creates tasks, reviews your work, reviews Issues & Suggestions, and adjusts priorities
-- **You (Claude Code)** execute development tasks, report completion in Notion, and log issues/questions in the Issues & Suggestions database
-- **Kiano (Human Operator)** handles physical-world tasks (account setup, domain purchase, deployments) and responds to "Question for Kiano" entries
-- If you are **blocked** by a dependency (e.g., waiting for Kiano to provide credentials), set the task status to "Blocked", log a "Question for Kiano" in Issues & Suggestions, and move to the next available task
-- If you encounter a **technical decision** not covered in this file, log it as "Decision Needed" in Issues & Suggestions before proceeding
-
-### Task File Mirror (Backup)
-As a backup in case Notion is inaccessible, the active task should also be mirrored in:
-- `tasks/CURRENT_TASK.md` — copy of the active task spec
-- `tasks/completed/` — completed task specs with notes
-- `tasks/backlog/` — upcoming task specs
-
-**Notion is the source of truth.** The repo task files are a convenience mirror.
+### Issues & Suggestions Types
+- **Bug / Issue**: Unexpected behavior found during implementation
+- **Suggestion**: Improvement idea for architecture, DX, or performance
+- **Question for CEO**: Need strategic decision
+- **Question for Kiano**: Need something from the human operator
+- **Technical Debt**: Shortcut taken that needs revisiting
+- **Decision Needed**: Fork in the road requiring guidance
 
 ---
 
-## 🗺️ Build Phases (30-Day Plan)
+## 🗺️ Build Phases & Status
 
-### Phase 1: Foundation (Days 1-3)
-- Project scaffolding, Supabase schema, Vercel config
-- Basic auth (API key generation and validation)
-- Health endpoint
+### Phase 1: Foundation ✅ COMPLETE
+### Phase 2: Core Engine ✅ COMPLETE
+### Phase 3: Billing ✅ COMPLETE
+### Phase 4: Developer Experience ✅ COMPLETE
+### Phase 5: Distribution & Launch 🔄 IN PROGRESS
 
-### Phase 2: Core Engine (Days 4-10)
-- Extraction engine with Claude integration
-- Document type detection
-- Input processing (base64, URL)
-- Post-processing and validation
-- Error handling
+**Current work:**
+- Migrating `api/v1/*.ts` serverless functions into `src/app/v1/*/route.ts` Next.js Route Handlers
+- Merging the old root `package.json` (API deps) with `dashboard/package.json` (Next.js deps) into a single `package.json`
+- Converting static HTML pages (landing, playground, docs) into React components
+- Implementing the `(auth)` route group for dashboard-only auth wrapping
+- Adding `import 'server-only'` to all `src/lib/` files
 
-### Phase 3: Billing (Days 11-14)
-- Stripe product/price setup
-- Usage tracking and metering
-- Rate limiting
-- Webhook handling
+**Remaining after migration:**
+- Deploy unified app to Vercel
+- Update Supabase Auth redirect URLs to new deployment URL
+- Generate OpenAPI 3.0 spec for RapidAPI
+- List API on RapidAPI marketplace
+- Set up Sentry error tracking
+- Write 3 SEO blog posts
+- Prepare Product Hunt and Hacker News launch
+- Purchase domain (Kiano)
 
-### Phase 4: Developer Experience (Days 15-20)
-- API documentation
-- JavaScript and Python SDKs
-- Interactive playground
-- Developer dashboard (signup, API keys, usage)
+---
 
-### Phase 5: Distribution (Days 21-30)
-- Landing page
-- RapidAPI listing
-- SEO content (3-5 blog posts)
-- Product Hunt and Hacker News launch prep
-- n8n/Zapier/Make integrations
+## 📊 Key URLs & Resources
+
+| Resource | URL |
+|----------|-----|
+| GitHub Repo | https://github.com/TheOGSatoshiNakamoto/docuextract |
+| App (Vercel) | TBD (new unified deployment — replaces docuextract-azure.vercel.app) |
+| Supabase Project | https://jdvogyzrawcwxlrambpd.supabase.co |
+| Stripe Dashboard (Test) | https://dashboard.stripe.com/test |
+| Notion HQ | https://www.notion.so/DocuExtract-HQ-Command-Center-32d995287c1281d19ed3e8cd95a36138 |
