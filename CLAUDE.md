@@ -1,7 +1,7 @@
 # CLAUDE.md — DocuExtract
 
 > **Read this file in full before starting ANY task.** This is your single source of truth.
-> Last updated: 2026-03-28
+> Last updated: 2026-03-29
 
 ---
 
@@ -50,10 +50,10 @@ DocuExtract is a **single Next.js 14 App Router application** deployed as **one 
 | **Root Directory** | Repo root (project root IS the Next.js app) |
 | **UI Routes** | `/`, `/playground`, `/docs`, `/login`, `/dashboard/*` |
 | **API Routes** | `/v1/extract`, `/v1/detect`, `/v1/usage`, `/v1/health`, `/v1/billing/*`, `/v1/webhooks/*` |
-| **Current URL** | TBD (new deployment replaces `docuextract-azure.vercel.app`) |
-| **Future Domain** | `docuextract.dev` (serves both UI and API from one deployment) |
+| **Current URL** | https://docuextract.dev |
+| **Domain** | `docuextract.dev` (serves both UI and API from one deployment) |
 
-The previous two-project architecture (separate API serverless functions + separate Next.js dashboard) has been retired. The old `docuextract-azure.vercel.app` deployment will be decommissioned once the new unified deployment is live.
+The previous two-project architecture (separate API serverless functions + separate Next.js dashboard) has been retired. The old `docuextract-azure.vercel.app` deployment has been replaced by the unified deployment at `docuextract.dev`.
 
 **Why single project:** Same-origin means no CORS configuration, one set of environment variables, one deployment pipeline, one `package.json`, and simpler debugging. API route handlers in Next.js have the same capabilities as raw Vercel serverless functions.
 
@@ -65,7 +65,7 @@ The previous two-project architecture (separate API serverless functions + separ
 | **AI Engine** | Claude API (Haiku 4.5 for speed, Sonnet 4.6 for complex docs) | Best-in-class document extraction, consistent JSON output |
 | **Billing** | Stripe (Subscriptions + Metered Billing) | Industry standard, usage-based billing support |
 | **Monitoring** | Sentry (free tier) — planned | Error tracking, performance monitoring |
-| **Domain** | docuextract.dev (pending purchase by Kiano) | Short, memorable, developer-oriented |
+| **Domain** | docuextract.dev | Short, memorable, developer-oriented |
 
 ### System Flow
 ```
@@ -544,7 +544,7 @@ You have direct MCP access to these platforms. **Use them instead of asking Kian
 | Resource | URL |
 |----------|-----|
 | GitHub Repo | https://github.com/TheOGSatoshiNakamoto/docuextract |
-| App (Vercel) | TBD (new unified deployment — replaces docuextract-azure.vercel.app) |
+| App (Vercel) | https://docuextract.dev |
 | Supabase Project | https://jdvogyzrawcwxlrambpd.supabase.co |
 | Stripe Dashboard (Test) | https://dashboard.stripe.com/test |
 | Notion HQ | https://www.notion.so/DocuExtract-HQ-Command-Center-32d995287c1281d19ed3e8cd95a36138 |

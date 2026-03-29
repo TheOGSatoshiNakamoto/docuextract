@@ -10,7 +10,7 @@
  *   npx ts-node scripts/test-billing-e2e.ts [API_BASE_URL]
  *
  * Example:
- *   npx ts-node scripts/test-billing-e2e.ts https://docuextract-azure.vercel.app
+ *   npx ts-node scripts/test-billing-e2e.ts https://docuextract.dev
  */
 
 import { createClient } from '@supabase/supabase-js';

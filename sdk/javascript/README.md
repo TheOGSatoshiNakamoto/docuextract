@@ -1,6 +1,6 @@
 # docuextract
 
-Official JavaScript/TypeScript SDK for the [DocuExtract API](https://docuextract-azure.vercel.app/docs).
+Official JavaScript/TypeScript SDK for the [DocuExtract API](https://docuextract.dev/docs).
 
 Send a document, get structured JSON back. No templates. No training. Works in 2 minutes.
 
@@ -143,7 +143,7 @@ const result: ExtractResult<Invoice> = await dex.extract<Invoice>(document, {
 
 ## API Reference
 
-Full API documentation: [docuextract-azure.vercel.app/docs](https://docuextract-azure.vercel.app/docs)
+Full API documentation: [docuextract.dev/docs](https://docuextract.dev/docs)
 
 ## License
 

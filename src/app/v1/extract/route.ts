@@ -13,7 +13,11 @@ import {
   errorInvalidRequest,
   errorInternal,
 } from '@/lib/errors';
+import { captureException } from '@/lib/sentry';
 import type { ExtractRequest, DocumentType, ModelMode } from '@/lib/types';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 const VALID_TYPES = new Set<DocumentType>([
   'invoice', 'receipt', 'bank_statement', 'resume',
@@ -77,6 +81,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       });
       return errorResponse(err.code, err.message);
     }
+    captureException(err);
     return errorInternal(err);
   }
 
@@ -108,6 +113,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     if (err instanceof ExtractionError) {
       return errorResponse('extraction_failed', 'Document extraction failed. Please try again.');
     }
+    captureException(err);
     return errorInternal(err);
   }
 

@@ -992,7 +992,7 @@ const bodyHtml = `
         <div class="code-body">
           <div class="code-pane active" id="pane-curl">
             <pre><span class="tok-comment"># Extract data from any document</span>
-<span class="tok-fn">curl</span> -X POST https://docuextract-azure.vercel.app/v1/extract \\
+<span class="tok-fn">curl</span> -X POST https://docuextract.dev/v1/extract \\
   -H <span class="tok-str">"Authorization: Bearer dk_live_..."</span> \\
   -H <span class="tok-str">"Content-Type: application/json"</span> \\
   -d <span class="tok-str">'{

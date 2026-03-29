@@ -1,0 +1,603 @@
+openapi: 3.0.3
+info:
+  title: DocuExtract API
+  description: |
+    Convert unstructured documents into clean, validated JSON using Claude AI.
+    Send a document (image, PDF, or URL), specify what you want extracted, and
+    receive structured data in seconds. No templates, no training required.
+  version: 1.0.0
+  contact:
+    url: https://docuextract.dev
+  license:
+    name: Proprietary
+
+servers:
+  - url: https://docuextract.dev/v1
+    description: Production
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: |
+        API key obtained from your DocuExtract dashboard. Keys begin with `dex_live_`
+        followed by 32 random characters.
+
+  schemas:
+    DocumentType:
+      type: string
+      enum:
+        - invoice
+        - receipt
+        - bank_statement
+        - resume
+        - contract
+        - form
+        - id_document
+        - unknown
+      description: |
+        Type of the document. Use `unknown` for documents that don't fit a specific
+        category. When omitted from an extraction request, the type is auto-detected.
+
+    ModelMode:
+      type: string
+      enum:
+        - fast
+        - accurate
+      default: fast
+      description: |
+        Extraction model to use.
+        - `fast`: Claude Haiku 4.5 — optimized for speed (~1–2 s)
+        - `accurate`: Claude Sonnet 4.6 — better accuracy for complex or multi-page documents
+
+    ExtractionMetadata:
+      type: object
+      required:
+        - type
+        - confidence
+        - model
+        - processing_time_ms
+        - page_count
+      properties:
+        type:
+          $ref: '#/components/schemas/DocumentType'
+        confidence:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: Overall extraction confidence score (0–1)
+          example: 0.96
+        model:
+          type: string
+          description: Claude model ID used for the extraction
+          example: claude-haiku-4-5-20251001
+        processing_time_ms:
+          type: integer
+          description: Wall-clock processing time in milliseconds
+          example: 1847
+        page_count:
+          type: integer
+          description: Number of pages processed
+          example: 1
+
+    ExtractResponse:
+      type: object
+      required:
+        - data
+        - metadata
+      properties:
+        data:
+          type: object
+          additionalProperties: true
+          description: |
+            Extracted structured data. Fields vary by document type. Examples:
+            invoices include `vendor_name`, `invoice_number`, `total_amount`, `line_items`;
+            resumes include `name`, `work_experience`, `education`, `skills`.
+          example:
+            vendor_name: Acme Corp
+            invoice_number: INV-2024-0847
+            invoice_date: "2024-03-15"
+            due_date: "2024-04-15"
+            subtotal: 1000.00
+            tax_amount: 250.00
+            total_amount: 1250.00
+            currency: USD
+            line_items:
+              - description: Consulting services
+                quantity: 10
+                unit_price: 100.00
+                total: 1000.00
+        metadata:
+          $ref: '#/components/schemas/ExtractionMetadata'
+
+    DetectResponse:
+      type: object
+      required:
+        - type
+        - confidence
+      properties:
+        type:
+          $ref: '#/components/schemas/DocumentType'
+        confidence:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: Confidence in the detected document type
+          example: 0.98
+
+    UsageDayBreakdown:
+      type: object
+      required:
+        - date
+        - count
+      properties:
+        date:
+          type: string
+          format: date
+          description: Date in YYYY-MM-DD format
+          example: "2024-03-24"
+        count:
+          type: integer
+          description: Number of extractions on this date
+          example: 42
+
+    UsageResponse:
+      type: object
+      required:
+        - used
+        - limit
+        - plan
+        - period_end
+        - breakdown
+      properties:
+        used:
+          type: integer
+          description: Extractions consumed in the current billing period
+          example: 847
+        limit:
+          type: integer
+          description: Monthly extraction limit for the current plan
+          example: 10000
+        plan:
+          type: string
+          enum: [free, starter, pro, scale]
+          description: Current subscription plan
+          example: pro
+        period_end:
+          type: string
+          format: date
+          description: Date on which the current billing period ends (YYYY-MM-DD)
+          example: "2024-04-24"
+        breakdown:
+          type: array
+          items:
+            $ref: '#/components/schemas/UsageDayBreakdown'
+          description: Daily usage breakdown for the current period
+
+    HealthResponse:
+      type: object
+      required:
+        - status
+        - version
+      properties:
+        status:
+          type: string
+          enum: [ok]
+          example: ok
+        version:
+          type: string
+          example: "1.0.0"
+
+    CheckoutResponse:
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Stripe Checkout URL. Redirect the user to this URL to complete payment.
+          example: "https://checkout.stripe.com/c/pay/cs_live_..."
+
+    PortalResponse:
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Stripe Billing Portal URL. Redirect the user to manage their subscription.
+          example: "https://billing.stripe.com/p/session/..."
+
+    ApiError:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+              enum:
+                - unauthorized
+                - forbidden
+                - not_found
+                - rate_limited
+                - invalid_request
+                - file_too_large
+                - unsupported_format
+                - extraction_failed
+                - internal_error
+              description: Machine-readable error code
+            message:
+              type: string
+              description: Human-readable error description
+            details:
+              type: object
+              additionalProperties: true
+              description: Optional additional error context
+
+  responses:
+    Unauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          example:
+            error:
+              code: unauthorized
+              message: Invalid or missing API key
+
+    RateLimited:
+      description: Rate limit exceeded
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+          description: Seconds until the rate limit resets
+        X-RateLimit-Limit-Minute:
+          schema:
+            type: integer
+        X-RateLimit-Remaining-Minute:
+          schema:
+            type: integer
+        X-RateLimit-Limit-Month:
+          schema:
+            type: integer
+        X-RateLimit-Remaining-Month:
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          example:
+            error:
+              code: rate_limited
+              message: Rate limit exceeded
+
+    InternalError:
+      description: Unexpected server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          example:
+            error:
+              code: internal_error
+              message: An unexpected error occurred. Please try again.
+
+paths:
+  /extract:
+    post:
+      operationId: extractDocument
+      summary: Extract structured data from a document
+      description: |
+        The core endpoint. Accepts a document as a base64-encoded string or a
+        publicly accessible URL and returns structured JSON data with confidence
+        scores and processing metadata.
+
+        Rate limit headers are included on every response:
+        - `X-RateLimit-Limit-Minute` / `X-RateLimit-Remaining-Minute`
+        - `X-RateLimit-Limit-Month` / `X-RateLimit-Remaining-Month`
+      tags:
+        - Extraction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - document
+              properties:
+                document:
+                  type: string
+                  description: |
+                    Document to extract data from. One of:
+                    - Base64-encoded file content (include the `data:<mime>;base64,` prefix)
+                    - Publicly accessible HTTPS URL (PDF, PNG, JPG, or WEBP)
+                  example: "https://example.com/invoice.pdf"
+                type:
+                  $ref: '#/components/schemas/DocumentType'
+                  description: |
+                    Optional document type hint. When omitted, the type is
+                    auto-detected using a separate Claude call.
+                model:
+                  $ref: '#/components/schemas/ModelMode'
+                schema:
+                  type: object
+                  additionalProperties: true
+                  description: |
+                    Optional custom JSON schema describing the fields to extract.
+                    When provided, extraction is guided by your schema definition
+                    rather than the built-in document-type template.
+                  example:
+                    vendor_name:
+                      type: string
+                    total_amount:
+                      type: number
+            examples:
+              invoice_url:
+                summary: Extract from a URL (invoice, fast mode)
+                value:
+                  document: "https://example.com/invoice.pdf"
+                  type: invoice
+              resume_base64:
+                summary: Extract from base64 (resume, accurate mode)
+                value:
+                  document: "data:application/pdf;base64,JVBERi0xLjQ..."
+                  type: resume
+                  model: accurate
+              custom_schema:
+                summary: Extract with a custom schema
+                value:
+                  document: "https://example.com/form.png"
+                  schema:
+                    applicant_name:
+                      type: string
+                    date_of_birth:
+                      type: string
+                    signature_present:
+                      type: boolean
+      responses:
+        "200":
+          description: Successful extraction
+          headers:
+            X-RateLimit-Limit-Minute:
+              schema:
+                type: integer
+            X-RateLimit-Remaining-Minute:
+              schema:
+                type: integer
+            X-RateLimit-Limit-Month:
+              schema:
+                type: integer
+            X-RateLimit-Remaining-Month:
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractResponse'
+        "400":
+          description: Invalid request (missing field, bad document type, inaccessible URL)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "413":
+          description: Document exceeds 10 MB size limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        "415":
+          description: Unsupported file format (only PDF, PNG, JPG, WEBP accepted)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        "422":
+          description: Extraction failed after retrying
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        "429":
+          $ref: '#/components/responses/RateLimited'
+        "500":
+          $ref: '#/components/responses/InternalError'
+
+  /detect:
+    post:
+      operationId: detectDocumentType
+      summary: Detect document type
+      description: |
+        Detect the type of a document without extracting its data. Useful for
+        routing or pre-validation before calling `/v1/extract`.
+      tags:
+        - Extraction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - document
+              properties:
+                document:
+                  type: string
+                  description: |
+                    Document to classify. Base64-encoded string (with `data:<mime>;base64,`
+                    prefix) or a publicly accessible HTTPS URL.
+                  example: "https://example.com/invoice.pdf"
+      responses:
+        "200":
+          description: Document type detected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetectResponse'
+              example:
+                type: invoice
+                confidence: 0.98
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "413":
+          description: Document exceeds 10 MB size limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        "415":
+          description: Unsupported file format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        "429":
+          $ref: '#/components/responses/RateLimited'
+        "500":
+          $ref: '#/components/responses/InternalError'
+
+  /usage:
+    get:
+      operationId: getUsage
+      summary: Get current usage statistics
+      description: |
+        Returns extraction usage for the current billing period, including a
+        daily breakdown of the last 30 days.
+      tags:
+        - Account
+      responses:
+        "200":
+          description: Usage statistics for the current period
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageResponse'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "500":
+          $ref: '#/components/responses/InternalError'
+
+  /health:
+    get:
+      operationId: healthCheck
+      summary: Health check
+      description: Returns the API status and version. No authentication required.
+      tags:
+        - System
+      security: []
+      responses:
+        "200":
+          description: API is operational
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: ok
+                version: "1.0.0"
+
+  /billing/checkout:
+    post:
+      operationId: createCheckoutSession
+      summary: Create a Stripe Checkout session
+      description: |
+        Creates a Stripe Checkout session for subscribing to a paid plan.
+        Returns a URL to redirect the user to for payment. After successful
+        payment, Stripe redirects the user back to the dashboard.
+      tags:
+        - Billing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - plan
+              properties:
+                plan:
+                  type: string
+                  enum: [starter, pro, scale]
+                  description: Plan to subscribe to
+                  example: pro
+      responses:
+        "200":
+          description: Checkout session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckoutResponse'
+        "400":
+          description: Invalid or missing plan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "500":
+          $ref: '#/components/responses/InternalError'
+
+  /billing/portal:
+    post:
+      operationId: createBillingPortalSession
+      summary: Create a Stripe Billing Portal session
+      description: |
+        Creates a Stripe Billing Portal session for subscription management
+        (cancel, upgrade, update payment method, download invoices). Requires
+        an active paid subscription.
+      tags:
+        - Billing
+      responses:
+        "200":
+          description: Billing portal session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortalResponse'
+        "400":
+          description: No active Stripe subscription (free plan users)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "500":
+          $ref: '#/components/responses/InternalError'
+
+tags:
+  - name: Extraction
+    description: Document processing and data extraction
+  - name: Account
+    description: Usage statistics and account information
+  - name: Billing
+    description: Subscription management via Stripe
+  - name: System
+    description: API health and metadata

@@ -103,9 +103,9 @@ hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
 // Shared inline HTML for pre blocks with syntax highlighting
 const preBlocks: Record<string, string> = {
   authHttp: `<span class="hdr">Authorization: Bearer dex_live_xxxxxxxxxxxxxxxxxxxxxxxx</span>`,
-  qsCurl: `<span class="fn">curl</span> <span class="url">https://docuextract-azure.vercel.app/v1/extract</span> \\\n  <span class="hdr">-H</span> <span class="str">"Authorization: Bearer dex_live_YOUR_KEY"</span> \\\n  <span class="hdr">-H</span> <span class="str">"Content-Type: application/json"</span> \\\n  <span class="hdr">-d</span> <span class="str">&#39;{\n    "document": "https://example.com/invoice.pdf",\n    "type": "invoice"\n  }&#39;</span>`,
-  qsJs: `<span class="kw">const</span> response = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'https://docuextract-azure.vercel.app/v1/extract'</span>, {\n  method: <span class="str">'POST'</span>,\n  headers: {\n    <span class="str">'Authorization'</span>: <span class="str">'Bearer dex_live_YOUR_KEY'</span>,\n    <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>,\n  },\n  body: <span class="fn">JSON.stringify</span>({\n    document: <span class="str">'https://example.com/invoice.pdf'</span>,\n    type: <span class="str">'invoice'</span>,\n  }),\n});\n\n<span class="kw">const</span> result = <span class="kw">await</span> response.<span class="fn">json</span>();\nconsole.<span class="fn">log</span>(result.data);\n<span class="cmt">// { vendor_name: "Acme Corp", total_amount: 1250.00, ... }</span>`,
-  qsPy: `<span class="kw">import</span> requests\n\nresponse = requests.<span class="fn">post</span>(\n    <span class="str">'https://docuextract-azure.vercel.app/v1/extract'</span>,\n    headers={\n        <span class="str">'Authorization'</span>: <span class="str">'Bearer dex_live_YOUR_KEY'</span>,\n        <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>,\n    },\n    json={\n        <span class="str">'document'</span>: <span class="str">'https://example.com/invoice.pdf'</span>,\n        <span class="str">'type'</span>: <span class="str">'invoice'</span>,\n    }\n)\n\nresult = response.<span class="fn">json</span>()\n<span class="fn">print</span>(result[<span class="str">'data'</span>])\n<span class="cmt"># {'vendor_name': 'Acme Corp', 'total_amount': 1250.0, ...}</span>`,
+  qsCurl: `<span class="fn">curl</span> <span class="url">https://docuextract.dev/v1/extract</span> \\\n  <span class="hdr">-H</span> <span class="str">"Authorization: Bearer dex_live_YOUR_KEY"</span> \\\n  <span class="hdr">-H</span> <span class="str">"Content-Type: application/json"</span> \\\n  <span class="hdr">-d</span> <span class="str">&#39;{\n    "document": "https://example.com/invoice.pdf",\n    "type": "invoice"\n  }&#39;</span>`,
+  qsJs: `<span class="kw">const</span> response = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'https://docuextract.dev/v1/extract'</span>, {\n  method: <span class="str">'POST'</span>,\n  headers: {\n    <span class="str">'Authorization'</span>: <span class="str">'Bearer dex_live_YOUR_KEY'</span>,\n    <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>,\n  },\n  body: <span class="fn">JSON.stringify</span>({\n    document: <span class="str">'https://example.com/invoice.pdf'</span>,\n    type: <span class="str">'invoice'</span>,\n  }),\n});\n\n<span class="kw">const</span> result = <span class="kw">await</span> response.<span class="fn">json</span>();\nconsole.<span class="fn">log</span>(result.data);\n<span class="cmt">// { vendor_name: "Acme Corp", total_amount: 1250.00, ... }</span>`,
+  qsPy: `<span class="kw">import</span> requests\n\nresponse = requests.<span class="fn">post</span>(\n    <span class="str">'https://docuextract.dev/v1/extract'</span>,\n    headers={\n        <span class="str">'Authorization'</span>: <span class="str">'Bearer dex_live_YOUR_KEY'</span>,\n        <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>,\n    },\n    json={\n        <span class="str">'document'</span>: <span class="str">'https://example.com/invoice.pdf'</span>,\n        <span class="str">'type'</span>: <span class="str">'invoice'</span>,\n    }\n)\n\nresult = response.<span class="fn">json</span>()\n<span class="fn">print</span>(result[<span class="str">'data'</span>])\n<span class="cmt"># {'vendor_name': 'Acme Corp', 'total_amount': 1250.0, ...}</span>`,
   qsResponse: `{\n  <span class="key">"data"</span>: {\n    <span class="key">"vendor_name"</span>: <span class="str">"Acme Corp"</span>,\n    <span class="key">"invoice_number"</span>: <span class="str">"INV-2024-0847"</span>,\n    <span class="key">"invoice_date"</span>: <span class="str">"2024-03-15"</span>,\n    <span class="key">"due_date"</span>: <span class="str">"2024-04-15"</span>,\n    <span class="key">"subtotal"</span>: <span class="num">1000.00</span>,\n    <span class="key">"tax_amount"</span>: <span class="num">250.00</span>,\n    <span class="key">"total_amount"</span>: <span class="num">1250.00</span>,\n    <span class="key">"currency"</span>: <span class="str">"USD"</span>,\n    <span class="key">"line_items"</span>: [\n      { <span class="key">"description"</span>: <span class="str">"Consulting services"</span>, <span class="key">"quantity"</span>: <span class="num">10</span>, <span class="key">"unit_price"</span>: <span class="num">100.00</span>, <span class="key">"total"</span>: <span class="num">1000.00</span> }\n    ]\n  },\n  <span class="key">"metadata"</span>: {\n    <span class="key">"type"</span>: <span class="str">"invoice"</span>,\n    <span class="key">"confidence"</span>: <span class="num">0.96</span>,\n    <span class="key">"model"</span>: <span class="str">"claude-haiku-4-5-20251001"</span>,\n    <span class="key">"processing_time_ms"</span>: <span class="num">1847</span>,\n    <span class="key">"page_count"</span>: <span class="num">1</span>\n  }\n}`,
 };
 
@@ -164,7 +164,7 @@ export default function DocsPage() {
             <p>DocuExtract converts unstructured documents — invoices, receipts, contracts, resumes, bank statements — into clean, validated JSON using Claude AI. You send a document (image, PDF, or URL), specify what you want extracted, and receive structured data in seconds.</p>
             <div className="callout callout-info">
               <strong>Base URL</strong>
-              <code>https://docuextract-azure.vercel.app/v1</code>
+              <code>https://docuextract.dev/v1</code>
             </div>
             <div className="table-wrap">
               <table>
@@ -284,7 +284,7 @@ export default function DocsPage() {
             <p>Extract structured data from a document. This is the core endpoint.</p>
             <div className="endpoint-badge">
               <span className="badge-method badge-post">POST</span>
-              <span className="badge-path">https://docuextract-azure.vercel.app/v1/extract</span>
+              <span className="badge-path">https://docuextract.dev/v1/extract</span>
             </div>
             <h3>Request Body</h3>
             <div className="table-wrap">
@@ -313,7 +313,7 @@ export default function DocsPage() {
             <p>Detect the type of a document without extracting its data.</p>
             <div className="endpoint-badge">
               <span className="badge-method badge-post">POST</span>
-              <span className="badge-path">https://docuextract-azure.vercel.app/v1/detect</span>
+              <span className="badge-path">https://docuextract.dev/v1/detect</span>
             </div>
             <h3>Response</h3>
             <div className="code-block">
@@ -330,7 +330,7 @@ export default function DocsPage() {
             <p>Retrieve your current usage statistics for the billing period.</p>
             <div className="endpoint-badge">
               <span className="badge-method badge-get">GET</span>
-              <span className="badge-path">https://docuextract-azure.vercel.app/v1/usage</span>
+              <span className="badge-path">https://docuextract.dev/v1/usage</span>
             </div>
             <h3>Response</h3>
             <div className="code-block">
@@ -347,7 +347,7 @@ export default function DocsPage() {
             <p>Health check endpoint. No authentication required.</p>
             <div className="endpoint-badge">
               <span className="badge-method badge-get">GET</span>
-              <span className="badge-path">https://docuextract-azure.vercel.app/v1/health</span>
+              <span className="badge-path">https://docuextract.dev/v1/health</span>
             </div>
             <div className="code-block">
               <div className="code-header"><span className="code-lang">json</span></div>
@@ -363,7 +363,7 @@ export default function DocsPage() {
             <p>Create a Stripe Checkout session to subscribe to a paid plan. Returns a URL to redirect your user to for payment.</p>
             <div className="endpoint-badge">
               <span className="badge-method badge-post">POST</span>
-              <span className="badge-path">https://docuextract-azure.vercel.app/v1/billing/checkout</span>
+              <span className="badge-path">https://docuextract.dev/v1/billing/checkout</span>
             </div>
             <h3>Request Body</h3>
             <div className="table-wrap">
@@ -390,7 +390,7 @@ export default function DocsPage() {
             <p>Create a Stripe Billing Portal session for subscription management.</p>
             <div className="endpoint-badge">
               <span className="badge-method badge-post">POST</span>
-              <span className="badge-path">https://docuextract-azure.vercel.app/v1/billing/portal</span>
+              <span className="badge-path">https://docuextract.dev/v1/billing/portal</span>
             </div>
             <div className="callout callout-info">
               Requires an active Stripe subscription. Free plan users will receive a 400 error.
@@ -430,20 +430,19 @@ export default function DocsPage() {
           {/* Errors */}
           <section id="errors">
             <h2>Error Codes</h2>
-            <p>All errors return a JSON response with <code>error</code> and <code>message</code> fields.</p>
+            <p>All errors return a JSON response with an <code>error</code> object containing <code>code</code> and <code>message</code> fields.</p>
             <div className="code-block">
               <div className="code-header"><span className="code-lang">json</span></div>
-              <pre dangerouslySetInnerHTML={{ __html: `{\n  <span class="key">"error"</span>: <span class="str">"invalid_api_key"</span>,\n  <span class="key">"message"</span>: <span class="str">"Invalid or missing API key."</span>\n}` }} />
+              <pre dangerouslySetInnerHTML={{ __html: `{\n  <span class="key">"error"</span>: {\n    <span class="key">"code"</span>: <span class="str">"unauthorized"</span>,\n    <span class="key">"message"</span>: <span class="str">"Invalid or missing API key"</span>\n  }\n}` }} />
             </div>
             <h3>4xx Client Errors</h3>
-            <div className="error-card"><div className="error-code">401 — invalid_api_key</div><div className="error-desc">The API key is missing, malformed, or revoked.</div></div>
-            <div className="error-card"><div className="error-code">400 — invalid_request</div><div className="error-desc">A required field is missing or a field value is invalid.</div></div>
-            <div className="error-card"><div className="error-code">400 — file_too_large</div><div className="error-desc">The document exceeds the 10 MB size limit.</div></div>
-            <div className="error-card"><div className="error-code">400 — unsupported_format</div><div className="error-desc">The file format is not supported. Use PDF, PNG, JPG, or WEBP.</div></div>
-            <div className="error-card"><div className="error-code">400 — invalid_url</div><div className="error-desc">The document URL is not accessible or returned a non-200 status.</div></div>
-            <div className="error-card"><div className="error-code">429 — rate_limit_exceeded</div><div className="error-desc">You&apos;ve exceeded your per-minute or per-month rate limit. Upgrade your plan for higher limits.</div></div>
+            <div className="error-card"><div className="error-code">401 — unauthorized</div><div className="error-desc">The API key is missing, malformed, or revoked.</div></div>
+            <div className="error-card"><div className="error-code">400 — invalid_request</div><div className="error-desc">A required field is missing or a field value is invalid (includes inaccessible document URLs).</div></div>
+            <div className="error-card"><div className="error-code">413 — file_too_large</div><div className="error-desc">The document exceeds the 10 MB size limit.</div></div>
+            <div className="error-card"><div className="error-code">415 — unsupported_format</div><div className="error-desc">The file format is not supported. Use PDF, PNG, JPG, or WEBP.</div></div>
+            <div className="error-card"><div className="error-code">422 — extraction_failed</div><div className="error-desc">The AI extraction failed after retrying. Try again. If it persists, the document may be corrupted or too complex.</div></div>
+            <div className="error-card"><div className="error-code">429 — rate_limited</div><div className="error-desc">You&apos;ve exceeded your per-minute or per-month rate limit. Check the <code>Retry-After</code> header. Upgrade your plan for higher limits.</div></div>
             <h3>5xx Server Errors</h3>
-            <div className="error-card"><div className="error-code">500 — extraction_failed</div><div className="error-desc">The AI extraction failed after retrying. Try again. If it persists, the document may be corrupted.</div></div>
             <div className="error-card"><div className="error-code">500 — internal_error</div><div className="error-desc">Unexpected server error. Please try again or contact support.</div></div>
           </section>
 

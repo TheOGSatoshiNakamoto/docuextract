@@ -1,5 +1,8 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { authenticateRequest } from '@/lib/auth';
+
+export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
 import { errorUnauthorized, errorInternal } from '@/lib/errors';
 import { getUsageStats } from '@/lib/usage';
 

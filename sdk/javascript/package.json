@@ -24,7 +24,7 @@
     "type": "git",
     "url": "https://github.com/TheOGSatoshiNakamoto/docuextract"
   },
-  "homepage": "https://docuextract-azure.vercel.app/docs",
+  "homepage": "https://docuextract.dev/docs",
   "devDependencies": {
     "tsup": "^8.0.0",
     "typescript": "^5.0.0"

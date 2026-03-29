@@ -6,7 +6,11 @@ import {
   errorInvalidRequest,
   errorInternal,
 } from '@/lib/errors';
+import { captureException } from '@/lib/sentry';
 import type { Plan } from '@/lib/types';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 const PAID_PLANS = new Set<Exclude<Plan, 'free'>>(['starter', 'pro', 'scale']);
 
@@ -39,6 +43,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const url = await createCheckoutSession(auth.user.id, priceId);
     return NextResponse.json({ url });
   } catch (err) {
+    captureException(err);
     return errorInternal(err);
   }
 }

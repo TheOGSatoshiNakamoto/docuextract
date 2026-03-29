@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { getSupabaseClient } from '@/lib/supabase';
 import DashboardNav from '@/components/DashboardNav';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://docuextract-azure.vercel.app';
 
 interface UsageData {
   used: number;
@@ -36,7 +35,7 @@ export default function DashboardPage() {
       if (data) setApiKey(data.api_key);
 
       try {
-        const res = await fetch(`${API_BASE}/v1/usage`, {
+        const res = await fetch('/v1/usage', {
           headers: { Authorization: `Bearer ${data?.api_key}` },
         });
         if (res.ok) setUsage(await res.json());
@@ -125,7 +124,7 @@ export default function DashboardPage() {
         {/* Quick start */}
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
           <h2 className="text-white font-semibold mb-4">Quick start</h2>
-          <pre className="bg-gray-950 rounded-lg p-4 text-xs text-gray-300 font-mono overflow-x-auto">{`curl -X POST https://docuextract-azure.vercel.app/v1/extract \\
+          <pre className="bg-gray-950 rounded-lg p-4 text-xs text-gray-300 font-mono overflow-x-auto">{`curl -X POST ${process.env.NEXT_PUBLIC_APP_URL ?? 'https://docuextract.dev'}/v1/extract \\
   -H "Authorization: Bearer ${apiKey ?? 'YOUR_API_KEY'}" \\
   -H "Content-Type: application/json" \\
   -d '{"document": "<base64_or_url>", "type": "invoice"}'`}</pre>

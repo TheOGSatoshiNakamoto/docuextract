@@ -6,6 +6,10 @@ import {
   errorInvalidRequest,
   errorInternal,
 } from '@/lib/errors';
+import { captureException } from '@/lib/sentry';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   // ── 1. Authenticate ───────────────────────────────────────────────────────
@@ -22,6 +26,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     if (message.includes('No Stripe customer')) {
       return errorInvalidRequest(message);
     }
+    captureException(err);
     return errorInternal(err);
   }
 }

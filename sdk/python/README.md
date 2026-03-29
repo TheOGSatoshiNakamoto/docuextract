@@ -1,6 +1,6 @@
 # docuextract
 
-Official Python SDK for the [DocuExtract API](https://docuextract-azure.vercel.app/docs).
+Official Python SDK for the [DocuExtract API](https://docuextract.dev/docs).
 
 Send a document, get structured JSON back. No templates. No training. Works in 2 minutes.
 
@@ -129,7 +129,7 @@ with DocuExtract(api_key) as dex:
 
 ## API Reference
 
-Full API documentation: [docuextract-azure.vercel.app/docs](https://docuextract-azure.vercel.app/docs)
+Full API documentation: [docuextract.dev/docs](https://docuextract.dev/docs)
 
 ## License
 

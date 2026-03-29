@@ -4,7 +4,7 @@ import requests
 
 from .types import DetectResult, ExtractOptions, ExtractResult, UsageResult
 
-DEFAULT_BASE_URL = "https://docuextract-azure.vercel.app/v1"
+DEFAULT_BASE_URL = "https://docuextract.dev/v1"
 
 
 class DocuExtractAPIError(Exception):

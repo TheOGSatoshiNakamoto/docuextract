@@ -11,7 +11,11 @@ import {
   errorInvalidRequest,
   errorInternal,
 } from '@/lib/errors';
+import { captureException } from '@/lib/sentry';
 import type { DetectRequest } from '@/lib/types';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const requestStart = Date.now();
@@ -62,6 +66,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       });
       return errorResponse(err.code, err.message);
     }
+    captureException(err);
     return errorInternal(err);
   }
 

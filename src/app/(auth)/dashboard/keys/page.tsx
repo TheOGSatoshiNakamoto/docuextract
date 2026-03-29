@@ -100,7 +100,7 @@ export default function KeysPage() {
         {/* Usage example */}
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 mb-6">
           <p className="text-gray-400 text-sm font-medium mb-3">Example usage</p>
-          <pre className="bg-gray-950 rounded-lg p-3 text-xs text-gray-300 font-mono overflow-x-auto">{`curl https://docuextract-azure.vercel.app/v1/extract \\
+          <pre className="bg-gray-950 rounded-lg p-3 text-xs text-gray-300 font-mono overflow-x-auto">{`curl ${process.env.NEXT_PUBLIC_APP_URL ?? 'https://docuextract.dev'}/v1/extract \\
   -H "Authorization: Bearer ${revealed && apiKey ? apiKey : 'YOUR_API_KEY'}" \\
   -H "Content-Type: application/json" \\
   -d '{"document": "https://example.com/invoice.pdf"}'`}</pre>

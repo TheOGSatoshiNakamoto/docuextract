@@ -2,7 +2,11 @@ import { type NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { invalidateAuthCache } from '@/lib/auth';
+import { captureException } from '@/lib/sentry';
 import type { Plan } from '@/lib/types';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 // ─── Clients ──────────────────────────────────────────────────────────────────
 
@@ -200,6 +204,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       eventType: event.type,
       error: String(err),
     }));
+    captureException(err);
   }
 
   return NextResponse.json({ received: true });

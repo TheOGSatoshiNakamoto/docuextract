@@ -119,8 +119,6 @@ pre.json-out { margin: 12px 20px 20px; background: var(--bg-code); border: 1px s
 }
 `;
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://docuextract-azure.vercel.app';
-
 export default function PlaygroundPage() {
   return (
     <>

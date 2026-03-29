@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { getSupabaseClient } from '@/lib/supabase';
 import DashboardNav from '@/components/DashboardNav';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://docuextract-azure.vercel.app';
 
 interface Plan {
   name: string;
@@ -73,7 +72,7 @@ export default function BillingPage() {
     setError('');
 
     try {
-      const res = await fetch(`${API_BASE}/v1/billing/checkout`, {
+      const res = await fetch('/v1/billing/checkout', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${apiKey}`,
@@ -100,7 +99,7 @@ export default function BillingPage() {
     setError('');
 
     try {
-      const res = await fetch(`${API_BASE}/v1/billing/portal`, {
+      const res = await fetch('/v1/billing/portal', {
         method: 'POST',
         headers: { Authorization: `Bearer ${apiKey}` },
       });

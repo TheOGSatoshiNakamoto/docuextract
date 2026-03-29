@@ -1,4 +1,4 @@
-const DEFAULT_BASE_URL = 'https://docuextract-azure.vercel.app/v1';
+const DEFAULT_BASE_URL = 'https://docuextract.dev/v1';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
