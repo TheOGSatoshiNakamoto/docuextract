@@ -78,6 +78,8 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 .plan-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; position: relative; transition: border-color 0.2s, transform 0.2s; }
 .plan-card:hover { border-color: var(--accent); transform: translateY(-2px); }
 .plan-card.featured { border-color: var(--accent-dim); }
+.plan-badge { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 8px; border-radius: 20px; margin-bottom: 8px; background: rgba(108,142,245,0.15); color: var(--accent); border: 1px solid rgba(108,142,245,0.3); }
+.plan-badge.best-value { background: rgba(74,222,128,0.12); color: var(--green); border-color: rgba(74,222,128,0.3); }
 .plan-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
 .plan-price { font-size: 24px; font-weight: 800; color: var(--text); margin-bottom: 2px; }
 .plan-price span { font-size: 13px; font-weight: 400; color: var(--text-muted); }
@@ -476,6 +478,7 @@ export default function DocsPage() {
                 <a href="/login" className="plan-subscribe">Get started free →</a>
               </div>
               <div className="plan-card featured">
+                <div className="plan-badge">Most Popular</div>
                 <div className="plan-name">Starter</div>
                 <div className="plan-price">$49<span>/mo</span></div>
                 <div className="plan-calls">2,500 extractions/mo</div>
@@ -484,9 +487,10 @@ export default function DocsPage() {
                   <li>Haiku + Sonnet</li>
                   <li>Email support</li>
                 </ul>
-                <a href="/login?plan=starter" className="plan-subscribe filled">Subscribe — $49/mo →</a>
+                <a href="/login?plan=starter" className="plan-subscribe filled">Start free trial →</a>
               </div>
               <div className="plan-card">
+                <div className="plan-badge best-value">Best Value</div>
                 <div className="plan-name">Pro</div>
                 <div className="plan-price">$99<span>/mo</span></div>
                 <div className="plan-calls">10,000 extractions/mo</div>
@@ -495,7 +499,7 @@ export default function DocsPage() {
                   <li>Haiku + Sonnet</li>
                   <li>Priority support</li>
                 </ul>
-                <a href="/login?plan=pro" className="plan-subscribe">Subscribe — $99/mo →</a>
+                <a href="/login?plan=pro" className="plan-subscribe">Get started →</a>
               </div>
               <div className="plan-card">
                 <div className="plan-name">Scale</div>
@@ -506,7 +510,7 @@ export default function DocsPage() {
                   <li>All models + Priority</li>
                   <li>SLA + dedicated support</li>
                 </ul>
-                <a href="/login?plan=scale" className="plan-subscribe">Subscribe — $249/mo →</a>
+                <a href="/login?plan=scale" className="plan-subscribe">Get started →</a>
               </div>
             </div>
             <h3>Overage Pricing</h3>
