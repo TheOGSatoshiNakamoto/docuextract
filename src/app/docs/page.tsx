@@ -75,7 +75,8 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 .error-code { font-family: var(--font-mono); font-size: 13px; color: var(--red); font-weight: 600; margin-bottom: 4px; }
 .error-desc { color: #b4bfcc; font-size: 14px; }
 .pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 20px 0; }
-.plan-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+.plan-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; position: relative; transition: border-color 0.2s, transform 0.2s; }
+.plan-card:hover { border-color: var(--accent); transform: translateY(-2px); }
 .plan-card.featured { border-color: var(--accent-dim); }
 .plan-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
 .plan-price { font-size: 24px; font-weight: 800; color: var(--text); margin-bottom: 2px; }
@@ -84,6 +85,13 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 .plan-features { list-style: none; }
 .plan-features li { font-size: 13px; color: #b4bfcc; padding: 3px 0; }
 .plan-features li::before { content: '✓ '; color: var(--green); }
+.plan-subscribe { display: block; width: 100%; margin-top: 16px; padding: 9px 0; border-radius: 7px; font-size: 13px; font-weight: 600; text-align: center; text-decoration: none; cursor: pointer; border: 1px solid var(--border); color: var(--text-muted); background: transparent; opacity: 0; transform: translateY(6px); transition: opacity 0.18s, transform 0.18s, background 0.18s, color 0.18s, border-color 0.18s; pointer-events: none; }
+.plan-card:hover .plan-subscribe { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.plan-subscribe:hover { background: var(--accent); border-color: var(--accent); color: #fff; text-decoration: none; }
+.plan-subscribe.filled { background: var(--accent); border-color: var(--accent); color: #fff; }
+.plan-subscribe.filled:hover { background: #5a7ef0; }
+.back-btn { display: flex; align-items: center; gap: 6px; padding: 8px 20px 16px; color: var(--text-muted); font-size: 13px; text-decoration: none; transition: color 0.15s; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+.back-btn:hover { color: var(--text); text-decoration: none; }
 .steps { counter-reset: step; }
 .step { display: flex; gap: 16px; margin-bottom: 32px; }
 .step-num { width: 32px; height: 32px; background: var(--accent-dim); border: 2px solid var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: var(--accent); flex-shrink: 0; margin-top: 2px; }
@@ -119,6 +127,9 @@ export default function DocsPage() {
       <div className="layout">
         {/* Sidebar */}
         <nav className="sidebar" id="sidebar">
+          <a href="/" className="back-btn">
+            ← Back to Home
+          </a>
           <div className="sidebar-logo">
             <a href="#introduction">
               <div className="logo-icon">📄</div>
@@ -462,6 +473,7 @@ export default function DocsPage() {
                   <li>Haiku model only</li>
                   <li>No credit card required</li>
                 </ul>
+                <a href="/login" className="plan-subscribe">Get started free →</a>
               </div>
               <div className="plan-card featured">
                 <div className="plan-name">Starter</div>
@@ -472,6 +484,7 @@ export default function DocsPage() {
                   <li>Haiku + Sonnet</li>
                   <li>Email support</li>
                 </ul>
+                <a href="/login?plan=starter" className="plan-subscribe filled">Subscribe — $49/mo →</a>
               </div>
               <div className="plan-card">
                 <div className="plan-name">Pro</div>
@@ -482,6 +495,7 @@ export default function DocsPage() {
                   <li>Haiku + Sonnet</li>
                   <li>Priority support</li>
                 </ul>
+                <a href="/login?plan=pro" className="plan-subscribe">Subscribe — $99/mo →</a>
               </div>
               <div className="plan-card">
                 <div className="plan-name">Scale</div>
@@ -492,6 +506,7 @@ export default function DocsPage() {
                   <li>All models + Priority</li>
                   <li>SLA + dedicated support</li>
                 </ul>
+                <a href="/login?plan=scale" className="plan-subscribe">Subscribe — $249/mo →</a>
               </div>
             </div>
             <h3>Overage Pricing</h3>
