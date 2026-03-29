@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { getSupabaseClient } from '@/lib/supabase';
 import { useSearchParams } from 'next/navigation';
 
@@ -17,8 +17,8 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const searchParams = useSearchParams();
   const plan = searchParams.get('plan') ?? '';
+  const isSignup = !!searchParams.get('signup') || !!plan;
 
-  // Pre-fill plan label
   const planLabel = plan ? PLAN_LABELS[plan] : null;
 
   async function handleSubmit(e: React.FormEvent) {
@@ -191,10 +191,10 @@ export default function LoginPage() {
                   ✦ Subscribing to {planLabel}
                 </div>
               )}
-              <div className="heading">{planLabel ? 'Create your account' : 'Welcome back'}</div>
+              <div className="heading">{isSignup ? 'Create your account' : 'Welcome back'}</div>
               <div className="subheading">
-                {planLabel
-                  ? 'Enter your email to create an account and complete your subscription.'
+                {isSignup
+                  ? 'Enter your email — we\'ll send you a magic link to create your account and go straight to your dashboard.'
                   : 'Enter your email and we\'ll send you a magic link to sign in.'}
               </div>
 
@@ -211,7 +211,7 @@ export default function LoginPage() {
                 />
                 {error && <p className="error">{error}</p>}
                 <button type="submit" className="submit-btn" disabled={loading || !email}>
-                  {loading ? 'Sending link…' : planLabel ? 'Create account & subscribe' : 'Continue with email →'}
+                  {loading ? 'Sending link…' : isSignup ? 'Create account & continue →' : 'Continue with email →'}
                 </button>
               </form>
 

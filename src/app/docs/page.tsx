@@ -75,7 +75,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 .error-code { font-family: var(--font-mono); font-size: 13px; color: var(--red); font-weight: 600; margin-bottom: 4px; }
 .error-desc { color: #b4bfcc; font-size: 14px; }
 .pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 20px 0; }
-.plan-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; position: relative; transition: border-color 0.2s, transform 0.2s; }
+.plan-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; position: relative; transition: border-color 0.2s, transform 0.2s; display: flex; flex-direction: column; }
 .plan-card:hover { border-color: var(--accent); transform: translateY(-2px); }
 .plan-card.featured { border-color: var(--accent-dim); }
 .plan-badge { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 8px; border-radius: 20px; margin-bottom: 8px; background: rgba(108,142,245,0.15); color: var(--accent); border: 1px solid rgba(108,142,245,0.3); }
@@ -84,7 +84,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 .plan-price { font-size: 24px; font-weight: 800; color: var(--text); margin-bottom: 2px; }
 .plan-price span { font-size: 13px; font-weight: 400; color: var(--text-muted); }
 .plan-calls { font-size: 13px; color: var(--text-muted); margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
-.plan-features { list-style: none; }
+.plan-features { list-style: none; flex: 1; }
 .plan-features li { font-size: 13px; color: #b4bfcc; padding: 3px 0; }
 .plan-features li::before { content: '✓ '; color: var(--green); }
 .plan-subscribe { display: block; width: 100%; margin-top: 16px; padding: 9px 0; border-radius: 7px; font-size: 13px; font-weight: 600; text-align: center; text-decoration: none; cursor: pointer; border: 1px solid var(--border); color: var(--text-muted); background: transparent; opacity: 0; transform: translateY(6px); transition: opacity 0.18s, transform 0.18s, background 0.18s, color 0.18s, border-color 0.18s; pointer-events: none; }
@@ -487,7 +487,7 @@ export default function DocsPage() {
                   <li>Haiku + Sonnet</li>
                   <li>Email support</li>
                 </ul>
-                <a href="/login?plan=starter" className="plan-subscribe filled">Start free trial →</a>
+                <a href="/login?plan=starter&signup=1" className="plan-subscribe filled">Start free trial →</a>
               </div>
               <div className="plan-card">
                 <div className="plan-badge best-value">Best Value</div>
@@ -499,7 +499,7 @@ export default function DocsPage() {
                   <li>Haiku + Sonnet</li>
                   <li>Priority support</li>
                 </ul>
-                <a href="/login?plan=pro" className="plan-subscribe">Get started →</a>
+                <a href="/login?plan=pro&signup=1" className="plan-subscribe">Get started →</a>
               </div>
               <div className="plan-card">
                 <div className="plan-name">Scale</div>
@@ -510,7 +510,7 @@ export default function DocsPage() {
                   <li>All models + Priority</li>
                   <li>SLA + dedicated support</li>
                 </ul>
-                <a href="/login?plan=scale" className="plan-subscribe">Get started →</a>
+                <a href="/login?plan=scale&signup=1" className="plan-subscribe">Get started →</a>
               </div>
             </div>
             <h3>Overage Pricing</h3>
