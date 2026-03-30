@@ -827,7 +827,7 @@ const bodyHtml = `
     <ul class="nav-links">
       <li><a href="/docs">Docs</a></li>
       <li><a href="/playground">Playground</a></li>
-      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="/pricing">Pricing</a></li>
       <li><a href="https://github.com" target="_blank">GitHub</a></li>
       <li><a href="/dashboard" class="btn btn-outline" style="padding:6px 14px">Dashboard</a></li>
       <li><a href="/playground" class="btn btn-primary" style="padding:6px 14px">Try it free</a></li>
@@ -1193,7 +1193,7 @@ result = client.<span class="tok-fn">extract</span>(
       <a href="/docs">Documentation</a>
       <a href="/playground">Playground</a>
       <a href="/dashboard">Dashboard</a>
-      <a href="#pricing">Pricing</a>
+      <a href="/pricing">Pricing</a>
       <a href="https://github.com" target="_blank">GitHub</a>
     </div>
 

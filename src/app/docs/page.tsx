@@ -163,7 +163,7 @@ export default function DocsPage() {
             <div className="nav-group-title">Reference</div>
             <a href="#document-types" className="nav-link">Document Types</a>
             <a href="#errors" className="nav-link">Error Codes</a>
-            <a href="#pricing" className="nav-link">Pricing</a>
+            <a href="/pricing" className="nav-link">Pricing</a>
           </div>
         </nav>
 
