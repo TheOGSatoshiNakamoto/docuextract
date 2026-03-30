@@ -1,6 +1,9 @@
-'use client';
-
+import type { Metadata } from 'next';
 import Sidebar from '@/components/Sidebar';
+
+export const metadata: Metadata = {
+  title: 'Dashboard | DocuExtract',
+};
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (

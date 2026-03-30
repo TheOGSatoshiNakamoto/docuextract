@@ -1,6 +1,7 @@
 'use client';
 
 import Script from 'next/script';
+import PublicNav from '@/components/PublicNav';
 
 const css = `
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -39,51 +40,6 @@ const css = `
 
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
-
-    /* ── NAV ── */
-    nav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(15,17,23,0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .nav-inner {
-      max-width: var(--max-w);
-      margin: 0 auto;
-      padding: 0 24px;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      gap: 32px;
-    }
-
-    .nav-logo {
-      font-weight: 700;
-      font-size: 18px;
-      color: var(--text);
-      letter-spacing: -0.3px;
-    }
-
-    .nav-logo span { color: var(--accent); }
-
-    .nav-links {
-      display: flex;
-      gap: 24px;
-      list-style: none;
-      margin-left: auto;
-      align-items: center;
-    }
-
-    .nav-links a {
-      color: var(--text-muted);
-      font-size: 14px;
-      transition: color 0.15s;
-    }
-
-    .nav-links a:hover { color: var(--text); text-decoration: none; }
 
     .btn {
       display: inline-flex;
@@ -820,22 +776,6 @@ const css = `
 `;
 
 const bodyHtml = `
-<!-- ── NAV ──────────────────────────────────────────────────────────────── -->
-<nav>
-  <div class="nav-inner">
-    <a href="/" class="nav-logo">Docu<span>Extract</span></a>
-    <ul class="nav-links">
-      <li><a href="/docs">Docs</a></li>
-      <li><a href="/playground">Playground</a></li>
-      <li><a href="/pricing">Pricing</a></li>
-      <li><a href="/blog">Blog</a></li>
-      <li><a href="https://github.com/TheOGSatoshiNakamoto/docuextract" target="_blank">GitHub</a></li>
-      <li><a href="/dashboard" class="btn btn-outline" style="padding:6px 14px">Dashboard</a></li>
-      <li><a href="/playground" class="btn btn-primary" style="padding:6px 14px">Try it free</a></li>
-    </ul>
-  </div>
-</nav>
-
 <!-- ── HERO ──────────────────────────────────────────────────────────────── -->
 <section class="hero">
   <div class="container">
@@ -1070,6 +1010,7 @@ result = client.<span class="tok-fn">extract</span>(
           <li>10 requests / minute</li>
           <li>Haiku model (fast)</li>
           <li>PDF, PNG, JPG, WEBP</li>
+          <li>Custom JSON schemas</li>
           <li>REST API access</li>
         </ul>
       </div>
@@ -1195,7 +1136,7 @@ result = client.<span class="tok-fn">extract</span>(
       <a href="/playground">Playground</a>
       <a href="/dashboard">Dashboard</a>
       <a href="/pricing">Pricing</a>
-      <a href="https://github.com" target="_blank">GitHub</a>
+      <a href="https://github.com/TheOGSatoshiNakamoto/docuextract" target="_blank">GitHub</a>
     </div>
 
     <div class="footer-copy">&copy; 2026 DocuExtract. All rights reserved.</div>
@@ -1207,6 +1148,7 @@ export default function HomePage() {
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: css }} />
+      <PublicNav />
       <div dangerouslySetInnerHTML={{ __html: bodyHtml }} />
       <Script id="landing-js" strategy="afterInteractive">{`
 // ── Code tab switcher ──────────────────────────────────────────────────────

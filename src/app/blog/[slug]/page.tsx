@@ -1,6 +1,8 @@
+import type { Metadata } from 'next';
 import fs from 'fs';
 import path from 'path';
 import { notFound } from 'next/navigation';
+import PublicNav from '@/components/PublicNav';
 
 // ── Markdown parsing (lightweight, no external deps) ──────────────────────────
 
@@ -118,6 +120,13 @@ export function generateStaticParams() {
     });
 }
 
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const post = getPost(slug);
+  if (!post) return { title: 'Blog | DocuExtract' };
+  return { title: `${post.title} | DocuExtract` };
+}
+
 // ── CSS ───────────────────────────────────────────────────────────────────────
 
 const css = `
@@ -133,14 +142,6 @@ const css = `
 body { font-family: var(--font-sans); background: var(--bg); color: var(--text); line-height: 1.6; font-size: 16px; }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
-
-nav { position: sticky; top: 0; z-index: 100; background: rgba(15,17,23,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
-.nav-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; height: 60px; display: flex; align-items: center; gap: 32px; }
-.nav-logo { font-weight: 700; font-size: 18px; color: var(--text); letter-spacing: -0.3px; text-decoration: none; }
-.nav-logo span { color: var(--accent); }
-.nav-links { display: flex; gap: 24px; list-style: none; margin-left: auto; align-items: center; }
-.nav-links a { color: var(--text-muted); font-size: 14px; transition: color 0.15s; text-decoration: none; }
-.nav-links a:hover { color: var(--text); }
 
 .article-header { max-width: var(--max-w); margin: 0 auto; padding: 60px 24px 40px; }
 .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 13px; margin-bottom: 24px; transition: color 0.15s; }
@@ -162,8 +163,9 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(15,17,23,0.92); b
 .article-body hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
 .article-body blockquote { border-left: 3px solid var(--accent); padding: 12px 16px; background: var(--bg-card); border-radius: 0 8px 8px 0; margin: 16px 0; color: var(--text-muted); font-style: italic; }
 .article-body img { max-width: 100%; border-radius: 8px; margin: 16px 0; }
-.article-body .code-block { background: var(--bg-code); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; margin: 16px 0; font-family: var(--font-mono); font-size: 13px; line-height: 1.7; }
+.article-body .code-block { background: var(--bg-code); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; overflow-x: auto; margin: 16px 0; font-family: var(--font-mono); font-size: 13px; line-height: 1.7; position: relative; }
 .article-body .code-block code { background: none; padding: 0; font-size: inherit; color: var(--text); }
+.article-body .code-block[data-lang]::before { content: attr(data-lang); position: absolute; top: 8px; right: 12px; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-family: var(--font-sans); }
 .article-body .inline-code { background: var(--bg-code); border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 13px; }
 
 .article-cta { max-width: var(--max-w); margin: 0 auto 60px; padding: 0 24px; }
@@ -184,7 +186,6 @@ footer { border-top: 1px solid var(--border); padding: 40px 24px; }
 .footer-copy { font-size: 13px; color: var(--text-muted); }
 
 @media (max-width: 600px) {
-  .nav-links li:not(:last-child) { display: none; }
   .article-header { padding-top: 40px; }
 }
 `;
@@ -200,17 +201,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     <>
       <style dangerouslySetInnerHTML={{ __html: css }} />
 
-      <nav>
-        <div className="nav-inner">
-          <a href="/" className="nav-logo">Docu<span>Extract</span></a>
-          <ul className="nav-links">
-            <li><a href="/docs">Docs</a></li>
-            <li><a href="/playground">Playground</a></li>
-            <li><a href="/pricing">Pricing</a></li>
-            <li><a href="/blog">Blog</a></li>
-          </ul>
-        </div>
-      </nav>
+      <PublicNav />
 
       <article>
         <div className="article-header">

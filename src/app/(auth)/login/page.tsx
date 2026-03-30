@@ -22,7 +22,8 @@ export default function LoginPage() {
   const isSignup = !!searchParams.get('signup') || !!plan;
 
   const planLabel = plan ? PLAN_LABELS[plan] : null;
-  const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback${plan ? `?plan=${plan}` : ''}`;
+  const oauthRedirectTo = `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback${plan ? `?plan=${plan}` : ''}`;
+  const magicLinkRedirectTo = `${process.env.NEXT_PUBLIC_APP_URL}/auth/confirm${plan ? `?plan=${plan}` : ''}`;
 
   async function handleOAuth(provider: 'github' | 'google') {
     setOauthLoading(provider);
@@ -30,7 +31,7 @@ export default function LoginPage() {
     const supabase = getSupabaseClient();
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo },
+      options: { redirectTo: oauthRedirectTo },
     });
     if (error) {
       setError(error.message);
@@ -45,7 +46,7 @@ export default function LoginPage() {
     const supabase = getSupabaseClient();
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: redirectTo },
+      options: { emailRedirectTo: magicLinkRedirectTo },
     });
     if (error) {
       setError(error.message);
@@ -88,22 +89,6 @@ export default function LoginPage() {
           color: var(--text-muted); font-size: 14px; text-decoration: none; transition: color 0.15s;
         }
         .back-link:hover { color: var(--text); }
-
-        .social-proof {
-          display: flex; align-items: center; gap: 8px;
-          margin-bottom: 20px; position: relative; z-index: 1;
-        }
-        .sp-dots { display: flex; }
-        .sp-dot {
-          width: 24px; height: 24px; border-radius: 50%;
-          background: linear-gradient(135deg, var(--accent-dim), var(--accent));
-          border: 2px solid var(--bg-card);
-          display: flex; align-items: center; justify-content: center;
-          font-size: 10px; font-weight: 700; color: #fff;
-        }
-        .sp-dot:not(:first-child) { margin-left: -6px; }
-        .sp-text { font-size: 13px; color: var(--text-muted); }
-        .sp-text strong { color: var(--text); }
 
         .card {
           width: 100%; max-width: 400px;
@@ -201,17 +186,6 @@ export default function LoginPage() {
 
       <div className="page">
         <a href="/" className="back-link">← Home</a>
-
-        {/* Social proof */}
-        <div className="social-proof">
-          <div className="sp-dots">
-            <div className="sp-dot">J</div>
-            <div className="sp-dot">M</div>
-            <div className="sp-dot">K</div>
-            <div className="sp-dot" style={{ background: 'var(--accent)' }}>+</div>
-          </div>
-          <span className="sp-text">Join <strong>500+</strong> developers extracting documents</span>
-        </div>
 
         <div className="card">
           <a href="/" className="logo">

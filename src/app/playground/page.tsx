@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
+import PublicNav from '@/components/PublicNav';
 
 // ── Inline CSS ────────────────────────────────────────────────────────────────
 
@@ -20,22 +21,6 @@ body { font-family: var(--font-sans); background: var(--bg); color: var(--text);
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
-/* ── NAV ── */
-nav {
-  position: sticky; top: 0; z-index: 100;
-  background: rgba(15,17,23,0.92); backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-}
-.nav-inner {
-  max-width: var(--max-w); margin: 0 auto; padding: 0 24px;
-  height: 60px; display: flex; align-items: center; gap: 32px;
-}
-.nav-logo { font-weight: 700; font-size: 18px; color: var(--text); letter-spacing: -0.3px; text-decoration: none; }
-.nav-logo span { color: var(--accent); }
-.nav-links { display: flex; gap: 24px; list-style: none; margin-left: auto; align-items: center; }
-.nav-links a { color: var(--text-muted); font-size: 14px; transition: color 0.15s; text-decoration: none; }
-.nav-links a:hover { color: var(--text); }
-.nav-links a.active { color: var(--accent); }
 .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 7px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: none; text-decoration: none; }
 .btn-primary { background: var(--accent); color: #fff; }
 .btn-primary:hover { background: var(--accent-hover); text-decoration: none; }
@@ -363,19 +348,7 @@ print(data)`,
     <>
       <style dangerouslySetInnerHTML={{ __html: css }} />
 
-      {/* NAV */}
-      <nav>
-        <div className="nav-inner">
-          <a href="/" className="nav-logo">Docu<span>Extract</span></a>
-          <ul className="nav-links">
-            <li><a href="/playground" className="active">Playground</a></li>
-            <li><a href="/docs">Docs</a></li>
-            <li><a href="/pricing">Pricing</a></li>
-            <li><a href="/dashboard" className="btn btn-outline" style={{ padding: '6px 14px' }}>Dashboard</a></li>
-            <li><a href="/login" className="btn btn-primary" style={{ padding: '6px 14px' }}>Get API Key</a></li>
-          </ul>
-        </div>
-      </nav>
+      <PublicNav />
 
       {/* HERO + SAMPLES */}
       <section className="pg-hero">

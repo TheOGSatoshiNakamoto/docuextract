@@ -330,24 +330,56 @@ export default function DashboardPage() {
       // Fetch API key and plan
       const { data: userData } = await supabase
         .from('users')
-        .select('api_key, plan')
+        .select('api_key, plan, monthly_limit')
         .eq('id', session.user.id)
         .single();
 
       if (userData?.api_key) {
         setApiKey(userData.api_key);
-
-        // Fetch usage stats
-        try {
-          const res = await fetch('/v1/usage', {
-            headers: { Authorization: `Bearer ${userData.api_key}` },
-          });
-          if (res.ok) setUsage(await res.json());
-        } catch { /* non-blocking */ }
-        finally { setLoadingUsage(false); }
-      } else {
-        setLoadingUsage(false);
       }
+
+      // Fetch usage stats directly from Supabase (avoids API key auth chain)
+      try {
+        const now = new Date();
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+        const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString();
+
+        const { count: usedCount } = await supabase
+          .from('api_usage')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', session.user.id)
+          .gte('created_at', monthStart)
+          .lte('created_at', monthEnd);
+
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString();
+        const { data: dailyData } = await supabase
+          .from('api_usage')
+          .select('created_at')
+          .eq('user_id', session.user.id)
+          .gte('created_at', thirtyDaysAgo)
+          .order('created_at', { ascending: true });
+
+        const breakdown: Array<{ date: string; count: number }> = [];
+        if (dailyData) {
+          const counts: Record<string, number> = {};
+          for (const row of dailyData) {
+            const date = row.created_at.slice(0, 10);
+            counts[date] = (counts[date] || 0) + 1;
+          }
+          for (const [date, count] of Object.entries(counts)) {
+            breakdown.push({ date, count });
+          }
+        }
+
+        setUsage({
+          used: usedCount ?? 0,
+          limit: userData?.monthly_limit ?? 100,
+          plan: userData?.plan ?? 'free',
+          period_end: monthEnd,
+          breakdown,
+        });
+      } catch { /* non-blocking */ }
+      finally { setLoadingUsage(false); }
 
       // Fetch recent extractions from Supabase directly
       try {

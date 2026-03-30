@@ -28,28 +28,57 @@ export default function UsagePage() {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) return;
 
-      const { data: userData } = await supabase
-        .from('users')
-        .select('api_key')
-        .eq('id', session.user.id)
-        .single();
-
-      if (!userData?.api_key) {
-        setLoading(false);
-        return;
-      }
-
       try {
-        const res = await fetch('/v1/usage', {
-          headers: { Authorization: `Bearer ${userData.api_key}` },
-        });
-        if (res.ok) {
-          setUsage(await res.json());
-        } else {
-          setError('Failed to load usage data.');
+        // Fetch user plan info
+        const { data: userData } = await supabase
+          .from('users')
+          .select('plan, monthly_limit')
+          .eq('id', session.user.id)
+          .single();
+
+        // Fetch usage count for current month
+        const now = new Date();
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+        const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString();
+
+        const { count: usedCount } = await supabase
+          .from('api_usage')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', session.user.id)
+          .gte('created_at', monthStart)
+          .lte('created_at', monthEnd);
+
+        // Fetch daily breakdown for the last 30 days
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString();
+        const { data: dailyData } = await supabase
+          .from('api_usage')
+          .select('created_at')
+          .eq('user_id', session.user.id)
+          .gte('created_at', thirtyDaysAgo)
+          .order('created_at', { ascending: true });
+
+        // Group by date
+        const breakdown: { date: string; count: number }[] = [];
+        if (dailyData) {
+          const counts: Record<string, number> = {};
+          for (const row of dailyData) {
+            const date = row.created_at.slice(0, 10);
+            counts[date] = (counts[date] || 0) + 1;
+          }
+          for (const [date, count] of Object.entries(counts)) {
+            breakdown.push({ date, count });
+          }
         }
+
+        setUsage({
+          used: usedCount ?? 0,
+          limit: userData?.monthly_limit ?? 100,
+          plan: userData?.plan ?? 'free',
+          period_end: monthEnd,
+          breakdown,
+        });
       } catch {
-        setError('Could not reach API.');
+        setError('Failed to load usage data.');
       } finally {
         setLoading(false);
       }

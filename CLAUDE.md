@@ -681,6 +681,7 @@ VERCEL_TOKEN=vcp_...
 - **E2E billing test**: `scripts/test-billing-e2e.ts`
 - **Manual testing**: Playground for real document extraction
 - **Test documents**: 14 samples in tests/fixtures/
+- **Automated UI/UX audit**: Playwright MCP browses docuextract.dev, takes screenshots, tests interactivity, checks responsive layouts, and pushes findings to Notion. Run with `/ux-audit` command. See the 🔍 UI/UX Audit Pipeline section below for details.
 
 ---
 
@@ -716,6 +717,7 @@ VERCEL_TOKEN=vcp_...
 14. **Follow the Visual Design System** in this file for all UI work — inline CSS pattern, CSS custom properties, color tokens. New public pages must match the existing landing page style exactly (same `:root` variables, no Tailwind, no animation libraries).
 15. **Follow the Brand Voice guidelines** — casual but premium. Lead with what the product does. Use specific numbers. Imperative CTAs.
 16. **Follow the Screen Roadmap** build order — Tier 1 screens first (Landing, Playground, Dashboard), then Tier 2, then Tier 3.
+17. **Run `/ux-audit` after every major page rebuild or deployment.** Push findings to the 🔍 UI/UX Audit Findings board. Wait for CEO approval before implementing fixes.
 
 ---
 
@@ -723,11 +725,12 @@ VERCEL_TOKEN=vcp_...
 
 | Platform | What You Can Do |
 |----------|----------------|
-| **Notion** | Read/write tasks, update statuses, log issues |
+| **Notion** | Read/write tasks, update statuses, log issues, push audit findings |
 | **Supabase** | Run SQL, manage tables, deploy migrations |
 | **Stripe** | Create products/prices, manage subscriptions, configure webhooks |
 | **Vercel** | Deploy the single project, configure env vars, check status, read logs |
 | **GitHub** | Read repo contents, manage files |
+| **Playwright** | Browse docuextract.dev in a real browser, take screenshots, click elements, test forms, check console errors, run UI/UX audits |
 
 **Only flag for Kiano when:** signup/payment required, physical-world tasks.
 
@@ -742,6 +745,10 @@ VERCEL_TOKEN=vcp_...
 | **Claude Code Tasks** | YOUR task queue with specs and acceptance criteria |
 | **Claude Code — Issues & Suggestions** | YOUR feedback channel |
 | **Kiano Tasks** | Tasks for Kiano — do NOT work on these |
+| **🔍 UI/UX Audit Findings** | Automated audit findings from Playwright MCP. Push findings here. CEO reviews and approves. |
+| **🐦 Twitter/X — Build in Public** | Content pipeline for daily tweets. CEO drafts, Kiano posts. |
+| **📝 SEO Blog Content Pipeline** | SEO-optimized blog post pipeline with keywords, outlines, drafts. |
+| **🚀 Community & Launch Content** | HN, Reddit, Dev.to, Product Hunt, Indie Hackers submissions. |
 | **Architecture & Technical Spec** | Technical reference |
 | **Research & Market Intelligence** | Market research and competitor data |
 | **Daily Progress Log** | Log what you completed each session |
@@ -756,6 +763,125 @@ VERCEL_TOKEN=vcp_...
 7. Log issues/questions in Issues & Suggestions
 8. Update the Daily Progress Log
 9. Move to next task
+
+---
+
+## 🔍 UI/UX Audit Pipeline
+
+> **Run after every major deployment or page rebuild.** This is our automated quality assurance system.
+
+### How It Works
+
+```
+Claude Code + Playwright MCP    →    Browses docuextract.dev like a real user
+        ↓                            (clicks, screenshots, console errors, responsive testing)
+   Compiles findings             →    Structured audit report + screenshots in audits/
+        ↓
+   Pushes to Notion              →    🔍 UI/UX Audit Findings board
+        ↓
+   CEO reviews in Notion         →    Approves / defers / rejects each finding
+        ↓
+   Claude Code implements        →    Pulls approved items, fixes, updates status to Done
+```
+
+### Running an Audit
+
+Use the `/ux-audit` slash command:
+
+```
+/ux-audit              # Full audit (all pages, all viewports, all tests)
+/ux-audit landing      # Landing page only
+/ux-audit mobile       # Mobile responsiveness audit only
+/ux-audit docs         # Documentation section only
+/ux-audit accessibility # Accessibility-focused audit only
+```
+
+### What Gets Tested
+
+- **Landing page** at desktop (1440px), tablet (768px), and mobile (375px) — hero clarity, CTA visibility, visual hierarchy
+- **Navigation** — all links, 404s, dead links, active states
+- **Documentation** — structure, code examples, copy buttons, endpoint coverage
+- **Dashboard & auth** — signup flow, form validation, OAuth buttons, empty states
+- **Playground** — sample documents, file upload, extraction animation, code snippet bridge
+- **Interactive elements** — hover states, click feedback, modals, dropdowns
+- **Error states** — 404 page, invalid form input, edge cases
+- **Accessibility** — color contrast, alt text, keyboard navigation, heading hierarchy, ARIA labels
+- **Console errors** — JavaScript errors, failed network requests, missing resources
+
+### Notion Board: 🔍 UI/UX Audit Findings
+
+**Database ID:** `6ba5321b-e192-453f-aa28-a25de47d7c5e`
+**Data Source ID:** `collection://2cc14bab-ab64-4609-b095-6fd5d7703ad9`
+
+**Properties:**
+| Property | Type | Purpose |
+|----------|------|---------|
+| Title | Title | Finding name |
+| Severity | Select | Critical / High / Medium / Low |
+| Category | Select | UI Design / UX Flow / Accessibility / Performance / Bug / Content / DX / Mobile Responsiveness |
+| Status | Select | New → CEO Reviewing → Approved → In Progress → Fixed → Deferred → Wont Fix |
+| Page/Location | Text | URL or page name |
+| Element | Text | Specific component |
+| Description | Text | What's wrong and why it matters |
+| Recommendation | Text | Specific actionable fix |
+| CEO Decision | Text | CEO's guidance (leave blank — CEO fills this) |
+| Effort | Select | Quick Fix / Small Task / Medium Task / Large Task |
+| Source | Select | Automated UX Audit / Manual Review / User Feedback |
+| Audit Date | Date | When the audit was run |
+| Screenshot Path | Text | Path to screenshot in audits/ directory |
+
+**Views:**
+- **CEO Review Board** — Kanban grouped by Status. Drag cards through the review workflow.
+- **By Severity** — Table sorted Critical → Low.
+- **Approved for Implementation** — Filtered to show only Approved items. This is your work queue.
+
+### CEO Review Workflow
+
+After an audit runs:
+1. CEO opens the **CEO Review Board** view
+2. Drags cards from "New" → "CEO Reviewing"
+3. Writes decision in the **CEO Decision** field with implementation guidance
+4. Moves to **Approved**, **Deferred**, or **Wont Fix**
+5. Claude Code switches to the **Approved for Implementation** view and pulls approved items, starting with Critical severity
+
+### When to Audit
+
+- After every Phase 6 page rebuild (landing page, playground, dashboard, pricing, etc.)
+- After major CSS/layout changes
+- Before any public launch (Product Hunt, Hacker News)
+- Periodically (weekly during active development)
+- Each run creates a timestamped folder: `audits/ux-audit-YYYY-MM-DD/`
+
+### Screenshot Storage
+
+```
+audits/
+└── ux-audit-2026-03-30/
+    ├── AUDIT-REPORT.md              # Full findings report
+    ├── 01-landing/desktop/          # Desktop screenshots
+    ├── 01-landing/tablet/           # Tablet screenshots
+    ├── 01-landing/mobile/           # Mobile screenshots
+    ├── 02-navigation/
+    ├── 03-documentation/
+    ├── 04-dashboard/
+    ├── 05-auth-flows/
+    ├── 06-interactive-elements/
+    ├── 07-error-states/
+    ├── 08-accessibility/
+    └── 09-console-errors/
+        └── console-log.txt
+```
+
+Screenshots are excluded from git via `audits/.gitignore`. Reports and text logs are committed.
+
+### Repo Files
+
+```
+.claude/commands/ux-audit.md    # The /ux-audit slash command definition
+audits/                         # Screenshot and report storage
+audits/.gitignore               # Excludes PNGs, keeps .md and .txt
+setup-ux-audit.sh               # One-time setup script (installs Playwright MCP)
+```
 
 ---
 

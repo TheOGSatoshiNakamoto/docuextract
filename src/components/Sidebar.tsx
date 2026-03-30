@@ -148,16 +148,32 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [usage, setUsage] = useState<UsageMini | null>(null);
   const [hasExtractions, setHasExtractions] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const [userEmail, setUserEmail] = useState('');
 
-  // Restore collapsed state from localStorage
+  // Detect mobile and restore collapsed state
   useEffect(() => {
+    function checkMobile() {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) {
+        setCollapsed(true);
+        setMobileOpen(false);
+      }
+    }
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
     try {
-      if (localStorage.getItem('sidebar-collapsed') === 'true') setCollapsed(true);
+      if (!isMobile && localStorage.getItem('sidebar-collapsed') === 'true') setCollapsed(true);
     } catch { /* SSR safe */ }
+
+    return () => window.removeEventListener('resize', checkMobile);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Keyboard shortcut: [ or Cmd/Ctrl+B
@@ -176,14 +192,23 @@ export default function Sidebar() {
   }, []);
 
   const toggleSidebar = useCallback(() => {
-    setCollapsed((c) => {
-      const next = !c;
-      try { localStorage.setItem('sidebar-collapsed', String(next)); } catch { /* SSR safe */ }
-      return next;
-    });
-  }, []);
+    if (isMobile) {
+      setMobileOpen((o) => !o);
+    } else {
+      setCollapsed((c) => {
+        const next = !c;
+        try { localStorage.setItem('sidebar-collapsed', String(next)); } catch { /* SSR safe */ }
+        return next;
+      });
+    }
+  }, [isMobile]);
 
-  // Fetch user + usage for the usage bar
+  // Close mobile sidebar on route change
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  // Fetch user + usage for the usage bar (direct Supabase queries)
   useEffect(() => {
     const supabase = getSupabaseClient();
     supabase.auth.getSession().then(async ({ data: { session } }) => {
@@ -192,21 +217,24 @@ export default function Sidebar() {
 
       const { data } = await supabase
         .from('users')
-        .select('api_key, plan')
+        .select('plan, monthly_limit')
         .eq('id', session.user.id)
         .single();
 
-      if (!data?.api_key) return;
+      if (!data) return;
 
       try {
-        const res = await fetch('/v1/usage', {
-          headers: { Authorization: `Bearer ${data.api_key}` },
-        });
-        if (res.ok) {
-          const stats = await res.json();
-          setUsage({ used: stats.used, limit: stats.limit, plan: stats.plan });
-          setHasExtractions(stats.used > 0);
-        }
+        const now = new Date();
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+        const { count } = await supabase
+          .from('api_usage')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', session.user.id)
+          .gte('created_at', monthStart);
+
+        const used = count ?? 0;
+        setUsage({ used, limit: data.monthly_limit ?? 100, plan: data.plan ?? 'free' });
+        setHasExtractions(used > 0);
       } catch { /* non-blocking */ }
     });
   }, []);
@@ -252,7 +280,7 @@ export default function Sidebar() {
     return (
       <a
         href={item.href}
-        title={collapsed ? item.label : undefined}
+        title={!isExpanded ? item.label : undefined}
         className={`
           flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-150
           ${active
@@ -262,27 +290,51 @@ export default function Sidebar() {
         `}
       >
         <span className={`shrink-0 ${active ? 'text-indigo-400' : ''}`}>{item.icon}</span>
-        {!collapsed && <span className="truncate">{item.label}</span>}
-        {!collapsed && active && (
+        {isExpanded && <span className="truncate">{item.label}</span>}
+        {isExpanded && active && (
           <span className="ml-auto text-indigo-500 opacity-60"><IconChevron /></span>
         )}
       </a>
     );
   }
 
+  // On mobile, sidebar is hidden by default and shown as overlay
+  const showSidebar = isMobile ? mobileOpen : true;
+  const sidebarWidth = isMobile ? 'w-[220px]' : collapsed ? 'w-[60px]' : 'w-[220px]';
+  const isExpanded = isMobile ? true : !collapsed;
+
   return (
     <>
+      {/* Mobile overlay backdrop */}
+      {isMobile && mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 z-40"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Mobile toggle button (fixed top-left when sidebar hidden) */}
+      {isMobile && !mobileOpen && (
+        <button
+          onClick={() => setMobileOpen(true)}
+          className="fixed top-3 left-3 z-30 p-2 rounded-lg bg-gray-900 border border-gray-800 text-gray-400 hover:text-white transition-colors"
+        >
+          <IconMenu />
+        </button>
+      )}
+
       {/* Sidebar */}
       <aside
         className={`
           flex flex-col shrink-0 border-r border-gray-800 bg-gray-950 transition-all duration-200
-          ${collapsed ? 'w-[60px]' : 'w-[220px]'}
+          ${sidebarWidth}
+          ${isMobile ? `fixed inset-y-0 left-0 z-50 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}` : ''}
         `}
-        style={{ minHeight: '100vh', position: 'sticky', top: 0, height: '100vh', overflowY: 'auto' }}
+        style={isMobile ? {} : { minHeight: '100vh', position: 'sticky', top: 0, height: '100vh', overflowY: 'auto' }}
       >
         {/* Logo + toggle */}
         <div className={`flex items-center h-14 border-b border-gray-800 px-3 gap-2 shrink-0`}>
-          {!collapsed && (
+          {isExpanded && (
             <a href="/" className="flex items-center gap-2 flex-1 min-w-0">
               <span className="text-indigo-400 text-lg leading-none">⚡</span>
               <span className="font-bold text-white text-sm truncate">DocuExtract</span>
@@ -302,24 +354,24 @@ export default function Sidebar() {
           {mainNav.map((item) => <NavLink key={item.label} item={item} />)}
 
           {/* DEVELOPER section */}
-          <div className={`mt-4 mb-1 ${collapsed ? 'hidden' : ''}`}>
+          <div className={`mt-4 mb-1 ${!isExpanded ? 'hidden' : ''}`}>
             <span className="px-3 text-[10px] font-semibold tracking-widest text-gray-600 uppercase">Developer</span>
           </div>
-          {collapsed && <div className="my-2 border-t border-gray-800/60" />}
+          {!isExpanded && <div className="my-2 border-t border-gray-800/60" />}
           {devNav.map((item) => <NavLink key={item.label} item={item} />)}
 
           {/* ACCOUNT section */}
-          <div className={`mt-4 mb-1 ${collapsed ? 'hidden' : ''}`}>
+          <div className={`mt-4 mb-1 ${!isExpanded ? 'hidden' : ''}`}>
             <span className="px-3 text-[10px] font-semibold tracking-widest text-gray-600 uppercase">Account</span>
           </div>
-          {collapsed && <div className="my-2 border-t border-gray-800/60" />}
+          {!isExpanded && <div className="my-2 border-t border-gray-800/60" />}
           {accountNav.map((item) => <NavLink key={item.label} item={item} />)}
         </nav>
 
         {/* Bottom: usage bar + sign out */}
         <div className="shrink-0 border-t border-gray-800 px-3 py-3 space-y-3">
           {/* Usage bar */}
-          {usage && !collapsed && (
+          {usage && isExpanded && (
             <div>
               <div className="flex justify-between items-center mb-1.5">
                 <span className="text-[11px] text-gray-500 capitalize">{usage.plan} plan</span>
@@ -340,14 +392,14 @@ export default function Sidebar() {
           )}
 
           {/* Usage bar icon-only (collapsed) */}
-          {usage && collapsed && (
+          {usage && !isExpanded && (
             <div title={`${usage.used} / ${usage.limit} extractions`} className="h-1 bg-gray-800 rounded-full overflow-hidden">
               <div className="h-full rounded-full" style={{ width: `${usedPct}%`, background: barColor }} />
             </div>
           )}
 
           {/* Sign out */}
-          {!collapsed && (
+          {isExpanded && (
             <div className="flex items-center gap-2">
               <span className="text-[11px] text-gray-600 truncate flex-1">{userEmail}</span>
               <button
@@ -359,7 +411,7 @@ export default function Sidebar() {
               </button>
             </div>
           )}
-          {collapsed && (
+          {!isExpanded && (
             <button
               onClick={signOut}
               disabled={signingOut}

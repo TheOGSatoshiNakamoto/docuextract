@@ -112,10 +112,10 @@ hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
 
 // Shared inline HTML for pre blocks with syntax highlighting
 const preBlocks: Record<string, string> = {
-  authHttp: `<span class="hdr">Authorization: Bearer dex_live_xxxxxxxxxxxxxxxxxxxxxxxx</span>`,
-  qsCurl: `<span class="fn">curl</span> <span class="url">https://docuextract.dev/v1/extract</span> \\\n  <span class="hdr">-H</span> <span class="str">"Authorization: Bearer dex_live_YOUR_KEY"</span> \\\n  <span class="hdr">-H</span> <span class="str">"Content-Type: application/json"</span> \\\n  <span class="hdr">-d</span> <span class="str">&#39;{\n    "document": "https://example.com/invoice.pdf",\n    "type": "invoice"\n  }&#39;</span>`,
-  qsJs: `<span class="kw">const</span> response = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'https://docuextract.dev/v1/extract'</span>, {\n  method: <span class="str">'POST'</span>,\n  headers: {\n    <span class="str">'Authorization'</span>: <span class="str">'Bearer dex_live_YOUR_KEY'</span>,\n    <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>,\n  },\n  body: <span class="fn">JSON.stringify</span>({\n    document: <span class="str">'https://example.com/invoice.pdf'</span>,\n    type: <span class="str">'invoice'</span>,\n  }),\n});\n\n<span class="kw">const</span> result = <span class="kw">await</span> response.<span class="fn">json</span>();\nconsole.<span class="fn">log</span>(result.data);\n<span class="cmt">// { vendor_name: "Acme Corp", total_amount: 1250.00, ... }</span>`,
-  qsPy: `<span class="kw">import</span> requests\n\nresponse = requests.<span class="fn">post</span>(\n    <span class="str">'https://docuextract.dev/v1/extract'</span>,\n    headers={\n        <span class="str">'Authorization'</span>: <span class="str">'Bearer dex_live_YOUR_KEY'</span>,\n        <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>,\n    },\n    json={\n        <span class="str">'document'</span>: <span class="str">'https://example.com/invoice.pdf'</span>,\n        <span class="str">'type'</span>: <span class="str">'invoice'</span>,\n    }\n)\n\nresult = response.<span class="fn">json</span>()\n<span class="fn">print</span>(result[<span class="str">'data'</span>])\n<span class="cmt"># {'vendor_name': 'Acme Corp', 'total_amount': 1250.0, ...}</span>`,
+  authHttp: `<span class="hdr">Authorization: Bearer dk_live_xxxxxxxxxxxxxxxxxxxxxxxx</span>`,
+  qsCurl: `<span class="fn">curl</span> <span class="url">https://docuextract.dev/v1/extract</span> \\\n  <span class="hdr">-H</span> <span class="str">"Authorization: Bearer dk_live_YOUR_KEY"</span> \\\n  <span class="hdr">-H</span> <span class="str">"Content-Type: application/json"</span> \\\n  <span class="hdr">-d</span> <span class="str">&#39;{\n    "document": "https://example.com/invoice.pdf",\n    "type": "invoice"\n  }&#39;</span>`,
+  qsJs: `<span class="kw">const</span> response = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'https://docuextract.dev/v1/extract'</span>, {\n  method: <span class="str">'POST'</span>,\n  headers: {\n    <span class="str">'Authorization'</span>: <span class="str">'Bearer dk_live_YOUR_KEY'</span>,\n    <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>,\n  },\n  body: <span class="fn">JSON.stringify</span>({\n    document: <span class="str">'https://example.com/invoice.pdf'</span>,\n    type: <span class="str">'invoice'</span>,\n  }),\n});\n\n<span class="kw">const</span> result = <span class="kw">await</span> response.<span class="fn">json</span>();\nconsole.<span class="fn">log</span>(result.data);\n<span class="cmt">// { vendor_name: "Acme Corp", total_amount: 1250.00, ... }</span>`,
+  qsPy: `<span class="kw">import</span> requests\n\nresponse = requests.<span class="fn">post</span>(\n    <span class="str">'https://docuextract.dev/v1/extract'</span>,\n    headers={\n        <span class="str">'Authorization'</span>: <span class="str">'Bearer dk_live_YOUR_KEY'</span>,\n        <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>,\n    },\n    json={\n        <span class="str">'document'</span>: <span class="str">'https://example.com/invoice.pdf'</span>,\n        <span class="str">'type'</span>: <span class="str">'invoice'</span>,\n    }\n)\n\nresult = response.<span class="fn">json</span>()\n<span class="fn">print</span>(result[<span class="str">'data'</span>])\n<span class="cmt"># {'vendor_name': 'Acme Corp', 'total_amount': 1250.0, ...}</span>`,
   qsResponse: `{\n  <span class="key">"data"</span>: {\n    <span class="key">"vendor_name"</span>: <span class="str">"Acme Corp"</span>,\n    <span class="key">"invoice_number"</span>: <span class="str">"INV-2024-0847"</span>,\n    <span class="key">"invoice_date"</span>: <span class="str">"2024-03-15"</span>,\n    <span class="key">"due_date"</span>: <span class="str">"2024-04-15"</span>,\n    <span class="key">"subtotal"</span>: <span class="num">1000.00</span>,\n    <span class="key">"tax_amount"</span>: <span class="num">250.00</span>,\n    <span class="key">"total_amount"</span>: <span class="num">1250.00</span>,\n    <span class="key">"currency"</span>: <span class="str">"USD"</span>,\n    <span class="key">"line_items"</span>: [\n      { <span class="key">"description"</span>: <span class="str">"Consulting services"</span>, <span class="key">"quantity"</span>: <span class="num">10</span>, <span class="key">"unit_price"</span>: <span class="num">100.00</span>, <span class="key">"total"</span>: <span class="num">1000.00</span> }\n    ]\n  },\n  <span class="key">"metadata"</span>: {\n    <span class="key">"type"</span>: <span class="str">"invoice"</span>,\n    <span class="key">"confidence"</span>: <span class="num">0.96</span>,\n    <span class="key">"model"</span>: <span class="str">"claude-haiku-4-5-20251001"</span>,\n    <span class="key">"processing_time_ms"</span>: <span class="num">1847</span>,\n    <span class="key">"page_count"</span>: <span class="num">1</span>\n  }\n}`,
 };
 
@@ -206,7 +206,7 @@ export default function DocsPage() {
                 <div className="step-num">1</div>
                 <div className="step-content">
                   <h3>Get your API key</h3>
-                  <p>Sign up at <a href="/dashboard">your dashboard</a> to get your free API key. It looks like <code>dex_live_xxxxxxxxxxxxxxxx</code>.</p>
+                  <p>Sign up at <a href="/dashboard">your dashboard</a> to get your free API key. It looks like <code>dk_live_xxxxxxxxxxxxxxxx</code>.</p>
                 </div>
               </div>
               <div className="step">
@@ -269,7 +269,7 @@ export default function DocsPage() {
               <pre dangerouslySetInnerHTML={{ __html: preBlocks.authHttp }} />
             </div>
             <h3>API Key Format</h3>
-            <p>API keys start with <code>dex_live_</code> followed by 32 random characters. Keys are generated when you sign up and can be regenerated from your dashboard.</p>
+            <p>API keys start with <code>dk_live_</code> followed by 32 random characters. Keys are generated when you sign up and can be regenerated from your dashboard.</p>
             <div className="callout callout-warn">
               <strong>Keep your API key secret</strong>
               Never expose your API key in client-side code or public repositories. Use environment variables to store it securely.
@@ -523,6 +523,33 @@ export default function DocsPage() {
 
         </main>
       </div>
+
+      <footer style={{
+        borderTop: '1px solid var(--border)',
+        padding: '40px 24px',
+        marginLeft: 0,
+      }}>
+        <div style={{
+          maxWidth: 1100,
+          margin: '0 auto',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap' as const,
+          gap: 20,
+        }}>
+          <span style={{ fontWeight: 700, fontSize: 16, color: 'var(--text)' }}>
+            Docu<span style={{ color: 'var(--accent)' }}>Extract</span>
+          </span>
+          <div style={{ display: 'flex', gap: 24 }}>
+            <a href="/docs" style={{ fontSize: 13, color: 'var(--text-muted)', textDecoration: 'none', transition: 'color 0.15s' }}>Docs</a>
+            <a href="/pricing" style={{ fontSize: 13, color: 'var(--text-muted)', textDecoration: 'none', transition: 'color 0.15s' }}>Pricing</a>
+            <a href="/playground" style={{ fontSize: 13, color: 'var(--text-muted)', textDecoration: 'none', transition: 'color 0.15s' }}>Playground</a>
+            <a href="/blog" style={{ fontSize: 13, color: 'var(--text-muted)', textDecoration: 'none', transition: 'color 0.15s' }}>Blog</a>
+          </div>
+          <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Built with Claude AI</span>
+        </div>
+      </footer>
 
       <Script id="docs-js" strategy="afterInteractive">{`
         window.switchTab = function(btn, panelId) {
