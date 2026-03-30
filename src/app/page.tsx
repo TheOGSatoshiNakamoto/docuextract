@@ -828,7 +828,8 @@ const bodyHtml = `
       <li><a href="/docs">Docs</a></li>
       <li><a href="/playground">Playground</a></li>
       <li><a href="/pricing">Pricing</a></li>
-      <li><a href="https://github.com" target="_blank">GitHub</a></li>
+      <li><a href="/blog">Blog</a></li>
+      <li><a href="https://github.com/TheOGSatoshiNakamoto/docuextract" target="_blank">GitHub</a></li>
       <li><a href="/dashboard" class="btn btn-outline" style="padding:6px 14px">Dashboard</a></li>
       <li><a href="/playground" class="btn btn-primary" style="padding:6px 14px">Try it free</a></li>
     </ul>
