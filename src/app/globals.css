@@ -1,2 +1,7 @@
-/* Minimal global reset — each page embeds its own styles */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
