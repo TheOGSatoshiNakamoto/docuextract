@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { getSupabaseClient } from '@/lib/supabase';
-import DashboardNav from '@/components/DashboardNav';
 
 
 interface Plan {
@@ -40,7 +39,6 @@ const PLANS: Plan[] = [
 ];
 
 export default function BillingPage() {
-  const [user, setUser] = useState<{ email?: string } | null>(null);
   const [currentPlan, setCurrentPlan] = useState<string>('free');
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [loadingPortal, setLoadingPortal] = useState(false);
@@ -52,7 +50,6 @@ export default function BillingPage() {
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) return;
-      setUser(session.user);
 
       const { data } = await supabase
         .from('users')
@@ -119,10 +116,7 @@ export default function BillingPage() {
   const isOnPaidPlan = currentPlan !== 'free';
 
   return (
-    <div className="min-h-screen bg-gray-950">
-      <DashboardNav user={user} activeTab="billing" />
-
-      <main className="max-w-4xl mx-auto px-4 py-10">
+    <div className="px-6 py-8 max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-bold text-white mb-1">Billing</h1>
@@ -210,7 +204,6 @@ export default function BillingPage() {
         <p className="text-gray-600 text-xs text-center mt-6">
           All plans include overages at $0.05/extraction · Cancel anytime · Billed monthly
         </p>
-      </main>
     </div>
   );
 }

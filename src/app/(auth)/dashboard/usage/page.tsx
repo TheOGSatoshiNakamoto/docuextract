@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { getSupabaseClient } from '@/lib/supabase';
-import DashboardNav from '@/components/DashboardNav';
 
 
 interface UsageBreakdown {
@@ -19,7 +18,6 @@ interface UsageData {
 }
 
 export default function UsagePage() {
-  const [user, setUser] = useState<{ email?: string } | null>(null);
   const [usage, setUsage] = useState<UsageData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -29,7 +27,6 @@ export default function UsagePage() {
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) return;
-      setUser(session.user);
 
       const { data: userData } = await supabase
         .from('users')
@@ -65,11 +62,8 @@ export default function UsagePage() {
     : 1;
 
   return (
-    <div className="min-h-screen bg-gray-950">
-      <DashboardNav user={user} activeTab="usage" />
-
-      <main className="max-w-4xl mx-auto px-4 py-10">
-        <h1 className="text-2xl font-bold text-white mb-1">Usage</h1>
+    <div className="px-6 py-8 max-w-4xl mx-auto">
+        <h1 className="text-xl font-bold text-white mb-1">Extractions</h1>
         <p className="text-gray-400 text-sm mb-8">API extraction usage for the current billing period</p>
 
         {loading ? (
@@ -164,7 +158,6 @@ export default function UsagePage() {
             )}
           </>
         ) : null}
-      </main>
     </div>
   );
 }

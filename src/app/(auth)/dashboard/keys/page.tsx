@@ -2,10 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { getSupabaseClient } from '@/lib/supabase';
-import DashboardNav from '@/components/DashboardNav';
 
 export default function KeysPage() {
-  const [user, setUser] = useState<{ email?: string } | null>(null);
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [copying, setCopying] = useState(false);
@@ -18,7 +16,6 @@ export default function KeysPage() {
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) return;
-      setUser(session.user);
       const { data } = await supabase
         .from('users')
         .select('api_key')
@@ -53,10 +50,7 @@ export default function KeysPage() {
   const maskedKey = apiKey ? `${apiKey.slice(0, 8)}${'•'.repeat(24)}${apiKey.slice(-4)}` : '–';
 
   return (
-    <div className="min-h-screen bg-gray-950">
-      <DashboardNav user={user} activeTab="keys" />
-
-      <main className="max-w-3xl mx-auto px-4 py-10">
+    <div className="px-6 py-8 max-w-3xl mx-auto">
         <h1 className="text-2xl font-bold text-white mb-1">API Keys</h1>
         <p className="text-gray-400 text-sm mb-8">
           Use your API key to authenticate requests. Keep it secret.
@@ -141,7 +135,6 @@ export default function KeysPage() {
             )}
           </div>
         </div>
-      </main>
     </div>
   );
 }
