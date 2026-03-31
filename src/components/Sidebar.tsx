@@ -258,7 +258,7 @@ export default function Sidebar() {
   ];
 
   const devNav: NavItem[] = [
-    { label: 'Documentation', href: '/docs', icon: <IconBook />, external: true },
+    { label: 'Documentation', href: '/dashboard/docs', icon: <IconBook /> },
     { label: 'Webhooks', href: '/dashboard/webhooks', icon: <IconWebhook /> },
     { label: 'Logs', href: '/dashboard/logs', icon: <IconTerminal /> },
   ];
