@@ -11,9 +11,10 @@ const css = `
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'SF Mono', 'Fira Code', Consolas, monospace;
 }
-.docs-layout { display: flex; height: 100vh; font-family: var(--font-sans); color: var(--text); font-size: 15px; line-height: 1.6; }
-.docs-toc { width: 240px; border-right: 1px solid var(--border); position: fixed; top: 0; bottom: 0; overflow-y: auto; padding: 24px 0; flex-shrink: 0; background: var(--bg-card); z-index: 5; }
-.docs-main-wrapper { flex: 1; margin-left: 240px; overflow-y: auto; height: 100vh; scroll-behavior: smooth; }
+.docs-layout { display: flex; height: 100%; font-family: var(--font-sans); color: var(--text); font-size: 15px; line-height: 1.6; overflow: hidden; }
+.docs-toc { width: clamp(200px, 22%, 260px); border-right: 1px solid var(--border); position: sticky; top: 0; height: 100vh; overflow-y: auto; padding: 24px 0; flex-shrink: 0; background: var(--bg-card); z-index: 5; transition: width 0.2s; }
+.docs-main-wrapper { flex: 1; overflow-y: auto; scroll-behavior: smooth; min-width: 0; }
+.docs-toc-toggle { display: none; }
 .docs-toc-logo { padding: 0 16px 16px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
 .docs-toc-logo a { text-decoration: none; display: flex; align-items: center; gap: 10px; }
 .docs-toc-logo .logo-icon { width: 28px; height: 28px; background: var(--accent); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
@@ -21,7 +22,7 @@ const css = `
 .docs-toc-logo .logo-badge { font-size: 11px; color: var(--text-muted); font-weight: 400; }
 .docs-nav-group { padding: 0 10px; margin-bottom: 8px; }
 .docs-nav-group-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); padding: 6px 8px; margin-bottom: 2px; }
-.docs-nav-link { display: block; padding: 5px 8px; border-radius: 6px; text-decoration: none; color: var(--text-muted); font-size: 13px; transition: all 0.15s; }
+.docs-nav-link { display: block; padding: 5px 8px; border-radius: 6px; text-decoration: none; color: var(--text-muted); font-size: 13px; transition: all 0.15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .docs-nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); text-decoration: none; }
 .docs-nav-link.active { color: var(--accent); background: rgba(108,142,245,0.1); }
 .docs-nav-method { display: inline-block; font-family: var(--font-mono); font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 3px; margin-right: 6px; }
@@ -89,11 +90,34 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 .step-num { width: 30px; height: 30px; background: var(--accent-dim); border: 2px solid var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--accent); flex-shrink: 0; margin-top: 2px; }
 .step-content h3 { margin-top: 0; }
 .docs-main hr { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
-@media (max-width: 900px) {
-  .docs-toc { display: none; }
-  .docs-main-wrapper { margin-left: 0; }
-  .docs-main { padding: 24px 20px 80px; }
+/* Medium screens — narrower TOC */
+@media (max-width: 1100px) {
+  .docs-main { padding: 32px 32px 80px; }
+}
+/* Small screens — TOC becomes a slide-over drawer */
+@media (max-width: 768px) {
+  .docs-toc {
+    position: fixed; top: 0; left: 0; bottom: 0; width: 260px;
+    transform: translateX(-100%); transition: transform 0.25s ease;
+    z-index: 50; box-shadow: none;
+  }
+  .docs-toc.open { transform: translateX(0); box-shadow: 4px 0 24px rgba(0,0,0,0.5); }
+  .docs-toc-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
+  .docs-toc-backdrop.open { display: block; }
+  .docs-toc-toggle {
+    display: flex; align-items: center; gap: 6px;
+    position: sticky; top: 0; z-index: 10;
+    background: var(--bg-card); border-bottom: 1px solid var(--border);
+    padding: 10px 16px; cursor: pointer; border: none;
+    color: var(--text-muted); font-size: 13px; font-weight: 600;
+    font-family: var(--font-sans); width: 100%; transition: color 0.15s;
+  }
+  .docs-toc-toggle:hover { color: var(--text); }
+  .docs-toc-toggle svg { flex-shrink: 0; }
+  .docs-main { padding: 24px 16px 80px; }
   .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+  .endpoint-badge { font-size: 11px; padding: 6px 10px; }
+  .badge-path { word-break: break-all; }
 }
 `;
 
@@ -111,8 +135,14 @@ export default function DashboardDocsPage() {
       <style dangerouslySetInnerHTML={{ __html: css }} />
 
       <div className="docs-layout">
+        {/* Mobile TOC backdrop */}
+        <div className="docs-toc-backdrop" id="docs-toc-backdrop" onClick={() => {
+          document.getElementById('docs-toc')?.classList.remove('open');
+          document.getElementById('docs-toc-backdrop')?.classList.remove('open');
+        }} />
+
         {/* Docs table of contents sidebar */}
-        <nav className="docs-toc">
+        <nav className="docs-toc" id="docs-toc">
           <div className="docs-toc-logo">
             <a href="#introduction">
               <div className="logo-icon">📄</div>
@@ -150,6 +180,14 @@ export default function DashboardDocsPage() {
 
         {/* Main docs content */}
         <div className="docs-main-wrapper" id="docs-scroll-container">
+        {/* Mobile TOC toggle */}
+        <button className="docs-toc-toggle" onClick={() => {
+          document.getElementById('docs-toc')?.classList.add('open');
+          document.getElementById('docs-toc-backdrop')?.classList.add('open');
+        }}>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 4H14M2 8H10M2 12H14" /></svg>
+          API Reference
+        </button>
         <main className="docs-main">
 
           {/* Introduction */}
@@ -536,7 +574,7 @@ export default function DashboardDocsPage() {
         }, { root: scrollContainer, rootMargin: '-20% 0px -70% 0px' });
         sections.forEach(function(s) { observer.observe(s); });
 
-        // Smooth scroll nav links within the scroll container
+        // Smooth scroll nav links + close mobile drawer
         navLinks.forEach(function(link) {
           link.addEventListener('click', function(e) {
             var href = link.getAttribute('href');
@@ -544,6 +582,11 @@ export default function DashboardDocsPage() {
               e.preventDefault();
               var target = document.getElementById(href.slice(1));
               if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              // Close mobile drawer if open
+              var toc = document.getElementById('docs-toc');
+              var backdrop = document.getElementById('docs-toc-backdrop');
+              if (toc) toc.classList.remove('open');
+              if (backdrop) backdrop.classList.remove('open');
             }
           });
         });
