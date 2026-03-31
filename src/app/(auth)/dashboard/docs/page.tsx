@@ -11,8 +11,9 @@ const css = `
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'SF Mono', 'Fira Code', Consolas, monospace;
 }
-.docs-layout { display: flex; min-height: 100%; font-family: var(--font-sans); color: var(--text); font-size: 15px; line-height: 1.6; }
-.docs-toc { width: 240px; border-right: 1px solid var(--border); position: sticky; top: 0; height: 100vh; overflow-y: auto; padding: 24px 0; flex-shrink: 0; background: var(--bg-card); }
+.docs-layout { display: flex; height: 100vh; font-family: var(--font-sans); color: var(--text); font-size: 15px; line-height: 1.6; }
+.docs-toc { width: 240px; border-right: 1px solid var(--border); position: fixed; top: 0; bottom: 0; overflow-y: auto; padding: 24px 0; flex-shrink: 0; background: var(--bg-card); z-index: 5; }
+.docs-main-wrapper { flex: 1; margin-left: 240px; overflow-y: auto; height: 100vh; scroll-behavior: smooth; }
 .docs-toc-logo { padding: 0 16px 16px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
 .docs-toc-logo a { text-decoration: none; display: flex; align-items: center; gap: 10px; }
 .docs-toc-logo .logo-icon { width: 28px; height: 28px; background: var(--accent); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
@@ -26,8 +27,8 @@ const css = `
 .docs-nav-method { display: inline-block; font-family: var(--font-mono); font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 3px; margin-right: 6px; }
 .method-get { background: rgba(74,222,128,0.15); color: var(--green); }
 .method-post { background: rgba(108,142,245,0.15); color: var(--accent); }
-.docs-main { flex: 1; max-width: 820px; padding: 40px 48px 100px; min-width: 0; }
-.docs-main section { padding-top: 72px; margin-top: -72px; }
+.docs-main { max-width: 820px; padding: 40px 48px 100px; min-width: 0; }
+.docs-main section { scroll-margin-top: 24px; }
 .docs-main h1 { font-size: 28px; font-weight: 800; color: var(--text); margin-bottom: 12px; line-height: 1.2; }
 .docs-main h2 { font-size: 20px; font-weight: 700; color: var(--text); margin: 36px 0 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
 .docs-main h3 { font-size: 15px; font-weight: 600; color: var(--text); margin: 24px 0 10px; }
@@ -90,6 +91,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 .docs-main hr { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
 @media (max-width: 900px) {
   .docs-toc { display: none; }
+  .docs-main-wrapper { margin-left: 0; }
   .docs-main { padding: 24px 20px 80px; }
   .pricing-grid { grid-template-columns: repeat(2, 1fr); }
 }
@@ -147,6 +149,7 @@ export default function DashboardDocsPage() {
         </nav>
 
         {/* Main docs content */}
+        <div className="docs-main-wrapper" id="docs-scroll-container">
         <main className="docs-main">
 
           {/* Introduction */}
@@ -497,6 +500,7 @@ export default function DashboardDocsPage() {
           </section>
 
         </main>
+        </div>
       </div>
 
       <Script id="dashboard-docs-js" strategy="afterInteractive">{`
@@ -518,6 +522,7 @@ export default function DashboardDocsPage() {
         };
 
         // Active nav on scroll
+        var scrollContainer = document.getElementById('docs-scroll-container');
         var sections = document.querySelectorAll('.docs-main section[id]');
         var navLinks = document.querySelectorAll('.docs-nav-link');
         var observer = new IntersectionObserver(function(entries) {
@@ -528,8 +533,20 @@ export default function DashboardDocsPage() {
               if (active) active.classList.add('active');
             }
           });
-        }, { rootMargin: '-20% 0px -70% 0px' });
+        }, { root: scrollContainer, rootMargin: '-20% 0px -70% 0px' });
         sections.forEach(function(s) { observer.observe(s); });
+
+        // Smooth scroll nav links within the scroll container
+        navLinks.forEach(function(link) {
+          link.addEventListener('click', function(e) {
+            var href = link.getAttribute('href');
+            if (href && href.startsWith('#')) {
+              e.preventDefault();
+              var target = document.getElementById(href.slice(1));
+              if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          });
+        });
       `}</Script>
     </>
   );
