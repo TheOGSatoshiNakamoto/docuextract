@@ -36,6 +36,7 @@ function OverviewContent({
   loadingUsage,
   loadingExtractions,
   hasExtractions,
+  dataError,
 }: {
   apiKey: string | null;
   usage: UsageData | null;
@@ -43,6 +44,7 @@ function OverviewContent({
   loadingUsage: boolean;
   loadingExtractions: boolean;
   hasExtractions: boolean;
+  dataError?: string | null;
 }) {
   const sparkData = usage?.breakdown?.slice(-30).map((d) => d.count) ?? [];
   const usedPct = usage ? Math.min(100, (usage.used / usage.limit) * 100) : 0;
@@ -58,6 +60,14 @@ function OverviewContent({
 
   return (
     <div className="p-6 md:p-8 max-w-7xl w-full mx-auto space-y-8">
+      {/* Data error banner */}
+      {dataError && (
+        <div className="flex items-center gap-3 p-4 bg-error/5 border border-error/20 rounded-lg">
+          <span className="material-symbols-outlined text-error text-lg shrink-0">error</span>
+          <p className="text-sm text-on-surface">{dataError}</p>
+        </div>
+      )}
+
       {/* Header */}
       <section className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div className="space-y-1">
@@ -155,6 +165,7 @@ export default function DashboardPage() {
   const [extractions, setExtractions] = useState<Extraction[]>([]);
   const [loadingUsage, setLoadingUsage] = useState(true);
   const [loadingExtractions, setLoadingExtractions] = useState(true);
+  const [dataError, setDataError] = useState<string | null>(null);
   const [onboardingComplete, setOnboardingComplete] = useState<boolean | null>(null); // null = loading
 
   // Check onboarding state
@@ -184,6 +195,13 @@ export default function DashboardPage() {
         .single();
 
       if (userData?.api_key) setApiKey(userData.api_key);
+
+      if (!userData) {
+        setDataError('Unable to load your account data. Please try refreshing the page.');
+        setLoadingUsage(false);
+        setLoadingExtractions(false);
+        return;
+      }
 
       // Usage stats
       try {
@@ -225,8 +243,10 @@ export default function DashboardPage() {
           period_end: monthEnd,
           breakdown,
         });
-      } catch { /* non-blocking */ }
-      finally { setLoadingUsage(false); }
+      } catch (err) {
+        console.error('Usage fetch failed:', err);
+        setDataError('Failed to load usage data.');
+      } finally { setLoadingUsage(false); }
 
       // Recent extractions
       try {
@@ -237,8 +257,10 @@ export default function DashboardPage() {
           .order('created_at', { ascending: false })
           .limit(10);
         setExtractions(exData ?? []);
-      } catch { /* non-blocking */ }
-      finally { setLoadingExtractions(false); }
+      } catch (err) {
+        console.error('Extractions fetch failed:', err);
+        setDataError('Failed to load recent extractions.');
+      } finally { setLoadingExtractions(false); }
     });
   }, []);
 
@@ -298,6 +320,7 @@ export default function DashboardPage() {
       loadingUsage={loadingUsage}
       loadingExtractions={loadingExtractions}
       hasExtractions={hasExtractions}
+      dataError={dataError}
     />
   );
 }

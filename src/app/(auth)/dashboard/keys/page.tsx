@@ -25,9 +25,11 @@ export default function KeysPage() {
     });
   }, []);
 
+  const [errorMsg, setErrorMsg] = useState('');
+
   function copyKey() {
     if (!apiKey) return;
-    navigator.clipboard.writeText(apiKey);
+    navigator.clipboard.writeText(apiKey).catch(() => {});
     setCopying(true);
     setTimeout(() => setCopying(false), 2000);
   }
@@ -35,14 +37,19 @@ export default function KeysPage() {
   async function regenerateKey() {
     setRegenerating(true);
     setConfirmRegen(false);
+    setErrorMsg('');
 
     const supabase = getSupabaseClient();
     const { data, error } = await supabase.rpc('regenerate_my_api_key');
-    if (!error && data) {
+    if (error) {
+      setErrorMsg(`Failed to regenerate key: ${error.message}`);
+    } else if (data) {
       setApiKey(data);
       setRevealed(true);
       setSuccessMsg('New API key generated. Copy it now — it won\'t be shown again in full.');
       setTimeout(() => setSuccessMsg(''), 6000);
+    } else {
+      setErrorMsg('Failed to regenerate key. Please try again.');
     }
     setRegenerating(false);
   }
@@ -59,6 +66,13 @@ export default function KeysPage() {
         {successMsg && (
           <div className="bg-green-900/40 border border-green-700 text-green-300 text-sm rounded-lg px-4 py-3 mb-6">
             {successMsg}
+          </div>
+        )}
+
+        {errorMsg && (
+          <div className="bg-red-900/40 border border-red-700 text-red-300 text-sm rounded-lg px-4 py-3 mb-6 flex items-center justify-between">
+            <span>{errorMsg}</span>
+            <button onClick={() => setErrorMsg('')} className="text-red-400 hover:text-red-300 ml-4 shrink-0">&times;</button>
           </div>
         )}
 
