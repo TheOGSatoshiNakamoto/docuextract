@@ -20,6 +20,7 @@ export default function BillingPage() {
   const [usageCount, setUsageCount] = useState(0);
   const [monthlyLimit, setMonthlyLimit] = useState(100);
   const [loading, setLoading] = useState(true);
+  const [apiKey, setApiKey] = useState<string | null>(null);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
 
@@ -30,11 +31,12 @@ export default function BillingPage() {
 
       const { data } = await supabase
         .from('users')
-        .select('plan, monthly_limit')
+        .select('api_key, plan, monthly_limit')
         .eq('id', session.user.id)
         .single();
 
       if (data) {
+        setApiKey(data.api_key ?? null);
         setUserPlan(data.plan ?? 'free');
         setMonthlyLimit(data.monthly_limit ?? 100);
       }
@@ -57,11 +59,15 @@ export default function BillingPage() {
   const barColor = usagePct >= 95 ? 'bg-error' : usagePct >= 80 ? 'bg-amber-500' : 'bg-primary-container';
 
   async function handleCheckout(planKey: string) {
+    if (!apiKey) return;
     setCheckoutLoading(planKey);
     try {
       const res = await fetch('/v1/billing/checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+        },
         body: JSON.stringify({ plan: planKey }),
       });
       const data = await res.json();
@@ -71,9 +77,13 @@ export default function BillingPage() {
   }
 
   async function handlePortal() {
+    if (!apiKey) return;
     setPortalLoading(true);
     try {
-      const res = await fetch('/v1/billing/portal', { method: 'POST' });
+      const res = await fetch('/v1/billing/portal', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${apiKey}` },
+      });
       const data = await res.json();
       if (data.url) window.location.href = data.url;
     } catch { /* error handling */ }
