@@ -23,6 +23,7 @@ export default function BillingPage() {
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = getSupabaseClient();
@@ -59,7 +60,11 @@ export default function BillingPage() {
   const barColor = usagePct >= 95 ? 'bg-error' : usagePct >= 80 ? 'bg-amber-500' : 'bg-primary-container';
 
   async function handleCheckout(planKey: string) {
-    if (!apiKey) return;
+    setError(null);
+    if (!apiKey) {
+      setError('API key not loaded. Please refresh the page and try again.');
+      return;
+    }
     setCheckoutLoading(planKey);
     try {
       const res = await fetch('/v1/billing/checkout', {
@@ -71,13 +76,22 @@ export default function BillingPage() {
         body: JSON.stringify({ plan: planKey }),
       });
       const data = await res.json();
-      if (data.url) window.location.href = data.url;
-    } catch { /* error handling */ }
-    finally { setCheckoutLoading(null); }
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setError(data.error?.message ?? 'Failed to create checkout session. Please try again.');
+      }
+    } catch {
+      setError('Network error. Please check your connection and try again.');
+    } finally { setCheckoutLoading(null); }
   }
 
   async function handlePortal() {
-    if (!apiKey) return;
+    setError(null);
+    if (!apiKey) {
+      setError('API key not loaded. Please refresh the page and try again.');
+      return;
+    }
     setPortalLoading(true);
     try {
       const res = await fetch('/v1/billing/portal', {
@@ -85,9 +99,14 @@ export default function BillingPage() {
         headers: { 'Authorization': `Bearer ${apiKey}` },
       });
       const data = await res.json();
-      if (data.url) window.location.href = data.url;
-    } catch { /* error handling */ }
-    finally { setPortalLoading(false); }
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setError(data.error?.message ?? 'Failed to open billing portal. Please try again.');
+      }
+    } catch {
+      setError('Network error. Please check your connection and try again.');
+    } finally { setPortalLoading(false); }
   }
 
   // Billing period
@@ -106,6 +125,17 @@ export default function BillingPage() {
         <h2 className="text-4xl font-bold font-headline tracking-tighter text-on-surface">Billing</h2>
         <p className="text-on-surface-variant">Manage your subscription, usage, and payment details.</p>
       </div>
+
+      {/* Error banner */}
+      {error && (
+        <div className="flex items-center gap-3 p-4 bg-error/5 border border-error/20 rounded-lg">
+          <span className="material-symbols-outlined text-error text-lg shrink-0">error</span>
+          <p className="text-sm text-on-surface flex-1">{error}</p>
+          <button onClick={() => setError(null)} className="text-on-surface-variant/40 hover:text-on-surface-variant shrink-0">
+            <span className="material-symbols-outlined text-sm">close</span>
+          </button>
+        </div>
+      )}
 
       {/* Current Plan Hero */}
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
