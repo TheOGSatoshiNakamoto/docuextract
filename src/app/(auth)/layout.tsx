@@ -4,13 +4,13 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { getSupabaseClient } from '@/lib/supabase';
 import type { User } from '@supabase/supabase-js';
+import DashboardLayout from '@/components/dashboard/DashboardLayout';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [loading, setLoading] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const supabase = getSupabaseClient();
@@ -42,11 +42,17 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="text-gray-400 text-sm">Loading…</div>
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <div className="text-on-surface-variant text-sm font-headline">Loading&hellip;</div>
       </div>
     );
   }
 
-  return <>{children}</>;
+  // Login page does not get the dashboard shell
+  if (pathname === '/login') {
+    return <>{children}</>;
+  }
+
+  // All dashboard routes get the shell
+  return <DashboardLayout>{children}</DashboardLayout>;
 }

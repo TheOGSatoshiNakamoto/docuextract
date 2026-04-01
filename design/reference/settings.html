@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DocuExtract | Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;family=Roboto+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "inverse-primary": "#3258bc",
+                        "error-container": "#93000a",
+                        "on-surface-variant": "#c4c6d5",
+                        "surface-dim": "#111319",
+                        "on-tertiary-fixed-variant": "#41474e",
+                        "primary-fixed": "#dbe1ff",
+                        "on-error": "#690005",
+                        "surface-variant": "#33343b",
+                        "outline-variant": "#434652",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary-fixed": "#161c22",
+                        "surface-container-lowest": "#0c0e14",
+                        "tertiary-fixed-dim": "#c1c7cf",
+                        "secondary": "#bdc7da",
+                        "on-tertiary": "#2b3137",
+                        "on-background": "#e2e2eb",
+                        "surface-bright": "#373940",
+                        "secondary-fixed-dim": "#bdc7da",
+                        "on-primary-container": "#00256f",
+                        "outline": "#8e909e",
+                        "on-primary": "#002979",
+                        "on-primary-fixed-variant": "#103ea3",
+                        "on-primary-fixed": "#00174c",
+                        "background": "#111319",
+                        "secondary-container": "#3d4757",
+                        "tertiary": "#c1c7cf",
+                        "inverse-surface": "#e2e2eb",
+                        "inverse-on-surface": "#2e3037",
+                        "primary": "#b4c5ff",
+                        "surface-container": "#1e1f26",
+                        "primary-container": "#6c8ef5",
+                        "on-secondary-fixed": "#121c2a",
+                        "on-secondary-container": "#acb6c8",
+                        "surface-tint": "#b4c5ff",
+                        "surface-container-high": "#282a30",
+                        "surface": "#111319",
+                        "on-surface": "#e2e2eb",
+                        "tertiary-container": "#8d949b",
+                        "surface-container-low": "#191b22",
+                        "tertiary-fixed": "#dde3eb",
+                        "secondary-fixed": "#d9e3f7",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-secondary": "#273140",
+                        "error": "#ffb4ab",
+                        "surface-container-highest": "#33343b",
+                        "on-tertiary-container": "#262d33",
+                        "on-secondary-fixed-variant": "#3d4757"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Space Grotesk"],
+                        "mono": ["Roboto Mono"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #111319; }
+        ::-webkit-scrollbar-thumb { background: #33343b; border-radius: 10px; }
+        .glass-panel {
+            background: rgba(30, 31, 38, 0.4);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary/30">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 bottom-0 w-64 bg-slate-900 flex flex-col h-full py-6 font-['Space_Grotesk'] uppercase text-[11px] tracking-[0.05em] border-r border-slate-800">
+<div class="px-6 mb-10 flex items-center gap-3">
+<div class="w-8 h-8 bg-primary rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container text-sm" style="font-variation-settings: 'FILL' 1;">terminal</span>
+</div>
+<span class="text-lg font-black text-slate-100 normal-case tracking-tighter">Terminal Elite</span>
+</div>
+<nav class="flex-1 space-y-1">
+<div class="px-4 mb-2 opacity-40 text-[10px] font-bold">Main Console</div>
+<a class="flex items-center px-6 py-3 text-slate-500 hover:text-slate-300 hover:bg-slate-800/50 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="dashboard">dashboard</span> Dashboard
+            </a>
+<a class="flex items-center px-6 py-3 text-slate-500 hover:text-slate-300 hover:bg-slate-800/50 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="vpn_key">vpn_key</span> API Keys
+            </a>
+<a class="flex items-center px-6 py-3 text-slate-500 hover:text-slate-300 hover:bg-slate-800/50 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="terminal">terminal</span> Logs
+            </a>
+<div class="px-4 mt-6 mb-2 opacity-40 text-[10px] font-bold">Resources</div>
+<a class="flex items-center px-6 py-3 text-slate-500 hover:text-slate-300 hover:bg-slate-800/50 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="memory">memory</span> Compute
+            </a>
+<a class="flex items-center px-6 py-3 text-slate-500 hover:text-slate-300 hover:bg-slate-800/50 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="database">database</span> Database
+            </a>
+<a class="flex items-center px-6 py-3 bg-blue-500/10 text-blue-400 border-r-2 border-blue-500 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="settings">settings</span> Billing
+            </a>
+</nav>
+<div class="mt-auto px-4 space-y-1">
+<button class="w-full mb-6 bg-primary-container text-on-primary-container py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-all hover:brightness-110 active:scale-95">
+<span class="material-symbols-outlined text-sm">rocket_launch</span>
+                Deploy New Node
+            </button>
+<a class="flex items-center px-6 py-2 text-slate-500 hover:text-slate-300 hover:bg-slate-800/50 transition-all" href="#">
+<span class="material-symbols-outlined mr-3 text-sm" data-icon="menu_book">menu_book</span> Documentation
+            </a>
+<a class="flex items-center px-6 py-2 text-slate-500 hover:text-slate-300 hover:bg-slate-800/50 transition-all" href="#">
+<span class="material-symbols-outlined mr-3 text-sm" data-icon="contact_support">contact_support</span> Support
+            </a>
+</div>
+</aside>
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 left-64 h-16 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/50 flex items-center justify-between px-8 z-20">
+<div class="flex items-center gap-4">
+<span class="font-['Space_Grotesk'] tracking-tight text-xl font-bold tracking-tighter text-slate-100">DocuExtract</span>
+<div class="h-4 w-px bg-slate-800"></div>
+<div class="flex items-center gap-2 text-slate-400 text-sm">
+<span class="material-symbols-outlined text-sm">home</span>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<span class="text-blue-400 font-bold">Settings</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-slate-500 text-lg">search</span>
+<input class="bg-slate-900 border-none rounded-lg pl-10 pr-4 py-1.5 text-sm w-64 focus:ring-1 focus:ring-blue-500 text-slate-300" placeholder="Search system configuration..." type="text"/>
+</div>
+<div class="flex items-center gap-4 text-slate-400">
+<button class="hover:text-blue-300 transition-colors scale-95 active:duration-100">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="hover:text-blue-300 transition-colors scale-95 active:duration-100">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-slate-700">
+<img alt="Developer Profile" class="w-full h-full object-cover" data-alt="close-up portrait of a developer with glasses in a dark studio setting with soft blue neon backlighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCooGKK8Z-e-wXs9uA8WLG9UQhGwUQWj9UtDteiBNjYoJAqEuu48kXfa_v5btkKXH8-ELZUyfKxhKp-gbr1eReRmZuKTWucJDrVZFNHyw2nEtQwlDk5vXGRvvArZqaYgPliaZwxyYjGM3pl0s1rw8ERF64USXsHqx9f_xaRDipAx44uIoFNtOfj9d2CE2BnEXvNzT_VH5pejKlK47FwbeNiDWT1_IUgPm5ozA6BjsalPDo-tf1TWEZfT8CJ5rC2C1RtsOZWpu6jEdw"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-64 mt-16 p-12 max-w-5xl mx-auto space-y-16">
+<!-- Section 1: Profile -->
+<section class="space-y-8" id="profile">
+<div class="flex justify-between items-end">
+<div>
+<h2 class="text-3xl font-headline font-bold text-on-surface tracking-tight">Profile Settings</h2>
+<p class="text-on-surface-variant text-sm mt-1">Manage your public identity and account metadata.</p>
+</div>
+<button class="hidden group-modified:block px-6 py-2 bg-primary-container text-on-primary-container font-bold rounded-lg hover:brightness-110 transition-all">Save changes</button>
+</div>
+<div class="bg-surface-container-low p-8 rounded-xl space-y-8">
+<div class="flex items-center gap-8">
+<div class="relative group cursor-pointer">
+<div class="w-24 h-24 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden border-2 border-primary/20">
+<img alt="Profile Photo" class="w-full h-full object-cover" data-alt="close-up portrait of a developer with glasses in a dark studio setting with soft blue neon backlighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5uxnlosdbPZBhXXlBDugP0uxkbrwB9rlSNHJg5lk5fzag-5hD60JyVxYPCbCNitFGEktpP75t29U_c0yaQRcB2WL9P-FK_NQlctUIawnsr6DAROAoL8RLNxJpxggKD-7yfWIHRBHORKpo9CbSNwgpk-HNASfIc25aLDFlvtcyYo-SOxq_soLfqqrR3CcpW0abS89tSvBj9pMr84ZT4Sow3WlUc3mysvW_nx6zlOU00v_ROirb5q8q1x4jdtjVGNNcqBbwAC7yRos"/>
+</div>
+<div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+<span class="material-symbols-outlined text-white">photo_camera</span>
+</div>
+</div>
+<div class="space-y-4 flex-1">
+<div class="grid grid-cols-2 gap-6">
+<div class="space-y-1">
+<label class="block text-[10px] font-label uppercase tracking-widest text-primary/70">Display Name</label>
+<input class="w-full bg-surface-container-lowest border-none rounded focus:ring-1 focus:ring-primary text-on-surface py-2" type="text" value="Alex Rivera"/>
+</div>
+<div class="space-y-1">
+<label class="block text-[10px] font-label uppercase tracking-widest text-primary/70">Email Address</label>
+<div class="flex items-center justify-between py-2 text-on-surface-variant bg-transparent">
+<span>a.rivera@docuextract.io</span>
+<a class="text-primary text-xs font-bold hover:underline" href="#">Change email</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-8 pt-6 border-t border-outline-variant/20">
+<div class="space-y-1">
+<label class="block text-[10px] font-label uppercase tracking-widest text-primary/70">Account ID</label>
+<div class="flex items-center gap-3 font-mono text-sm text-on-surface-variant bg-surface-container-lowest px-3 py-2 rounded">
+<span>usr_01H2VX9K8R4P</span>
+<button class="ml-auto hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-base">content_copy</span>
+</button>
+</div>
+</div>
+<div class="space-y-1">
+<label class="block text-[10px] font-label uppercase tracking-widest text-primary/70">Member Since</label>
+<p class="py-2 text-on-surface">October 12, 2023</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Authentication & Security -->
+<section class="space-y-8" id="security">
+<div>
+<h2 class="text-3xl font-headline font-bold text-on-surface tracking-tight">Security &amp; Auth</h2>
+<p class="text-on-surface-variant text-sm mt-1">Configure multi-factor authentication and session controls.</p>
+</div>
+<div class="space-y-6">
+<!-- Connected Accounts -->
+<div class="bg-surface-container-low p-6 rounded-xl">
+<h3 class="text-sm font-bold uppercase tracking-widest text-primary mb-4">Connected Accounts</h3>
+<div class="divide-y divide-outline-variant/10">
+<div class="py-4 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 bg-surface-container-highest rounded flex items-center justify-center">
+<svg class="w-6 h-6 fill-white" viewbox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"></path></svg>
+</div>
+<div>
+<p class="font-bold">GitHub</p>
+<p class="text-xs text-on-surface-variant">Connected as @arivera-dev</p>
+</div>
+</div>
+<button class="text-xs font-bold px-4 py-2 border border-outline-variant hover:bg-surface-container-highest transition-colors rounded">Disconnect</button>
+</div>
+<div class="py-4 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 bg-surface-container-highest rounded flex items-center justify-center">
+<svg class="w-6 h-6" viewbox="0 0 24 24"><path d="M24 12.27c0-.85-.07-1.53-.22-2.23H12v4.17h6.75c-.32 1.57-1.23 2.9-2.58 3.78v3.15h4.17c2.44-2.25 3.86-5.57 3.86-9.15z" fill="#EA4335"></path><path d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-4.17-3.15c-1.15.77-2.62 1.22-3.76 1.22-2.9 0-5.36-1.95-6.23-4.57H1.54v3.25C3.52 21.93 7.5 24 12 24z" fill="#4285F4"></path><path d="M5.77 14.59c-.23-.67-.36-1.38-.36-2.12s.13-1.45.36-2.12V7.1H1.54c-.8 1.59-1.25 3.38-1.25 5.27s.45 3.68 1.25 5.27l4.23-3.05z" fill="#FBBC05"></path><path d="M12 5.38c1.76 0 3.35.6 4.6 1.79l3.44-3.44C17.95 1.77 15.24.69 12 .69c-4.5 0-8.48 2.07-10.46 5.33l4.23 3.05c.87-2.62 3.33-4.69 6.23-4.69z" fill="#34A853"></path></svg>
+</div>
+<div>
+<p class="font-bold">Google</p>
+<p class="text-xs text-on-surface-variant">Connected as alex.rivera.ux@gmail.com</p>
+</div>
+</div>
+<button class="text-xs font-bold px-4 py-2 border border-outline-variant hover:bg-surface-container-highest transition-colors rounded">Disconnect</button>
+</div>
+</div>
+</div>
+<!-- Active Sessions -->
+<div class="bg-surface-container-low overflow-hidden rounded-xl">
+<div class="p-6 pb-0">
+<h3 class="text-sm font-bold uppercase tracking-widest text-primary mb-4">Active Sessions</h3>
+</div>
+<table class="w-full text-left">
+<thead class="bg-surface-container text-[10px] font-label uppercase text-on-surface-variant tracking-wider">
+<tr>
+<th class="px-6 py-3">Device / Browser</th>
+<th class="px-6 py-3">IP Address</th>
+<th class="px-6 py-3">Location</th>
+<th class="px-6 py-3">Last Active</th>
+<th class="px-6 py-3 text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10 text-sm">
+<tr>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">laptop</span>
+<span>macOS • Chrome 118</span>
+<span class="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-bold">CURRENT</span>
+</div>
+</td>
+<td class="px-6 py-4 font-mono text-xs opacity-80">192.168.1.45</td>
+<td class="px-6 py-4 text-on-surface-variant">San Francisco, US</td>
+<td class="px-6 py-4 text-on-surface-variant">Just now</td>
+<td class="px-6 py-4 text-right">
+<button class="text-xs font-bold text-error opacity-50 cursor-not-allowed">Revoke</button>
+</td>
+</tr>
+<tr>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-sm">smartphone</span>
+<span>iPhone 15 Pro • Safari</span>
+</div>
+</td>
+<td class="px-6 py-4 font-mono text-xs opacity-80">172.20.10.2</td>
+<td class="px-6 py-4 text-on-surface-variant">San Francisco, US</td>
+<td class="px-6 py-4 text-on-surface-variant">2 hours ago</td>
+<td class="px-6 py-4 text-right">
+<button class="text-xs font-bold text-error hover:underline transition-all">Revoke</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- API Security -->
+<div class="bg-surface-container-low p-6 rounded-xl grid grid-cols-2 gap-8">
+<div class="space-y-2 opacity-50">
+<div class="flex items-center justify-between">
+<label class="font-bold text-sm">IP Allowlist</label>
+<span class="text-[9px] bg-outline-variant/30 text-on-surface-variant px-1.5 py-0.5 rounded uppercase font-bold tracking-tighter">Coming Soon</span>
+</div>
+<p class="text-xs text-on-surface-variant">Restrict API access to specific IP ranges for enhanced security.</p>
+<div class="bg-surface-container-lowest h-10 rounded border border-outline-variant/10"></div>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<div>
+<p class="font-bold text-sm">Key Rotation Reminder</p>
+<p class="text-xs text-on-surface-variant">Get notified every 90 days to rotate production keys.</p>
+</div>
+<button class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-primary">
+<span class="translate-x-4 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-on-primary shadow ring-0 transition duration-200 ease-in-out"></span>
+</button>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<p class="font-bold text-sm">Email Authentication</p>
+<p class="text-xs text-on-surface-variant">Require email confirmation for critical changes.</p>
+</div>
+<button class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-primary">
+<span class="translate-x-4 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-on-primary shadow ring-0 transition duration-200 ease-in-out"></span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Notifications -->
+<section class="space-y-8" id="notifications">
+<div>
+<h2 class="text-3xl font-headline font-bold text-on-surface tracking-tight">Notifications</h2>
+<p class="text-on-surface-variant text-sm mt-1">Control how and when you receive system communications.</p>
+</div>
+<div class="bg-surface-container-low rounded-xl divide-y divide-outline-variant/10">
+<div class="p-6 flex items-center justify-between">
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">warning</span>
+<div>
+<p class="font-bold">Security Alerts</p>
+<p class="text-xs text-on-surface-variant">Critical notifications about account access and password changes.</p>
+</div>
+</div>
+<button class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-not-allowed opacity-50 rounded-full border-2 border-transparent bg-primary">
+<span class="translate-x-4 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-on-primary"></span>
+</button>
+</div>
+<div class="p-6 flex items-center justify-between">
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-on-surface-variant">monitoring</span>
+<div>
+<p class="font-bold">Usage Alerts</p>
+<p class="text-xs text-on-surface-variant">Get notified when your credit balance or monthly limit reaches 80%.</p>
+</div>
+</div>
+<button class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-primary">
+<span class="translate-x-4 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-on-primary shadow ring-0 transition duration-200 ease-in-out"></span>
+</button>
+</div>
+<div class="p-6 flex items-center justify-between">
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-on-surface-variant">summarize</span>
+<div>
+<p class="font-bold">Weekly Usage Report</p>
+<p class="text-xs text-on-surface-variant">A summary of your API performance and token consumption.</p>
+</div>
+</div>
+<button class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-surface-container-highest">
+<span class="translate-x-0 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-outline shadow ring-0 transition duration-200 ease-in-out"></span>
+</button>
+</div>
+<div class="p-6 flex items-center justify-between">
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-on-surface-variant">campaign</span>
+<div>
+<p class="font-bold">Product Updates</p>
+<p class="text-xs text-on-surface-variant">News about new models, features, and platform improvements.</p>
+</div>
+</div>
+<button class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-primary">
+<span class="translate-x-4 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-on-primary shadow ring-0 transition duration-200 ease-in-out"></span>
+</button>
+</div>
+<div class="p-6 flex items-center justify-between">
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-on-surface-variant">lightbulb</span>
+<div>
+<p class="font-bold">Marketing and Tips</p>
+<p class="text-xs text-on-surface-variant">Optimizing your workflow and special offers.</p>
+</div>
+</div>
+<button class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-surface-container-highest">
+<span class="translate-x-0 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-outline shadow ring-0 transition duration-200 ease-in-out"></span>
+</button>
+</div>
+</div>
+</section>
+<!-- Section 4: Developer Preferences -->
+<section class="space-y-8" id="developer">
+<div>
+<h2 class="text-3xl font-headline font-bold text-on-surface tracking-tight">Developer Preferences</h2>
+<p class="text-on-surface-variant text-sm mt-1">Configure default behaviors for the extraction engine.</p>
+</div>
+<div class="bg-surface-container-low p-8 rounded-xl grid grid-cols-2 gap-x-12 gap-y-8">
+<div class="space-y-2">
+<label class="block text-[10px] font-label uppercase tracking-widest text-primary/70">Default Processing Model</label>
+<div class="flex gap-2 p-1 bg-surface-container-lowest rounded-lg">
+<button class="flex-1 py-2 px-4 rounded font-bold text-xs bg-primary text-on-primary transition-all">Fast (GPT-3.5)</button>
+<button class="flex-1 py-2 px-4 rounded font-bold text-xs text-on-surface-variant hover:bg-surface-container-highest transition-all">Accurate (GPT-4o)</button>
+</div>
+</div>
+<div class="space-y-2">
+<label class="block text-[10px] font-label uppercase tracking-widest text-primary/70">Default Document Type</label>
+<select class="w-full bg-surface-container-lowest border-none rounded text-sm text-on-surface focus:ring-1 focus:ring-primary py-2.5">
+<option>Financial Invoices</option>
+<option>Legal Contracts</option>
+<option>Medical Records</option>
+<option>Generic OCR</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="block text-[10px] font-label uppercase tracking-widest text-primary/70">System Timezone</label>
+<select class="w-full bg-surface-container-lowest border-none rounded text-sm text-on-surface focus:ring-1 focus:ring-primary py-2.5">
+<option>(GMT-08:00) Pacific Time (US &amp; Canada)</option>
+<option>(GMT+00:00) Western European Time</option>
+<option>(GMT+08:00) China Standard Time</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="block text-[10px] font-label uppercase tracking-widest text-primary/70">Date Format</label>
+<select class="w-full bg-surface-container-lowest border-none rounded text-sm text-on-surface focus:ring-1 focus:ring-primary py-2.5">
+<option>YYYY-MM-DD (ISO)</option>
+<option>DD/MM/YYYY</option>
+<option>MM/DD/YYYY</option>
+</select>
+</div>
+</div>
+</section>
+<!-- Section 5: Team (Coming Soon) -->
+<section class="relative overflow-hidden p-12 rounded-2xl bg-surface-container-low/50 border border-outline-variant/10 group" id="team">
+<div class="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[120px]">group</span>
+</div>
+<div class="max-w-md space-y-4">
+<div class="inline-flex items-center px-2 py-1 rounded bg-surface-container-highest text-[10px] font-bold text-primary tracking-widest uppercase">Platform Beta</div>
+<h2 class="text-2xl font-headline font-bold text-on-surface/50">Multi-user Workspaces</h2>
+<p class="text-on-surface-variant/50 text-sm">Collaborative document review, role-based access control, and shared API usage reporting for high-velocity teams.</p>
+<button class="mt-4 px-6 py-2 border border-outline-variant/50 text-on-surface-variant/50 font-bold rounded-lg cursor-not-allowed flex items-center gap-2">
+                    Notify me when available
+                    <span class="material-symbols-outlined text-sm">notifications</span>
+</button>
+</div>
+</section>
+<!-- Section 6: Danger Zone -->
+<section class="pt-8 border-t border-error/20 space-y-6" id="danger">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">dangerous</span>
+<h2 class="text-xl font-headline font-bold text-error uppercase tracking-widest">Danger Zone</h2>
+</div>
+<div class="p-6 rounded-xl border border-error/30 bg-error/5 flex items-center justify-between">
+<div>
+<p class="font-bold text-on-surface">Data Portability</p>
+<p class="text-xs text-on-surface-variant">Download a full archive of your extractions, metadata, and logs in JSON format.</p>
+</div>
+<button class="px-6 py-2 border border-outline-variant hover:bg-surface-container-low transition-all font-bold text-xs rounded">Export my data</button>
+</div>
+<div class="p-6 rounded-xl border border-error/30 bg-error/5 flex items-center justify-between">
+<div>
+<p class="font-bold text-on-surface">Delete Account</p>
+<p class="text-xs text-on-surface-variant">Permanently remove your account and all associated data. This action is irreversible.</p>
+</div>
+<button class="px-6 py-2 bg-error-container text-on-error-container hover:brightness-110 transition-all font-bold text-xs rounded">Delete account</button>
+</div>
+</section>
+<!-- Footer spacing -->
+<div class="h-20"></div>
+</main>
+</body></html>

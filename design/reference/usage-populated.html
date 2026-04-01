@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DocuExtract - Usage Analytics</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-container": "#acb6c8",
+              "surface-tint": "#b4c5ff",
+              "surface-container-highest": "#33343b",
+              "secondary": "#bdc7da",
+              "on-secondary-fixed-variant": "#3d4757",
+              "on-secondary-fixed": "#121c2a",
+              "surface": "#111319",
+              "on-surface": "#e2e2eb",
+              "on-tertiary-container": "#262d33",
+              "tertiary-container": "#8d949b",
+              "secondary-fixed": "#d9e3f7",
+              "inverse-primary": "#3258bc",
+              "primary-container": "#6c8ef5",
+              "on-secondary": "#273140",
+              "on-surface-variant": "#c4c6d5",
+              "primary": "#b4c5ff",
+              "on-tertiary-fixed-variant": "#41474e",
+              "outline": "#8e909e",
+              "on-primary-container": "#00256f",
+              "background": "#111319",
+              "surface-variant": "#33343b",
+              "outline-variant": "#434652",
+              "tertiary-fixed": "#dde3eb",
+              "on-tertiary": "#2b3137",
+              "on-primary-fixed-variant": "#103ea3",
+              "on-primary": "#002979",
+              "secondary-fixed-dim": "#bdc7da",
+              "inverse-on-surface": "#2e3037",
+              "surface-dim": "#111319",
+              "error": "#ffb4ab",
+              "secondary-container": "#3d4757",
+              "surface-container-lowest": "#0c0e14",
+              "surface-container": "#1e1f26",
+              "surface-bright": "#373940",
+              "tertiary": "#c1c7cf",
+              "primary-fixed-dim": "#b4c5ff",
+              "inverse-surface": "#e2e2eb",
+              "surface-container-low": "#191b22",
+              "surface-container-high": "#282a30",
+              "on-primary-fixed": "#00174c",
+              "on-tertiary-fixed": "#161c22",
+              "on-error-container": "#ffdad6",
+              "primary-fixed": "#dbe1ff",
+              "error-container": "#93000a",
+              "on-error": "#690005",
+              "on-background": "#e2e2eb",
+              "tertiary-fixed-dim": "#c1c7cf"
+            },
+            fontFamily: {
+              "headline": ["Space Grotesk"],
+              "body": ["Inter"],
+              "label": ["Space Grotesk"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      body { background-color: #111319; color: #e2e2eb; font-family: 'Inter', sans-serif; }
+      .font-headline { font-family: 'Space Grotesk', sans-serif; }
+      .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+      .glass-card { background: rgba(30, 31, 38, 0.4); backdrop-filter: blur(12px); }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="flex min-h-screen">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 bottom-0 w-64 bg-slate-950 flex flex-col h-full py-6 px-4 z-50">
+<div class="mb-10 px-2 flex items-center gap-3">
+<div class="w-10 h-10 bg-primary-container rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container text-2xl" data-icon="terminal">terminal</span>
+</div>
+<div>
+<h1 class="text-lg font-black text-blue-400 font-headline leading-none">DocuExtract</h1>
+<p class="text-[10px] uppercase tracking-widest text-slate-500 mt-1 font-headline">Terminal Elite v1.0</p>
+</div>
+</div>
+<nav class="flex-1 space-y-8 overflow-y-auto no-scrollbar">
+<!-- CORE ACCESS -->
+<div>
+<h3 class="text-[10px] uppercase tracking-widest text-slate-600 font-headline font-bold mb-4 px-2">CORE ACCESS</h3>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900/30 transition-all font-headline text-[10px] tracking-widest uppercase" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="rocket_launch">rocket_launch</span>
+                    Quick Start
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900/30 transition-all font-headline text-[10px] tracking-widest uppercase" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="dashboard">dashboard</span>
+                    Overview
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900/30 transition-all font-headline text-[10px] tracking-widest uppercase" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="description">description</span>
+                    Extractions
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900/30 transition-all font-headline text-[10px] tracking-widest uppercase" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="terminal">terminal</span>
+                    Playground
+                </a>
+</div>
+</div>
+<!-- INFRASTRUCTURE -->
+<div>
+<h3 class="text-[10px] uppercase tracking-widest text-slate-600 font-headline font-bold mb-4 px-2">INFRASTRUCTURE</h3>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900/30 transition-all font-headline text-[10px] tracking-widest uppercase" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="vpn_key">vpn_key</span>
+                    API Keys
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-blue-400 bg-slate-900/50 border-r-2 border-blue-400 transition-all font-headline text-[10px] tracking-widest uppercase" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="bar_chart">bar_chart</span>
+                    Usage
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900/30 transition-all font-headline text-[10px] tracking-widest uppercase" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="settings_input_component">settings_input_component</span>
+                    Webhooks
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900/30 transition-all font-headline text-[10px] tracking-widest uppercase" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="list_alt">list_alt</span>
+                    Logs
+                </a>
+</div>
+</div>
+<!-- ACCOUNT -->
+<div>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900/30 transition-all font-headline text-[10px] tracking-widest uppercase" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="payments">payments</span>
+                    Billing
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900/30 transition-all font-headline text-[10px] tracking-widest uppercase" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="settings">settings</span>
+                    Settings
+                </a>
+</div>
+</div>
+</nav>
+<div class="mt-auto pt-6 border-t border-slate-900">
+<div class="flex items-center gap-3 px-2">
+<img class="w-8 h-8 rounded-full border border-outline-variant" data-alt="Close-up portrait of a developer in a dark studio setting with soft blue rim light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB46Pz0C-JDNchl6WwXFrK9TsakT3Fjpa3GcHGm20lFu2zz-_uwbcWwy5l5z1Losgt7YAPQUh7BoxVfhHMyJDrFSvV7vQ_tO63HdhD5TuGxtP6hGihsiIHDfmqNx8Q4-4zzps_yk-bOmket5w6EDMruiCLIKx0osC6Ky0ua8tJZONbbADqRpY8zU37o9MJ8OTQQHEoHDBnkTez8ot7xl1qJ8mJuddUowBzSiB_Lrt2znh7zWsnFA1SIuU2ZrxeQF_Hc7dVbRHilqVo"/>
+<div class="overflow-hidden">
+<p class="text-xs font-bold truncate">Alex Sterling</p>
+<p class="text-[10px] text-slate-500 truncate">Pro Plan</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="ml-64 flex-1 flex flex-col bg-surface overflow-x-hidden">
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 left-64 h-16 bg-slate-900 flex justify-between items-center px-6 w-auto z-40">
+<div class="flex items-center gap-4 flex-1">
+<h2 class="text-xl font-bold tracking-tighter text-blue-400 font-headline">Usage Analytics</h2>
+<div class="relative w-full max-w-md ml-8">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-lg" data-icon="search">search</span>
+<input class="bg-slate-800/50 border-none rounded-lg py-2 pl-10 pr-4 text-xs text-on-surface w-full focus:ring-1 focus:ring-primary-container" placeholder="Search analytics..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center text-slate-400 hover:bg-slate-800 transition-colors rounded-lg">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<div class="h-8 w-[1px] bg-slate-800 mx-2"></div>
+<div class="flex items-center gap-2 cursor-pointer active:opacity-80">
+<img class="w-8 h-8 rounded-full" data-alt="User Profile Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1Zm9BJDvrPjpMSXf40HRXQ37r150OdVboHV0VvWATz1xob7j2KVBFoen0oQ3bEm6gSIy960VkzdUVh8aNd9a5BMFVCptf83IDOrAxSU1BG_Ep1QY9CcGodBbU1134JOrrwywG_04lWllmPK4vI7tmnWS5g7xON8Px768nGB4CSA_A6u4UOL5a7roZis-DgsDX4xSJFyBn6oRpJ8hPlYZ2KAd5xbzgOdqJ88x3PmlRKHU4vYYLCRvYjx-7xgJVspAoX9zWjlhvYpw"/>
+<span class="material-symbols-outlined text-slate-500 text-sm" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+</header>
+<section class="mt-16 p-8 space-y-8">
+<!-- Time Range & Status Controls -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h3 class="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-headline font-bold mb-2">TIME RANGE</h3>
+<div class="flex items-center gap-3">
+<div class="flex p-1 bg-surface-container-low rounded-lg border border-outline-variant/20">
+<button class="px-4 py-1.5 text-xs font-medium bg-primary-container text-on-primary-container rounded-md">This billing period</button>
+<button class="px-4 py-1.5 text-xs font-medium text-slate-400 hover:text-slate-200">Last 30 days</button>
+<button class="px-4 py-1.5 text-xs font-medium text-slate-400 hover:text-slate-200">Year to date</button>
+</div>
+<p class="text-xs text-on-surface-variant italic">Mar 24 – Apr 24, 2026 <span class="text-primary-container ml-2 font-semibold">(12 days remaining)</span></p>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-high border border-outline-variant/20 rounded-lg text-xs font-bold hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="download">download</span> EXPORT DATA
+                </button>
+</div>
+</div>
+<!-- Summary Metrics Grid -->
+<div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+<div class="bg-surface-container-low p-5 rounded-xl border border-outline-variant/10">
+<p class="text-[10px] uppercase tracking-widest text-slate-500 font-headline font-bold mb-3">Total API Calls</p>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-black font-headline text-on-surface">1,847</span>
+<span class="text-xs text-slate-500">/ 2,500</span>
+</div>
+<div class="mt-4 h-1 bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary-container" style="width: 73.8%"></div>
+</div>
+</div>
+<div class="bg-surface-container-low p-5 rounded-xl border border-outline-variant/10">
+<p class="text-[10px] uppercase tracking-widest text-slate-500 font-headline font-bold mb-3">Success Rate</p>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-black font-headline text-on-surface">98.7%</span>
+<span class="text-[10px] text-primary flex items-center"><span class="material-symbols-outlined text-xs" data-icon="arrow_upward">arrow_upward</span> 0.2%</span>
+</div>
+<div class="mt-4 flex gap-1">
+<div class="flex-1 h-1 bg-primary/40"></div>
+<div class="flex-1 h-1 bg-primary"></div>
+<div class="flex-1 h-1 bg-primary"></div>
+<div class="flex-1 h-1 bg-primary"></div>
+</div>
+</div>
+<div class="bg-surface-container-low p-5 rounded-xl border border-outline-variant/10">
+<p class="text-[10px] uppercase tracking-widest text-slate-500 font-headline font-bold mb-3">Avg Confidence</p>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-black font-headline text-on-surface">96.4%</span>
+</div>
+<p class="mt-4 text-[10px] text-slate-500 leading-tight">Historical precision remains within Tier-1 threshold.</p>
+</div>
+<div class="bg-surface-container-low p-5 rounded-xl border border-outline-variant/10">
+<p class="text-[10px] uppercase tracking-widest text-slate-500 font-headline font-bold mb-3">Avg Latency</p>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-black font-headline text-on-surface">1.2s</span>
+<span class="text-[10px] text-error flex items-center"><span class="material-symbols-outlined text-xs" data-icon="arrow_upward">arrow_upward</span> 0.1s</span>
+</div>
+<div class="mt-4 h-1 bg-slate-800 rounded-full">
+<div class="h-full bg-orange-400/50" style="width: 45%"></div>
+</div>
+</div>
+<div class="bg-surface-container-low p-5 rounded-xl border border-outline-variant/10">
+<p class="text-[10px] uppercase tracking-widest text-slate-500 font-headline font-bold mb-3">Docs Processed</p>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-black font-headline text-on-surface">1,592</span>
+</div>
+<p class="mt-4 text-[10px] text-primary font-bold">ACTIVE OPS: 14</p>
+</div>
+</div>
+<!-- Primary Chart Section -->
+<div class="bg-surface-container-low rounded-xl p-8 border border-outline-variant/10">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+<div>
+<h3 class="text-lg font-bold font-headline mb-1">Usage Over Time</h3>
+<p class="text-xs text-slate-500">API call volume relative to service plan capacity</p>
+</div>
+<div class="flex p-1 bg-surface-container rounded-lg border border-outline-variant/20">
+<button class="px-3 py-1.5 text-[10px] font-bold tracking-widest uppercase bg-primary-container text-on-primary-container rounded">API CALLS</button>
+<button class="px-3 py-1.5 text-[10px] font-bold tracking-widest uppercase text-slate-400 hover:text-slate-200">SUCCESS/FAILURE</button>
+<button class="px-3 py-1.5 text-[10px] font-bold tracking-widest uppercase text-slate-400 hover:text-slate-200">LATENCY</button>
+<button class="px-3 py-1.5 text-[10px] font-bold tracking-widest uppercase text-slate-400 hover:text-slate-200">CONFIDENCE</button>
+</div>
+</div>
+<div class="relative h-[300px] w-full mt-4">
+<!-- Faux Area Chart -->
+<svg class="w-full h-full" preserveaspectratio="none">
+<defs>
+<lineargradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#6c8ef5" stop-opacity="0.3"></stop>
+<stop offset="100%" stop-color="#6c8ef5" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<!-- Plan Limit Line -->
+<line stroke="#434652" stroke-dasharray="8,8" stroke-width="1" x1="0" x2="100%" y1="50" y2="50"></line>
+<!-- Chart Area -->
+<path d="M0,280 L50,260 L100,240 L150,270 L200,230 L250,210 L300,180 L350,150 L400,190 L450,140 L500,160 L550,110 L600,130 L650,100 L700,140 L750,90 L800,110 L850,70 L900,95 L950,60 L1000,80 L1050,40 L1100,65 L1200,280 Z" fill="url(#chartGradient)"></path>
+<path d="M0,280 L50,260 L100,240 L150,270 L200,230 L250,210 L300,180 L350,150 L400,190 L450,140 L500,160 L550,110 L600,130 L650,100 L700,140 L750,90 L800,110 L850,70 L900,95 L950,60 L1000,80 L1050,40 L1100,65" fill="none" stroke="#b4c5ff" stroke-width="2"></path>
+</svg>
+<!-- Y-Axis Labels -->
+<div class="absolute left-0 top-0 h-full flex flex-col justify-between text-[10px] text-slate-600 font-bold -ml-8">
+<span>2.5K</span>
+<span>2.0K</span>
+<span>1.5K</span>
+<span>1.0K</span>
+<span>0.5K</span>
+<span>0</span>
+</div>
+<!-- Legend -->
+<div class="absolute top-10 right-0 flex items-center gap-4">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<span class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Actual Usage</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-6 h-[1px] border-t border-dashed border-outline-variant"></div>
+<span class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Plan Limit (2.5K)</span>
+</div>
+</div>
+</div>
+<div class="flex justify-between mt-6 px-4">
+<span class="text-[10px] text-slate-600 font-bold uppercase tracking-widest">Mar 24</span>
+<span class="text-[10px] text-slate-600 font-bold uppercase tracking-widest">Apr 01</span>
+<span class="text-[10px] text-slate-600 font-bold uppercase tracking-widest">Apr 08</span>
+<span class="text-[10px] text-slate-600 font-bold uppercase tracking-widest">Apr 15</span>
+<span class="text-[10px] text-slate-600 font-bold uppercase tracking-widest">Today</span>
+</div>
+</div>
+<!-- Middle Section: Breakdowns -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Usage by Doc Type -->
+<div class="lg:col-span-1 bg-surface-container-low rounded-xl p-6 border border-outline-variant/10">
+<h3 class="text-sm font-bold font-headline mb-6 flex items-center gap-2 uppercase tracking-widest">
+<span class="material-symbols-outlined text-primary-container" data-icon="insert_drive_file">insert_drive_file</span>
+                    Usage by Document Type
+                </h3>
+<div class="space-y-6">
+<div>
+<div class="flex justify-between text-xs mb-2 font-bold uppercase tracking-wider">
+<span class="text-slate-400">Invoice</span>
+<span class="text-on-surface">842 <span class="text-slate-500 font-normal">(45%)</span></span>
+</div>
+<div class="h-2 bg-slate-800 rounded-full">
+<div class="h-full bg-primary-container" style="width: 45%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs mb-2 font-bold uppercase tracking-wider">
+<span class="text-slate-400">Receipt</span>
+<span class="text-on-surface">421 <span class="text-slate-500 font-normal">(23%)</span></span>
+</div>
+<div class="h-2 bg-slate-800 rounded-full">
+<div class="h-full bg-primary-container/70" style="width: 23%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs mb-2 font-bold uppercase tracking-wider">
+<span class="text-slate-400">Resume</span>
+<span class="text-on-surface">198 <span class="text-slate-500 font-normal">(11%)</span></span>
+</div>
+<div class="h-2 bg-slate-800 rounded-full">
+<div class="h-full bg-primary-container/50" style="width: 11%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs mb-2 font-bold uppercase tracking-wider">
+<span class="text-slate-400">Passport / ID</span>
+<span class="text-on-surface">112 <span class="text-slate-500 font-normal">(6%)</span></span>
+</div>
+<div class="h-2 bg-slate-800 rounded-full">
+<div class="h-full bg-primary-container/30" style="width: 6%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Error Breakdown & Status Codes -->
+<div class="lg:col-span-1 bg-surface-container-low rounded-xl p-6 border border-outline-variant/10">
+<h3 class="text-sm font-bold font-headline mb-6 flex items-center gap-2 uppercase tracking-widest">
+<span class="material-symbols-outlined text-error" data-icon="error_outline">error_outline</span>
+                    Success vs Error Breakdown
+                </h3>
+<div class="flex items-center justify-between py-3 border-b border-outline-variant/10">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<span class="text-xs font-bold text-slate-400">200 OK</span>
+</div>
+<span class="text-xs font-black text-on-surface">1,823</span>
+</div>
+<div class="flex items-center justify-between py-3 border-b border-outline-variant/10">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-amber-400"></div>
+<span class="text-xs font-bold text-slate-400">422 Unprocessable</span>
+</div>
+<span class="text-xs font-black text-on-surface">14</span>
+</div>
+<div class="flex items-center justify-between py-3 border-b border-outline-variant/10">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-orange-500"></div>
+<span class="text-xs font-bold text-slate-400">429 Rate Limited</span>
+</div>
+<span class="text-xs font-black text-on-surface">7</span>
+</div>
+<div class="flex items-center justify-between py-3">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-error"></div>
+<span class="text-xs font-bold text-slate-400">500 Server Error</span>
+</div>
+<span class="text-xs font-black text-on-surface">3</span>
+</div>
+<div class="mt-8 bg-surface-container-highest/30 p-4 rounded-lg border border-outline-variant/20">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-blue-400 text-lg" data-icon="info">info</span>
+<p class="text-[10px] text-slate-400 leading-relaxed uppercase tracking-widest font-bold">Recommendation: Check 422 errors for malformed PDF headers in the extraction log.</p>
+</div>
+</div>
+</div>
+<!-- Model Usage Split (Replaces old Plan Card) -->
+<div class="lg:col-span-1 bg-surface-container-low rounded-xl p-6 border border-outline-variant/10">
+<h3 class="text-sm font-bold font-headline mb-6 flex items-center gap-2 uppercase tracking-widest">
+<span class="material-symbols-outlined text-primary" data-icon="neurology">neurology</span>
+                    Model Usage Split
+                </h3>
+<div class="space-y-6">
+<div>
+<div class="flex justify-between items-end mb-2">
+<span class="text-xs font-black font-headline text-on-surface">HAIKU</span>
+<span class="text-[10px] font-bold text-slate-500 uppercase">1,523 CALLS (82%)</span>
+</div>
+<div class="flex gap-4 mb-4">
+<div class="flex-1">
+<p class="text-[10px] text-slate-500 uppercase font-bold mb-0.5">Latency</p>
+<p class="text-sm font-bold text-primary">0.8s</p>
+</div>
+<div class="flex-1">
+<p class="text-[10px] text-slate-500 uppercase font-bold mb-0.5">Confidence</p>
+<p class="text-sm font-bold text-primary">94%</p>
+</div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-end mb-2">
+<span class="text-xs font-black font-headline text-blue-400">SONNET</span>
+<span class="text-[10px] font-bold text-slate-500 uppercase">324 CALLS (18%)</span>
+</div>
+<div class="flex gap-4">
+<div class="flex-1">
+<p class="text-[10px] text-slate-500 uppercase font-bold mb-0.5">Latency</p>
+<p class="text-sm font-bold text-blue-400">2.1s</p>
+</div>
+<div class="flex-1">
+<p class="text-[10px] text-slate-500 uppercase font-bold mb-0.5">Confidence</p>
+<p class="text-sm font-bold text-blue-400">98.5%</p>
+</div>
+</div>
+</div>
+<div class="pt-4">
+<div class="h-3 w-full flex rounded-full overflow-hidden bg-slate-800">
+<div class="h-full bg-primary" style="width: 82%"></div>
+<div class="h-full bg-blue-400" style="width: 18%"></div>
+</div>
+<div class="flex justify-between mt-2">
+<div class="flex items-center gap-1.5">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<span class="text-[10px] font-bold text-slate-500 uppercase">Haiku</span>
+</div>
+<div class="flex items-center gap-1.5">
+<div class="w-2 h-2 rounded-full bg-blue-400"></div>
+<span class="text-[10px] font-bold text-slate-500 uppercase">Sonnet</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Repositioned & Restyled Plan Info Bar -->
+<div class="bg-surface-container-low rounded-xl p-6 border border-primary-container/20 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-32 translate-x-32 blur-3xl"></div>
+<div class="flex flex-col xl:flex-row gap-8 items-center">
+<!-- Progress & Warning -->
+<div class="w-full xl:w-1/3 space-y-4">
+<div class="flex justify-between items-end">
+<h3 class="text-sm font-bold font-headline uppercase tracking-widest text-slate-500">Plan Usage</h3>
+<span class="text-2xl font-black font-headline text-primary-container">73.9% <span class="text-[10px] text-slate-500 font-bold uppercase ml-1">Used</span></span>
+</div>
+<div class="space-y-2">
+<div class="h-3 bg-slate-800 rounded-full overflow-hidden border border-slate-700/50">
+<div class="h-full bg-gradient-to-r from-primary-container to-primary" style="width: 73.9%"></div>
+</div>
+<div class="flex justify-between text-[9px] font-bold uppercase tracking-widest text-slate-500">
+<span>0 API CALLS</span>
+<span>2,500 LIMIT</span>
+</div>
+</div>
+<div class="flex items-center gap-2 text-error">
+<span class="material-symbols-outlined text-sm" data-icon="warning">warning</span>
+<p class="text-[10px] font-black uppercase tracking-widest">You're on track to exceed your limit by ~340 calls.</p>
+</div>
+</div>
+<!-- Limits & Overage -->
+<div class="w-full xl:w-1/3 grid grid-cols-2 gap-4 border-l xl:border-outline-variant/10 xl:pl-8">
+<div>
+<p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Rate Limit Status</p>
+<p class="text-xs font-bold text-on-surface">30 requests/minute <span class="text-slate-500">(Starter plan)</span></p>
+</div>
+<div>
+<p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Recent Rate Limits</p>
+<p class="text-xs font-bold text-on-surface">Hit 12 times <span class="text-slate-500">last 24h</span></p>
+</div>
+<div class="col-span-2 pt-2 border-t border-outline-variant/10">
+<p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Estimated Overage</p>
+<p class="text-xs font-bold text-on-surface">127 calls × $0.05 = <span class="text-primary-container font-black">$6.35</span></p>
+</div>
+</div>
+<!-- Upgrade CTA -->
+<div class="w-full xl:w-1/3 bg-primary-container/10 border border-primary-container/20 p-4 rounded-lg flex flex-col sm:flex-row items-center justify-between gap-4">
+<div class="text-center sm:text-left">
+<p class="text-[10px] font-black text-primary-container uppercase tracking-widest mb-1">Efficiency Boost</p>
+<p class="text-xs font-bold text-on-surface leading-tight">Upgrade to Pro for 4x the calls at $99/month</p>
+</div>
+<button class="whitespace-nowrap px-6 py-2.5 bg-primary-container text-on-primary-container font-black font-headline text-xs rounded-lg hover:brightness-110 transition-all flex items-center justify-center gap-2">
+                        UPGRADE TO PRO
+                        <span class="material-symbols-outlined text-sm" data-icon="bolt">bolt</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Recent API Activity Table -->
+<div class="bg-surface-container-low rounded-xl overflow-hidden border border-outline-variant/10">
+<div class="p-6 border-b border-outline-variant/10 flex justify-between items-center">
+<h3 class="text-sm font-bold font-headline uppercase tracking-widest">Recent API Activity</h3>
+<button class="text-xs font-bold text-primary flex items-center gap-1 hover:underline">
+                    VIEW FULL LOG <span class="material-symbols-outlined text-sm" data-icon="open_in_new">open_in_new</span>
+</button>
+</div>
+<table class="w-full text-left">
+<thead class="bg-surface-container-high/50 border-b border-outline-variant/10">
+<tr>
+<th class="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Timestamp</th>
+<th class="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Type</th>
+<th class="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Status</th>
+<th class="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Latency</th>
+<th class="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Confidence</th>
+<th class="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<tr class="hover:bg-surface-container-high/30 transition-colors">
+<td class="px-6 py-4 text-xs font-medium text-on-surface-variant">2026-04-12 14:22:01</td>
+<td class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-on-surface">Invoice-V2</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black bg-primary/10 text-primary uppercase tracking-tighter">200 OK</span>
+</td>
+<td class="px-6 py-4 text-xs text-slate-400">1.1s</td>
+<td class="px-6 py-4 text-xs text-on-surface">99.4%</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-500 hover:text-primary transition-colors"><span class="material-symbols-outlined text-lg" data-icon="visibility">visibility</span></button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-high/30 transition-colors">
+<td class="px-6 py-4 text-xs font-medium text-on-surface-variant">2026-04-12 14:18:55</td>
+<td class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-on-surface">Receipt-V1</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black bg-primary/10 text-primary uppercase tracking-tighter">200 OK</span>
+</td>
+<td class="px-6 py-4 text-xs text-slate-400">0.9s</td>
+<td class="px-6 py-4 text-xs text-on-surface">98.1%</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-500 hover:text-primary transition-colors"><span class="material-symbols-outlined text-lg" data-icon="visibility">visibility</span></button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-high/30 transition-colors">
+<td class="px-6 py-4 text-xs font-medium text-on-surface-variant">2026-04-12 14:15:22</td>
+<td class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-on-surface">Invoice-V2</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black bg-error/10 text-error uppercase tracking-tighter">422 ERR</span>
+</td>
+<td class="px-6 py-4 text-xs text-slate-400">1.4s</td>
+<td class="px-6 py-4 text-xs text-slate-600">--</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-500 hover:text-primary transition-colors"><span class="material-symbols-outlined text-lg" data-icon="visibility">visibility</span></button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-high/30 transition-colors">
+<td class="px-6 py-4 text-xs font-medium text-on-surface-variant">2026-04-12 14:12:08</td>
+<td class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-on-surface">Resume-V3</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black bg-primary/10 text-primary uppercase tracking-tighter">200 OK</span>
+</td>
+<td class="px-6 py-4 text-xs text-slate-400">1.8s</td>
+<td class="px-6 py-4 text-xs text-on-surface">96.7%</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-500 hover:text-primary transition-colors"><span class="material-symbols-outlined text-lg" data-icon="visibility">visibility</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Footer Info -->
+<footer class="mt-auto py-6 px-8 border-t border-outline-variant/10 flex justify-between items-center text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em]">
+<span>System Status: Operational</span>
+<span>Last Sync: 2026-04-12 14:30:12 UTC</span>
+</footer>
+</main>
+</body></html>

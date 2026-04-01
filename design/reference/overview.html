@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DocuExtract Developer Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "inverse-primary": "#3258bc",
+                        "error-container": "#93000a",
+                        "surface-dim": "#111319",
+                        "on-tertiary-fixed-variant": "#41474e",
+                        "on-surface-variant": "#c4c6d5",
+                        "primary-fixed": "#dbe1ff",
+                        "on-error": "#690005",
+                        "tertiary-fixed-dim": "#c1c7cf",
+                        "secondary": "#bdc7da",
+                        "on-tertiary": "#2b3137",
+                        "surface-container-lowest": "#0c0e14",
+                        "on-tertiary-fixed": "#161c22",
+                        "surface-variant": "#33343b",
+                        "outline-variant": "#434652",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-container": "#00256f",
+                        "surface-bright": "#373940",
+                        "secondary-fixed-dim": "#bdc7da",
+                        "on-background": "#e2e2eb",
+                        "on-primary-fixed-variant": "#103ea3",
+                        "on-primary-fixed": "#00174c",
+                        "outline": "#8e909e",
+                        "on-primary": "#002979",
+                        "secondary-container": "#3d4757",
+                        "background": "#111319",
+                        "tertiary": "#c1c7cf",
+                        "inverse-surface": "#e2e2eb",
+                        "inverse-on-surface": "#2e3037",
+                        "primary": "#b4c5ff",
+                        "surface-container": "#1e1f26",
+                        "surface": "#111319",
+                        "on-surface": "#e2e2eb",
+                        "surface-tint": "#b4c5ff",
+                        "surface-container-high": "#282a30",
+                        "primary-container": "#6c8ef5",
+                        "on-secondary-fixed": "#121c2a",
+                        "on-secondary-container": "#acb6c8",
+                        "tertiary-container": "#8d949b",
+                        "surface-container-low": "#191b22",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "tertiary-fixed": "#dde3eb",
+                        "secondary-fixed": "#d9e3f7",
+                        "on-secondary": "#273140",
+                        "error": "#ffb4ab",
+                        "surface-container-highest": "#33343b",
+                        "on-tertiary-container": "#262d33",
+                        "on-secondary-fixed-variant": "#3d4757"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Space Grotesk"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-headline { font-family: 'Space Grotesk', sans-serif; }
+        .glass-effect { backdrop-filter: blur(20px); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-background text-on-background selection:bg-primary selection:text-on-primary">
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-slate-950 flex flex-col h-full py-6 px-4 z-50">
+<div class="mb-10 px-2 flex items-center gap-3">
+<div class="w-8 h-8 bg-primary-container rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container text-sm">description</span>
+</div>
+<div>
+<h1 class="text-lg font-black text-blue-100 font-headline leading-tight">DocuExtract</h1>
+<p class="font-headline uppercase text-[10px] tracking-[0.2em] text-slate-500">v1.2.0-stable</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<p class="font-headline uppercase text-[10px] tracking-widest text-slate-600 mb-4 px-2">Core Access</p>
+<a class="flex items-center gap-3 px-3 py-2 bg-blue-500/10 text-blue-400 border-r-2 border-blue-400 font-headline uppercase text-xs tracking-widest transition-all translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined text-lg">rocket_launch</span> Quick Start
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900 font-headline uppercase text-xs tracking-widest transition-all" href="#">
+<span class="material-symbols-outlined text-lg">dashboard</span> Overview
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900 font-headline uppercase text-xs tracking-widest transition-all" href="#">
+<span class="material-symbols-outlined text-lg">description</span> Extractions
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900 font-headline uppercase text-xs tracking-widest transition-all" href="#">
+<span class="material-symbols-outlined text-lg">terminal</span> Playground
+            </a>
+<div class="pt-6 pb-2">
+<p class="font-headline uppercase text-[10px] tracking-widest text-slate-600 mb-4 px-2">Infrastructure</p>
+</div>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900 font-headline uppercase text-xs tracking-widest transition-all" href="#">
+<span class="material-symbols-outlined text-lg">vpn_key</span> API Keys
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900 font-headline uppercase text-xs tracking-widest transition-all" href="#">
+<span class="material-symbols-outlined text-lg">menu_book</span> Docs
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900 font-headline uppercase text-xs tracking-widest transition-all" href="#">
+<span class="material-symbols-outlined text-lg">webhook</span> Webhooks
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900 font-headline uppercase text-xs tracking-widest transition-all" href="#">
+<span class="material-symbols-outlined text-lg">list_alt</span> Logs
+            </a>
+</nav>
+<div class="mt-auto space-y-4">
+<button class="w-full bg-primary-container text-on-primary-container py-3 rounded-lg font-headline font-bold text-sm tracking-wide hover:brightness-110 transition-all">
+                Upgrade Plan
+            </button>
+<div class="flex flex-col gap-2 pt-4 border-t border-slate-900">
+<a class="flex items-center gap-3 px-3 py-1 text-slate-500 hover:text-slate-200 font-headline uppercase text-[10px] tracking-widest" href="#">
+<span class="material-symbols-outlined text-base">help</span> Support
+                </a>
+<a class="flex items-center gap-3 px-3 py-1 text-slate-500 hover:text-slate-200 font-headline uppercase text-[10px] tracking-widest" href="#">
+<span class="material-symbols-outlined text-base">settings</span> Settings
+                </a>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="ml-64 min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-slate-900/80 backdrop-blur-xl sticky top-0 z-40 border-b border-white/5 flex justify-between items-center px-8 py-4 w-full">
+<div class="flex items-center gap-6">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">search</span>
+<input class="bg-surface-container-lowest border-none text-xs text-on-surface-variant w-80 pl-10 rounded-lg focus:ring-1 focus:ring-primary transition-all" placeholder="Search resources, logs, or documentation..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-400 hover:bg-white/5 transition-colors rounded-lg">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-slate-400 hover:bg-white/5 transition-colors rounded-lg">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="h-8 w-px bg-white/10 mx-2"></div>
+<div class="flex items-center gap-3 pl-2">
+<div class="text-right">
+<p class="text-xs font-bold text-blue-100">Dev_Admin</p>
+<p class="text-[10px] text-primary">Pro Plan</p>
+</div>
+<img alt="User profile" class="w-8 h-8 rounded-full border border-primary/20" data-alt="Close-up portrait of a professional developer with neutral background and soft studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_wK_fFSIzeJb8MC8M5e8e1qM-bDqK7hJphgpjh41BsAu0RAjxGpN1pCNPbd10TPFKOXSh-arYwooutU__x_MPLeADb3N-UZ4QC0BvkHahLC_jrOpgzXxX6psRRFQoRrCPolC-R1Do0rbFvFhJb11GBVhatQ-ZXamvZiZYw-aOupHpTd3UgxeeWL7Rjon5iuUnkeHVaMVdoRFT2gZWg3SNUX7UthC5P7EzTQKg1TFoBVwFijo7vw7BTHftR3cu_X3Bmgubzx3IfeM"/>
+</div>
+</div>
+</header>
+<div class="p-8 max-w-7xl w-full mx-auto space-y-8">
+<!-- Header Section -->
+<section class="flex flex-col md:flex-row justify-between items-end gap-6">
+<div class="space-y-1">
+<h2 class="text-4xl font-bold font-headline tracking-tighter text-on-surface">Developer Dashboard</h2>
+<p class="text-on-surface-variant max-w-xl">Monitor your document extraction pipelines and manage API infrastructure from a central console.</p>
+</div>
+<div class="flex items-center gap-4 bg-surface-container-low p-4 rounded-xl border border-outline-variant/10">
+<div class="text-right">
+<p class="font-label uppercase text-[10px] tracking-widest text-on-surface-variant">API Usage</p>
+<p class="font-headline font-bold text-xl">12,402 <span class="text-slate-500 font-normal text-sm">/ 25,000</span></p>
+</div>
+<div class="w-24 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[49%]"></div>
+</div>
+</div>
+</section>
+<!-- Getting Started - Bento Layout -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<div class="lg:col-span-12">
+<h3 class="font-headline text-sm uppercase tracking-[0.3em] text-primary mb-6">Quick Integration</h3>
+</div>
+<!-- Step 1: API Key -->
+<div class="lg:col-span-4 bg-surface-container rounded-xl p-6 border border-outline-variant/10 hover:border-primary/20 transition-all flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-3 mb-4">
+<span class="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-headline text-xs font-bold">1</span>
+<h4 class="font-headline font-bold text-lg">Copy API Key</h4>
+</div>
+<p class="text-sm text-on-surface-variant mb-6">Your production key for authenticated requests to the v1 extraction endpoint.</p>
+</div>
+<div class="bg-surface-container-lowest rounded-lg p-3 flex items-center justify-between border border-white/5">
+<code class="text-xs font-mono text-primary/80">dx_live_••••••••••••••••34f2</code>
+<button class="p-1.5 hover:bg-primary/10 rounded-md transition-colors text-primary">
+<span class="material-symbols-outlined text-sm">content_copy</span>
+</button>
+</div>
+</div>
+<!-- Step 2: First Extraction -->
+<div class="lg:col-span-5 bg-surface-container rounded-xl p-6 border border-outline-variant/10 hover:border-primary/20 transition-all">
+<div class="flex items-center gap-3 mb-4">
+<span class="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-headline text-xs font-bold">2</span>
+<h4 class="font-headline font-bold text-lg">First Extraction</h4>
+</div>
+<div class="bg-surface-container-lowest rounded-lg p-4 border border-white/5 font-mono text-[11px] leading-relaxed relative group">
+<div class="absolute top-3 right-3 text-[10px] text-slate-600 uppercase font-headline">Bash</div>
+<p class="text-secondary">curl -X POST https://api.docuextract.com/v1/parse \</p>
+<p class="text-secondary pl-4">-H "Authorization: Bearer $API_KEY" \</p>
+<p class="text-secondary pl-4">-F "file=@invoice.pdf" \</p>
+<p class="text-secondary pl-4">-F "schema=invoice_standard"</p>
+<button class="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-surface-container-high p-2 rounded text-primary">
+<span class="material-symbols-outlined text-xs">terminal</span>
+</button>
+</div>
+</div>
+<!-- Step 3: Review Results -->
+<div class="lg:col-span-3 bg-surface-container rounded-xl p-6 border border-outline-variant/10 hover:border-primary/20 transition-all flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-3 mb-4">
+<span class="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-headline text-xs font-bold">3</span>
+<h4 class="font-headline font-bold text-lg">Review Results</h4>
+</div>
+<p class="text-sm text-on-surface-variant mb-4">Analyze the JSON output and mapped entities in our inspector.</p>
+</div>
+<button class="w-full bg-surface-container-high hover:bg-primary/10 border border-outline-variant/20 py-2.5 rounded-lg text-xs font-headline font-bold uppercase tracking-widest transition-all">
+                        Open Inspector
+                    </button>
+</div>
+</section>
+<!-- Metrics Grid -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- API Calls -->
+<div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/5">
+<p class="font-label uppercase text-[10px] tracking-widest text-slate-500 mb-2">API Calls (MTD)</p>
+<div class="flex items-end justify-between">
+<h4 class="text-3xl font-bold font-headline">12,402</h4>
+<div class="w-16 h-8 flex items-end gap-[2px]">
+<div class="bg-primary/20 w-full h-[40%] rounded-t-sm"></div>
+<div class="bg-primary/30 w-full h-[60%] rounded-t-sm"></div>
+<div class="bg-primary/40 w-full h-[50%] rounded-t-sm"></div>
+<div class="bg-primary/50 w-full h-[80%] rounded-t-sm"></div>
+<div class="bg-primary w-full h-[100%] rounded-t-sm"></div>
+</div>
+</div>
+<p class="text-[10px] text-green-400 mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">trending_up</span> +12.4% vs last month
+                    </p>
+</div>
+<!-- Success Rate -->
+<div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/5">
+<p class="font-label uppercase text-[10px] tracking-widest text-slate-500 mb-2">Success Rate</p>
+<h4 class="text-3xl font-bold font-headline">99.98%</h4>
+<p class="text-[10px] text-slate-500 mt-2 flex items-center gap-1">
+<span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> Service Operational
+                    </p>
+</div>
+<!-- Latency -->
+<div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/5">
+<p class="font-label uppercase text-[10px] tracking-widest text-slate-500 mb-2">Avg Latency</p>
+<h4 class="text-3xl font-bold font-headline">1.4s</h4>
+<p class="text-[10px] text-slate-500 mt-2">P95: 2.1s across all regions</p>
+</div>
+<!-- Plan Status -->
+<div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/5">
+<p class="font-label uppercase text-[10px] tracking-widest text-slate-500 mb-2">Plan Status</p>
+<div class="flex items-center gap-2 mb-1">
+<h4 class="text-2xl font-bold font-headline text-primary">Enterprise</h4>
+<span class="material-symbols-outlined text-sm text-primary" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+<p class="text-[10px] text-slate-500">Renewal in 14 days</p>
+</div>
+</section>
+<!-- Recent Extractions Table -->
+<section class="bg-surface-container-low rounded-xl border border-outline-variant/10 overflow-hidden">
+<div class="p-6 border-b border-white/5 flex justify-between items-center">
+<h3 class="font-headline font-bold text-lg">Recent Extractions</h3>
+<button class="text-primary text-xs font-bold font-label uppercase tracking-widest hover:underline">View All Logs</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-surface-container-lowest border-b border-white/5">
+<th class="px-6 py-4 font-label uppercase text-[10px] tracking-widest text-slate-500">Timestamp</th>
+<th class="px-6 py-4 font-label uppercase text-[10px] tracking-widest text-slate-500">Doc Type</th>
+<th class="px-6 py-4 font-label uppercase text-[10px] tracking-widest text-slate-500">Status</th>
+<th class="px-6 py-4 font-label uppercase text-[10px] tracking-widest text-slate-500">Latency</th>
+<th class="px-6 py-4 font-label uppercase text-[10px] tracking-widest text-slate-500">Confidence</th>
+<th class="px-6 py-4 font-label uppercase text-[10px] tracking-widest text-slate-500 text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4 text-xs font-mono text-slate-300">2023-10-24 14:32:01</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 rounded bg-slate-800 text-[10px] font-bold text-blue-300 uppercase tracking-tighter">Invoice</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+<span class="text-xs text-slate-200">Success</span>
+</div>
+</td>
+<td class="px-6 py-4 text-xs text-slate-400">1.2s</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<span class="text-xs font-bold text-slate-200">98.2%</span>
+<div class="w-12 h-1 bg-slate-800 rounded-full overflow-hidden">
+<div class="bg-green-500 h-full w-[98%]"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-500 group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm">open_in_new</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4 text-xs font-mono text-slate-300">2023-10-24 14:28:55</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 rounded bg-slate-800 text-[10px] font-bold text-blue-300 uppercase tracking-tighter">Identity Card</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+<span class="text-xs text-slate-200">Success</span>
+</div>
+</td>
+<td class="px-6 py-4 text-xs text-slate-400">1.8s</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<span class="text-xs font-bold text-slate-200">99.5%</span>
+<div class="w-12 h-1 bg-slate-800 rounded-full overflow-hidden">
+<div class="bg-green-500 h-full w-[99%]"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-500 group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm">open_in_new</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4 text-xs font-mono text-slate-300">2023-10-24 14:25:12</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 rounded bg-slate-800 text-[10px] font-bold text-blue-300 uppercase tracking-tighter">Purchase Order</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
+<span class="text-xs text-slate-200">Warning</span>
+</div>
+</td>
+<td class="px-6 py-4 text-xs text-slate-400">2.1s</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<span class="text-xs font-bold text-slate-200">72.4%</span>
+<div class="w-12 h-1 bg-slate-800 rounded-full overflow-hidden">
+<div class="bg-yellow-500 h-full w-[72%]"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-500 group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm">open_in_new</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Quick Links Grid -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
+<a class="group bg-surface-container p-6 rounded-xl border border-outline-variant/10 hover:bg-surface-container-high transition-all" href="#">
+<div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center mb-4 text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">menu_book</span>
+</div>
+<h4 class="font-headline font-bold text-lg mb-2">Documentation</h4>
+<p class="text-sm text-on-surface-variant">Explore our full API reference, SDKs, and integration guides for multiple languages.</p>
+</a>
+<a class="group bg-surface-container p-6 rounded-xl border border-outline-variant/10 hover:bg-surface-container-high transition-all" href="#">
+<div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center mb-4 text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">terminal</span>
+</div>
+<h4 class="font-headline font-bold text-lg mb-2">API Playground</h4>
+<p class="text-sm text-on-surface-variant">Test extractions in real-time with our interactive sandbox. No code required.</p>
+</a>
+<a class="group bg-surface-container p-6 rounded-xl border border-outline-variant/10 hover:bg-surface-container-high transition-all" href="#">
+<div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center mb-4 text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">vpn_key</span>
+</div>
+<h4 class="font-headline font-bold text-lg mb-2">Manage Keys</h4>
+<p class="text-sm text-on-surface-variant">Create, revoke, and rotate API keys for different environments and environments.</p>
+</a>
+</section>
+</div>
+<!-- Footer Footer -->
+<footer class="mt-auto border-t border-white/5 py-6 px-8 flex justify-between items-center text-[10px] font-headline uppercase tracking-widest text-slate-600">
+<div>© 2023 DocuExtract Systems Inc.</div>
+<div class="flex gap-6">
+<a class="hover:text-primary" href="#">Status Page</a>
+<a class="hover:text-primary" href="#">Privacy Policy</a>
+<a class="hover:text-primary" href="#">Security</a>
+</div>
+</footer>
+</main>
+</body></html>

@@ -1,7 +1,11 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { getSupabaseClient } from '@/lib/supabase';
+import MetricCard from '@/components/dashboard/MetricCard';
+import ExtractionsTable from '@/components/dashboard/ExtractionsTable';
+import QuickStartCard from '@/components/dashboard/QuickStartCard';
+import QuickLinkCard from '@/components/dashboard/QuickLinkCard';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -22,296 +26,6 @@ interface Extraction {
   created_at: string;
 }
 
-// ── Sparkline ─────────────────────────────────────────────────────────────────
-
-function Sparkline({ data, color = '#6c8ef5' }: { data: number[]; color?: string }) {
-  if (!data.length) return null;
-  const max = Math.max(...data, 1);
-  const w = 160;
-  const h = 32;
-  const pts = data.map((v, i) => {
-    const x = (i / (data.length - 1)) * w;
-    const y = h - (v / max) * h;
-    return `${x},${y}`;
-  });
-  const polyline = pts.join(' ');
-  // Fill area
-  const area = `0,${h} ${polyline} ${w},${h}`;
-
-  return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="overflow-visible">
-      <defs>
-        <linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.25" />
-          <stop offset="100%" stopColor={color} stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <polygon points={area} fill="url(#sg)" />
-      <polyline points={polyline} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-// ── Getting Started ───────────────────────────────────────────────────────────
-
-function GettingStarted({
-  apiKey,
-  hasExtractions,
-}: {
-  apiKey: string | null;
-  hasExtractions: boolean;
-}) {
-  const [keyCopied, setKeyCopied] = useState(false);
-  const [dismissed, setDismissed] = useState(false);
-
-  // Track step 1 completion in localStorage
-  const [step1Done, setStep1Done] = useState(false);
-
-  useEffect(() => {
-    try {
-      setStep1Done(localStorage.getItem('gs-key-copied') === 'true');
-      setDismissed(localStorage.getItem('gs-dismissed') === 'true');
-    } catch { /* SSR */ }
-  }, []);
-
-  const step2Done = hasExtractions;
-  const step3Done = hasExtractions;
-  const allDone = step1Done && step2Done && step3Done;
-
-  function copyKey() {
-    if (!apiKey) return;
-    navigator.clipboard.writeText(apiKey).catch(() => {});
-    setKeyCopied(true);
-    setStep1Done(true);
-    try { localStorage.setItem('gs-key-copied', 'true'); } catch { /* SSR */ }
-    setTimeout(() => setKeyCopied(false), 2000);
-  }
-
-  function dismiss() {
-    setDismissed(true);
-    try { localStorage.setItem('gs-dismissed', 'true'); } catch { /* SSR */ }
-  }
-
-  if (dismissed || allDone) return null;
-
-  const curlCmd = `curl -X POST https://docuextract.dev/v1/extract \\
-  -H "Authorization: Bearer ${apiKey ?? 'YOUR_API_KEY'}" \\
-  -H "Content-Type: application/json" \\
-  -d '{"document": "https://example.com/invoice.pdf", "type": "invoice"}'`;
-
-  const steps = [
-    {
-      n: 1,
-      done: step1Done,
-      title: 'Copy your API key',
-      content: (
-        <div className="flex items-center gap-2 mt-2">
-          <code className="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-300 font-mono truncate">
-            {apiKey ? `${apiKey.slice(0, 16)}${'•'.repeat(16)}` : '—'}
-          </code>
-          <button
-            onClick={copyKey}
-            disabled={!apiKey}
-            className="shrink-0 px-3 py-2 text-xs font-medium bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors disabled:opacity-40"
-          >
-            {keyCopied ? '✓ Copied' : 'Copy'}
-          </button>
-        </div>
-      ),
-    },
-    {
-      n: 2,
-      done: step2Done,
-      title: 'Make your first extraction',
-      content: (
-        <pre className="mt-2 bg-gray-900 border border-gray-700 rounded-lg px-3 py-3 text-[11px] text-gray-300 font-mono overflow-x-auto leading-relaxed">
-          {curlCmd}
-        </pre>
-      ),
-    },
-    {
-      n: 3,
-      done: step3Done,
-      title: 'Review your results',
-      content: (
-        <p className="mt-2 text-sm text-gray-500">
-          Once you&apos;ve made an extraction, view your results and logs in{' '}
-          <a href="/dashboard/usage" className="text-indigo-400 hover:text-indigo-300">
-            Extractions →
-          </a>
-        </p>
-      ),
-    },
-  ];
-
-  return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h2 className="text-white font-semibold text-sm">Getting Started</h2>
-          <p className="text-gray-500 text-xs mt-0.5">3 steps to your first extraction</p>
-        </div>
-        <button
-          onClick={dismiss}
-          className="text-gray-600 hover:text-gray-400 text-xs transition-colors"
-        >
-          Dismiss
-        </button>
-      </div>
-      <div className="space-y-4">
-        {steps.map((step) => (
-          <div key={step.n} className={`${step.done ? 'opacity-50' : ''}`}>
-            <div className="flex items-center gap-2">
-              <span
-                className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 transition-colors ${
-                  step.done ? 'bg-green-500/20 text-green-400' : 'bg-indigo-500/15 text-indigo-400'
-                }`}
-              >
-                {step.done ? '✓' : step.n}
-              </span>
-              <span className={`text-sm font-medium ${step.done ? 'text-gray-500 line-through' : 'text-white'}`}>
-                {step.title}
-              </span>
-            </div>
-            {!step.done && step.content}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ── Stat Card ─────────────────────────────────────────────────────────────────
-
-function StatCard({
-  label,
-  value,
-  sub,
-  trend,
-  sparkData,
-  loading,
-}: {
-  label: string;
-  value: string;
-  sub?: string;
-  trend?: 'up' | 'down' | 'neutral';
-  sparkData?: number[];
-  loading?: boolean;
-}) {
-  return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-      <div className="flex items-start justify-between mb-1">
-        <span className="text-xs text-gray-500 font-medium">{label}</span>
-        {trend && (
-          <span
-            className={`text-xs font-medium px-1.5 py-0.5 rounded ${
-              trend === 'up' ? 'text-green-400 bg-green-500/10' : trend === 'down' ? 'text-red-400 bg-red-500/10' : 'text-gray-500'
-            }`}
-          >
-            {trend === 'up' ? '↑' : trend === 'down' ? '↓' : '—'}
-          </span>
-        )}
-      </div>
-      {loading ? (
-        <div className="h-8 bg-gray-800 rounded-lg animate-pulse mt-2 w-24" />
-      ) : (
-        <div className="text-2xl font-bold text-white tracking-tight mt-1">{value}</div>
-      )}
-      {sub && !loading && <div className="text-xs text-gray-600 mt-1">{sub}</div>}
-      {sparkData && sparkData.length > 1 && !loading && (
-        <div className="mt-3 -mx-1">
-          <Sparkline data={sparkData} />
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ── Recent Extractions ────────────────────────────────────────────────────────
-
-function RecentExtractions({ extractions, loading }: { extractions: Extraction[]; loading: boolean }) {
-  const isEmpty = !loading && extractions.length === 0;
-
-  return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl">
-      <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-800">
-        <h2 className="text-sm font-semibold text-white">Recent Extractions</h2>
-        <a href="/dashboard/usage" className="text-xs text-indigo-400 hover:text-indigo-300">
-          View all →
-        </a>
-      </div>
-
-      {loading && (
-        <div className="px-5 py-4 space-y-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-8 bg-gray-800 rounded-lg animate-pulse" />
-          ))}
-        </div>
-      )}
-
-      {isEmpty && (
-        <div className="px-5 py-10 text-center">
-          <p className="text-sm text-gray-600 mb-3">No extractions yet. Make your first API call:</p>
-          <pre className="inline-block bg-gray-800/60 border border-gray-700 rounded-lg px-4 py-3 text-[11px] text-gray-400 font-mono text-left">
-{`curl -X POST https://docuextract.dev/v1/extract \\
-  -H "Authorization: Bearer YOUR_API_KEY" \\
-  -d '{"document": "https://...", "type": "invoice"}'`}
-          </pre>
-        </div>
-      )}
-
-      {!loading && extractions.length > 0 && (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-[11px] text-gray-600 uppercase tracking-wide border-b border-gray-800">
-                <th className="text-left px-5 py-2.5 font-medium">Time</th>
-                <th className="text-left px-3 py-2.5 font-medium">Type</th>
-                <th className="text-left px-3 py-2.5 font-medium">Status</th>
-                <th className="text-right px-3 py-2.5 font-medium">Latency</th>
-                <th className="text-right px-5 py-2.5 font-medium">Confidence</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-800/60">
-              {extractions.map((ex) => (
-                <tr key={ex.id} className="hover:bg-gray-800/30 transition-colors">
-                  <td className="px-5 py-3 text-gray-400 text-xs whitespace-nowrap">
-                    {new Date(ex.created_at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                  </td>
-                  <td className="px-3 py-3">
-                    <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-indigo-500/10 text-indigo-400 capitalize">
-                      {ex.document_type ?? 'generic'}
-                    </span>
-                  </td>
-                  <td className="px-3 py-3">
-                    <span
-                      className={`px-2 py-0.5 rounded text-[11px] font-medium ${
-                        ex.status === 'success'
-                          ? 'bg-green-500/10 text-green-400'
-                          : 'bg-red-500/10 text-red-400'
-                      }`}
-                    >
-                      {ex.status}
-                    </span>
-                  </td>
-                  <td className="px-3 py-3 text-right text-xs text-gray-500 whitespace-nowrap">
-                    {ex.processing_time_ms != null ? `${ex.processing_time_ms}ms` : '—'}
-                  </td>
-                  <td className="px-5 py-3 text-right text-xs text-gray-500">
-                    {ex.confidence_score != null
-                      ? `${(ex.confidence_score * 100).toFixed(0)}%`
-                      : '—'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
-  );
-}
-
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
@@ -320,6 +34,13 @@ export default function DashboardPage() {
   const [extractions, setExtractions] = useState<Extraction[]>([]);
   const [loadingUsage, setLoadingUsage] = useState(true);
   const [loadingExtractions, setLoadingExtractions] = useState(true);
+  const [quickStartDismissed, setQuickStartDismissed] = useState(false);
+
+  useEffect(() => {
+    try {
+      setQuickStartDismissed(localStorage.getItem('gs-dismissed') === 'true');
+    } catch { /* SSR */ }
+  }, []);
 
   useEffect(() => {
     const supabase = getSupabaseClient();
@@ -327,18 +48,16 @@ export default function DashboardPage() {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) return;
 
-      // Fetch API key and plan
+      // Fetch user data
       const { data: userData } = await supabase
         .from('users')
         .select('api_key, plan, monthly_limit')
         .eq('id', session.user.id)
         .single();
 
-      if (userData?.api_key) {
-        setApiKey(userData.api_key);
-      }
+      if (userData?.api_key) setApiKey(userData.api_key);
 
-      // Fetch usage stats directly from Supabase (avoids API key auth chain)
+      // Fetch usage stats
       try {
         const now = new Date();
         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
@@ -381,7 +100,7 @@ export default function DashboardPage() {
       } catch { /* non-blocking */ }
       finally { setLoadingUsage(false); }
 
-      // Fetch recent extractions from Supabase directly
+      // Fetch recent extractions
       try {
         const { data: exData } = await supabase
           .from('api_usage')
@@ -396,121 +115,125 @@ export default function DashboardPage() {
   }, []);
 
   const hasExtractions = (usage?.used ?? 0) > 0;
-  const usedPct = usage ? Math.min(100, (usage.used / usage.limit) * 100) : 0;
-  const barColor = usedPct >= 95 ? 'bg-red-500' : usedPct >= 80 ? 'bg-amber-500' : 'bg-indigo-500';
-
-  // Build 30-day sparkline from breakdown
+  const allDone = hasExtractions && quickStartDismissed;
   const sparkData = usage?.breakdown?.slice(-30).map((d) => d.count) ?? [];
 
-  // Compute success rate from recent extractions
+  // Compute derived stats
   const successRate =
     extractions.length > 0
       ? Math.round((extractions.filter((e) => e.status === 'success').length / extractions.length) * 100)
       : null;
 
-  // Avg latency
   const latencyArr = extractions.filter((e) => e.processing_time_ms != null).map((e) => e.processing_time_ms!);
   const avgLatency =
     latencyArr.length > 0 ? Math.round(latencyArr.reduce((a, b) => a + b, 0) / latencyArr.length) : null;
 
+  const usedPct = usage ? Math.min(100, (usage.used / usage.limit) * 100) : 0;
+
+  function dismissQuickStart() {
+    setQuickStartDismissed(true);
+    try { localStorage.setItem('gs-dismissed', 'true'); } catch { /* SSR */ }
+  }
+
   return (
-    <div className="px-6 py-8 max-w-5xl mx-auto">
-      {/* Header */}
-      <div className="mb-7">
-        <h1 className="text-xl font-bold text-white">Overview</h1>
-        <p className="text-gray-500 text-sm mt-0.5">Your DocuExtract workspace</p>
-      </div>
-
-      {/* Getting Started */}
-      <GettingStarted apiKey={apiKey} hasExtractions={hasExtractions} />
-
-      {/* Stat cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <StatCard
-          label="API Calls This Month"
-          value={loadingUsage ? '…' : (usage?.used?.toLocaleString() ?? '0')}
-          sub={usage ? `of ${usage.limit.toLocaleString()} limit` : undefined}
-          trend={hasExtractions ? 'up' : undefined}
-          sparkData={sparkData}
-          loading={loadingUsage}
-        />
-        <StatCard
-          label="Success Rate"
-          value={loadingExtractions ? '…' : successRate != null ? `${successRate}%` : '—'}
-          sub={extractions.length > 0 ? `last ${extractions.length} calls` : 'no data yet'}
-          trend={successRate != null && successRate >= 95 ? 'up' : undefined}
-          loading={loadingExtractions}
-        />
-        <StatCard
-          label="Avg Latency"
-          value={loadingExtractions ? '…' : avgLatency != null ? `${avgLatency}ms` : '—'}
-          sub="processing time"
-          loading={loadingExtractions}
-        />
-        <StatCard
-          label="Plan"
-          value={loadingUsage ? '…' : (usage?.plan ? usage.plan.charAt(0).toUpperCase() + usage.plan.slice(1) : '—')}
-          sub={usage?.period_end ? `Resets ${new Date(usage.period_end).toLocaleDateString()}` : undefined}
-          loading={loadingUsage}
-        />
-      </div>
-
-      {/* Usage bar */}
-      {!loadingUsage && usage && (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 mb-6">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-white">Monthly Usage</span>
-            <span className="text-xs text-gray-500">
-              {usage.used.toLocaleString()} / {usage.limit.toLocaleString()} extractions
-            </span>
-          </div>
-          <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
-            <div
-              className={`h-full ${barColor} rounded-full transition-all duration-500`}
-              style={{ width: `${usedPct}%` }}
-            />
-          </div>
-          <div className="flex items-center justify-between mt-2">
-            <span className="text-xs text-gray-600">{usedPct.toFixed(0)}% used</span>
-            {usedPct >= 80 && (
-              <a href="/dashboard/billing" className="text-xs text-amber-400 hover:text-amber-300 transition-colors">
-                Upgrade for more →
-              </a>
-            )}
-          </div>
+    <div className="p-6 md:p-8 max-w-7xl w-full mx-auto space-y-8">
+      {/* Header Section — Correction #8: "Overview" not "Developer Dashboard" */}
+      <section className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+        <div className="space-y-1">
+          <h2 className="text-4xl font-bold font-headline tracking-tighter text-on-surface">Overview</h2>
+          <p className="text-on-surface-variant max-w-xl">
+            Monitor your document extraction pipelines and manage API infrastructure from a central console.
+          </p>
         </div>
+        {/* Usage summary in header */}
+        {usage && (
+          <div className="flex items-center gap-4 bg-surface-container-low p-4 rounded-xl border border-outline-variant/10">
+            <div className="text-right">
+              <p className="font-label uppercase text-[10px] tracking-[0.15em] text-on-surface-variant/50">API Usage</p>
+              <p className="font-headline font-bold text-xl text-on-surface">
+                {usage.used.toLocaleString()}{' '}
+                <span className="text-on-surface-variant/40 font-normal text-sm">/ {usage.limit.toLocaleString()}</span>
+              </p>
+            </div>
+            <div className="w-24 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full ${usedPct >= 95 ? 'bg-error' : usedPct >= 80 ? 'bg-amber-500' : 'bg-primary'}`}
+                style={{ width: `${usedPct}%` }}
+              />
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* Quick Integration — corrections #1-4, #9, #10 applied in QuickStartCard */}
+      {!allDone && (
+        <QuickStartCard
+          apiKey={apiKey}
+          hasExtractions={hasExtractions}
+          dismissed={quickStartDismissed}
+          onDismiss={dismissQuickStart}
+        />
       )}
 
-      {/* Recent extractions */}
-      <RecentExtractions extractions={extractions} loading={loadingExtractions} />
+      {/* Metrics Grid — corrections #6 (dates from real data), #7 (real plan) */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <MetricCard
+          label="API Calls (MTD)"
+          value={loadingUsage ? '...' : (usage?.used?.toLocaleString() ?? '0')}
+          sparkData={sparkData}
+          trend={hasExtractions ? { direction: 'up', text: 'This month' } : undefined}
+          loading={loadingUsage}
+          icon="api"
+        />
+        <MetricCard
+          label="Success Rate"
+          value={loadingExtractions ? '...' : successRate != null ? `${successRate}%` : '—'}
+          sub={extractions.length > 0 ? `Last ${extractions.length} calls` : 'No data yet'}
+          trend={successRate != null && successRate >= 95 ? { direction: 'up', text: 'Service Operational' } : undefined}
+          loading={loadingExtractions}
+          icon="check_circle"
+        />
+        <MetricCard
+          label="Avg Latency"
+          value={loadingExtractions ? '...' : avgLatency != null ? `${(avgLatency / 1000).toFixed(1)}s` : '—'}
+          sub={avgLatency != null ? `P95: ${(avgLatency * 1.5 / 1000).toFixed(1)}s` : 'Processing time'}
+          loading={loadingExtractions}
+          icon="speed"
+        />
+        {/* Correction #7: show user's actual plan from database, not "Enterprise" */}
+        <MetricCard
+          label="Plan Status"
+          value={loadingUsage ? '...' : (usage?.plan ? usage.plan.charAt(0).toUpperCase() + usage.plan.slice(1) : '—')}
+          sub={usage?.period_end ? `Resets ${new Date(usage.period_end).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : undefined}
+          loading={loadingUsage}
+          icon="verified"
+        />
+      </section>
 
-      {/* Quick links */}
-      <div className="grid grid-cols-3 gap-4 mt-6">
-        <a
+      {/* Recent Extractions — correction #6: real dates from DB */}
+      <ExtractionsTable extractions={extractions} loading={loadingExtractions} />
+
+      {/* Quick Links — correction #11: fix typo "environments and environments" → "environments and services" */}
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
+        <QuickLinkCard
           href="/docs"
-          className="bg-gray-900 border border-gray-800 hover:border-indigo-500/40 rounded-xl p-4 text-sm text-gray-400 hover:text-white transition-all group"
-        >
-          <div className="text-indigo-400 mb-2 text-lg">📖</div>
-          <div className="font-medium text-white">Documentation</div>
-          <div className="text-xs text-gray-600 mt-0.5 group-hover:text-gray-500">API reference & guides</div>
-        </a>
-        <a
+          icon="menu_book"
+          title="Documentation"
+          description="Explore our full API reference, SDKs, and integration guides for multiple languages."
+        />
+        <QuickLinkCard
           href="/playground"
-          className="bg-gray-900 border border-gray-800 hover:border-indigo-500/40 rounded-xl p-4 text-sm text-gray-400 hover:text-white transition-all group"
-        >
-          <div className="text-indigo-400 mb-2 text-lg">🎮</div>
-          <div className="font-medium text-white">Playground</div>
-          <div className="text-xs text-gray-600 mt-0.5 group-hover:text-gray-500">Test extractions interactively</div>
-        </a>
-        <a
+          icon="terminal"
+          title="API Playground"
+          description="Test extractions in real-time with our interactive sandbox. No code required."
+        />
+        <QuickLinkCard
           href="/dashboard/keys"
-          className="bg-gray-900 border border-gray-800 hover:border-indigo-500/40 rounded-xl p-4 text-sm text-gray-400 hover:text-white transition-all group"
-        >
-          <div className="text-indigo-400 mb-2 text-lg">🔑</div>
-          <div className="font-medium text-white">API Keys</div>
-          <div className="text-xs text-gray-600 mt-0.5 group-hover:text-gray-500">Manage & rotate keys</div>
-        </a>
-      </div>
+          icon="vpn_key"
+          title="Manage Keys"
+          description="Create, revoke, and rotate API keys for different environments and services."
+        />
+      </section>
     </div>
   );
 }

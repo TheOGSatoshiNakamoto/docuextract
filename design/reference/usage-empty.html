@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-container": "#acb6c8",
+              "surface-tint": "#b4c5ff",
+              "surface-container-highest": "#33343b",
+              "secondary": "#bdc7da",
+              "on-secondary-fixed-variant": "#3d4757",
+              "on-secondary-fixed": "#121c2a",
+              "surface": "#111319",
+              "on-surface": "#e2e2eb",
+              "on-tertiary-container": "#262d33",
+              "tertiary-container": "#8d949b",
+              "secondary-fixed": "#d9e3f7",
+              "inverse-primary": "#3258bc",
+              "primary-container": "#6c8ef5",
+              "on-secondary": "#273140",
+              "on-surface-variant": "#c4c6d5",
+              "primary": "#b4c5ff",
+              "on-tertiary-fixed-variant": "#41474e",
+              "outline": "#8e909e",
+              "on-primary-container": "#00256f",
+              "background": "#111319",
+              "surface-variant": "#33343b",
+              "outline-variant": "#434652",
+              "tertiary-fixed": "#dde3eb",
+              "on-tertiary": "#2b3137",
+              "on-primary-fixed-variant": "#103ea3",
+              "on-primary": "#002979",
+              "secondary-fixed-dim": "#bdc7da",
+              "inverse-on-surface": "#2e3037",
+              "surface-dim": "#111319",
+              "error": "#ffb4ab",
+              "secondary-container": "#3d4757",
+              "surface-container-lowest": "#0c0e14",
+              "surface-container": "#1e1f26",
+              "surface-bright": "#373940",
+              "tertiary": "#c1c7cf",
+              "primary-fixed-dim": "#b4c5ff",
+              "inverse-surface": "#e2e2eb",
+              "surface-container-low": "#191b22",
+              "surface-container-high": "#282a30",
+              "on-primary-fixed": "#00174c",
+              "on-tertiary-fixed": "#161c22",
+              "on-error-container": "#ffdad6",
+              "primary-fixed": "#dbe1ff",
+              "error-container": "#93000a",
+              "on-error": "#690005",
+              "on-background": "#e2e2eb",
+              "tertiary-fixed-dim": "#c1c7cf"
+            },
+            fontFamily: {
+              "headline": ["Space Grotesk"],
+              "body": ["Inter"],
+              "label": ["Space Grotesk"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .tonal-transition {
+        background: linear-gradient(180deg, #0c0e14 0%, #111319 100%);
+      }
+      body {
+        background-color: #111319;
+        color: #e2e2eb;
+        font-family: 'Inter', sans-serif;
+      }
+      .font-space {
+        font-family: 'Space Grotesk', sans-serif;
+      }
+    </style>
+</head>
+<body class="bg-surface font-body selection:bg-primary/30">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 bottom-0 w-64 bg-slate-950 flex flex-col h-full py-6 px-4 border-r border-outline-variant/10">
+<div class="mb-10 px-2 flex items-center gap-3">
+<div class="w-8 h-8 bg-primary-container flex items-center justify-center rounded">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">terminal</span>
+</div>
+<div>
+<h1 class="text-lg font-black text-blue-400 font-headline tracking-tighter leading-none">DocuExtract</h1>
+<p class="font-headline uppercase text-[10px] tracking-widest text-slate-500 mt-1">Terminal Elite v1.0</p>
+</div>
+</div>
+<nav class="flex-1 space-y-8">
+<!-- CORE ACCESS -->
+<div>
+<p class="font-headline uppercase text-[10px] tracking-widest text-slate-600 px-2 mb-3">CORE ACCESS</p>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900/30 transition-all duration-200 ease-in-out font-headline uppercase text-[10px] tracking-widest" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="rocket_launch">rocket_launch</span>
+                        Quick Start
+                    </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900/30 transition-all duration-200 ease-in-out font-headline uppercase text-[10px] tracking-widest" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="dashboard">dashboard</span>
+                        Overview
+                    </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900/30 transition-all duration-200 ease-in-out font-headline uppercase text-[10px] tracking-widest" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="description">description</span>
+                        Extractions
+                    </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900/30 transition-all duration-200 ease-in-out font-headline uppercase text-[10px] tracking-widest" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="terminal">terminal</span>
+                        Playground
+                    </a>
+</div>
+</div>
+<!-- INFRASTRUCTURE -->
+<div>
+<p class="font-headline uppercase text-[10px] tracking-widest text-slate-600 px-2 mb-3">INFRASTRUCTURE</p>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900/30 transition-all duration-200 ease-in-out font-headline uppercase text-[10px] tracking-widest" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="vpn_key">vpn_key</span>
+                        API Keys
+                    </a>
+<a class="flex items-center gap-3 px-3 py-2 text-blue-400 bg-slate-900/50 border-r-2 border-blue-400 transition-all duration-200 ease-in-out font-headline uppercase text-[10px] tracking-widest" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="bar_chart">bar_chart</span>
+                        Usage
+                    </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900/30 transition-all duration-200 ease-in-out font-headline uppercase text-[10px] tracking-widest" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="payments">payments</span>
+                        Billing
+                    </a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900/30 transition-all duration-200 ease-in-out font-headline uppercase text-[10px] tracking-widest" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="settings">settings</span>
+                        Settings
+                    </a>
+</div>
+</div>
+</nav>
+<div class="mt-auto pt-6 border-t border-outline-variant/5 px-2">
+<div class="flex items-center gap-3 p-2 bg-surface-container-low rounded-lg">
+<div class="w-8 h-8 rounded bg-slate-800 flex items-center justify-center border border-outline-variant/20">
+<span class="material-symbols-outlined text-sm text-primary">person</span>
+</div>
+<div class="overflow-hidden">
+<p class="text-xs font-bold truncate">dev_root_01</p>
+<p class="text-[10px] text-on-surface-variant truncate">Enterprise Tier</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 left-64 h-16 bg-slate-900/50 backdrop-blur-md flex justify-between items-center px-8 z-10">
+<div class="flex items-center gap-6">
+<h2 class="text-xl font-bold tracking-tighter text-blue-400 font-headline">Usage Analytics</h2>
+<div class="relative group">
+<span class="absolute inset-y-0 left-3 flex items-center text-slate-500">
+<span class="material-symbols-outlined text-lg" data-icon="search">search</span>
+</span>
+<input class="bg-slate-800/50 border-none text-sm rounded px-10 py-1.5 w-64 focus:ring-1 focus:ring-blue-400 transition-all text-on-surface placeholder:text-slate-600" placeholder="Query usage logs..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-slate-800 rounded transition-colors text-slate-400">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant/20 mx-2"></div>
+<div class="flex items-center gap-3 cursor-pointer group">
+<div class="text-right">
+<p class="text-xs font-medium text-on-surface group-hover:text-blue-400 transition-colors">Extraction Quota</p>
+<div class="w-24 h-1 bg-slate-800 rounded-full mt-1 overflow-hidden">
+<div class="w-0 h-full bg-blue-400"></div>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-16 min-h-screen p-8">
+<!-- Header Metrics (Empty State) -->
+<!-- Center Empty State -->
+<div class="max-w-4xl mx-auto py-12 flex flex-col items-center text-center">
+<div class="mb-8 relative">
+<div class="absolute inset-0 blur-3xl bg-blue-500/10 rounded-full"></div>
+<div class="relative w-24 h-24 bg-slate-900 border border-outline-variant/20 rounded-2xl flex items-center justify-center text-blue-400/50">
+<span class="material-symbols-outlined text-5xl" data-icon="bar_chart">bar_chart</span>
+</div>
+</div>
+<h2 class="text-3xl font-bold font-headline text-on-surface mb-4 tracking-tight">No usage data yet</h2>
+<p class="text-on-surface-variant max-w-lg mb-10 leading-relaxed">
+                Once you make your first API call, this page will show your usage trends, document type breakdown, success rates, and more.
+            </p>
+<!-- Technical CTA Section -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full items-start">
+<!-- Quick Start Code Block -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/10 p-6 text-left overflow-hidden">
+<div class="flex items-center justify-between mb-4">
+<p class="font-headline uppercase text-[10px] tracking-widest text-primary font-bold">SAMPLE CURL COMMAND</p>
+<span class="text-[10px] text-slate-600 font-mono">POST /v1/extract</span>
+</div>
+<div class="bg-black/40 rounded-lg p-5 font-mono text-sm text-slate-300 leading-relaxed relative">
+<pre><code><span class="text-blue-400">curl</span> -X POST <span class="text-blue-400">\</span>
+  https://api.docuextract.com/v1/extract <span class="text-blue-400">\</span>
+  -H <span class="text-tertiary-container">"Authorization: Bearer <span class="text-primary-container">YOUR_API_KEY</span>"</span> <span class="text-blue-400">\</span>
+  -F <span class="text-tertiary-container">"file=@invoice_01.pdf"</span> <span class="text-blue-400">\</span>
+  -F <span class="text-tertiary-container">"schema=invoice_standard"</span></code></pre>
+<button class="absolute top-4 right-4 text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">content_copy</span>
+</button>
+</div>
+</div>
+<!-- Guidance & Action -->
+<div class="flex flex-col gap-6 text-left h-full justify-center">
+<div class="space-y-4">
+<h4 class="font-headline text-sm font-bold tracking-widest uppercase text-slate-500">Suggested Next Steps</h4>
+<div class="space-y-3">
+<div class="flex gap-4 items-start">
+<div class="mt-1 w-5 h-5 flex-shrink-0 bg-slate-800 rounded flex items-center justify-center">
+<span class="text-[10px] font-bold text-blue-400">01</span>
+</div>
+<p class="text-xs text-on-surface-variant">Generate your first <span class="text-blue-300">Secret API Key</span> in the settings panel.</p>
+</div>
+<div class="flex gap-4 items-start">
+<div class="mt-1 w-5 h-5 flex-shrink-0 bg-slate-800 rounded flex items-center justify-center">
+<span class="text-[10px] font-bold text-blue-400">02</span>
+</div>
+<p class="text-xs text-on-surface-variant">Define an extraction <span class="text-blue-300">Schema</span> or use our pre-built models.</p>
+</div>
+</div>
+</div>
+<div class="pt-4 flex flex-col gap-3">
+<button class="bg-primary-container hover:bg-primary text-on-primary-container font-headline uppercase text-[11px] font-bold tracking-widest px-6 py-3 rounded-lg flex items-center justify-center gap-2 transition-all group">
+                            Make your first extraction
+                            <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+<a class="text-center font-headline uppercase text-[11px] font-bold tracking-widest text-slate-500 hover:text-on-surface transition-colors" href="#">
+                            Read the quickstart docs
+                        </a>
+</div>
+</div>
+</div>
+</div>
+<!-- Background Aesthetic Elements -->
+<div class="fixed bottom-0 right-0 w-96 h-96 bg-blue-500/5 blur-[120px] -z-10 pointer-events-none"></div>
+<div class="fixed top-20 left-72 w-48 h-48 bg-primary-container/5 blur-[80px] -z-10 pointer-events-none"></div>
+</main>
+<!-- Invisible Image Placeholders for AI Contextualization -->
+<div class="hidden">
+<img data-alt="Dark technical UI dashboard with code blocks, data visualization charts, and blue glowing accents on a deep charcoal background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAz7Sqt6dWoNqcMpQJgE90G-YcKSVHrhSuQhi82DBbZ2_3HJ54kgNIMz7H9_bF-u3OK2oC3jZIZ2NvLzQzVkHPUsY1kHcAWNyaDbXTFbu4v21rw2yPqLBAS8G3GsB3AXEBOo5erUmUeLXLwzlZK__QHTE5OpxDarki94kp6wpXXglEN6Njf5ALnUke54LPcofodOg1AaQG9JKIMTGvTwq_ywuhucEqy3T5ia4bP59SPCV47wcVj3o8yNS4xe2_tHEJvj-FwUcMOww"/>
+<img data-alt="High-contrast blueprint style terminal interface with monospace fonts and neon highlight indicators for API metrics" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtRIt3FoZINE9a0L3-PhamkkESuVrXXMsT5EzqeWtiQlklIkKfOWe-L90FTwChv6apoRfSKKn6FwaO-WrQPbsPAC89HmRWN0xxm4X4ID1Jewh8o2cVwiDneHFlnBRRoosNYIC_6TKxOAu5RhYfDpP9ipS0NH2iIKalu0lGeehH7IlBrnomMLcCgfDj_YfPOrjsVzf-MSDe_HQOYV5mhP7zu7J91M3kB1cgAjr1JKab3ZE0BBRFuEE2O1EPhEtoge8PtZo1QLoii0A"/>
+</div>
+</body></html>

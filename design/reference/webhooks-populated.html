@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary-container": "#262d33",
+              "surface-variant": "#33343b",
+              "secondary-fixed-dim": "#bdc7da",
+              "outline-variant": "#434652",
+              "surface-container-lowest": "#0c0e14",
+              "surface-container-low": "#191b22",
+              "surface-dim": "#111319",
+              "on-surface-variant": "#c4c6d5",
+              "surface-container-high": "#282a30",
+              "surface-container": "#1e1f26",
+              "surface-tint": "#b4c5ff",
+              "on-secondary-fixed": "#121c2a",
+              "error": "#ffb4ab",
+              "background": "#111319",
+              "on-primary-fixed-variant": "#103ea3",
+              "surface": "#111319",
+              "on-error-container": "#ffdad6",
+              "on-primary-container": "#00256f",
+              "tertiary-container": "#8d949b",
+              "surface-bright": "#373940",
+              "inverse-primary": "#3258bc",
+              "surface-container-highest": "#33343b",
+              "error-container": "#93000a",
+              "primary-fixed-dim": "#b4c5ff",
+              "on-surface": "#e2e2eb",
+              "primary-fixed": "#dbe1ff",
+              "tertiary-fixed": "#dde3eb",
+              "outline": "#8e909e",
+              "on-primary": "#002979",
+              "inverse-on-surface": "#2e3037",
+              "secondary-fixed": "#d9e3f7",
+              "primary-container": "#6c8ef5",
+              "on-secondary-fixed-variant": "#3d4757",
+              "on-secondary": "#273140",
+              "on-error": "#690005",
+              "tertiary": "#c1c7cf",
+              "primary": "#b4c5ff",
+              "on-tertiary": "#2b3137",
+              "on-primary-fixed": "#00174c",
+              "on-tertiary-fixed-variant": "#41474e",
+              "on-secondary-container": "#acb6c8",
+              "on-tertiary-fixed": "#161c22",
+              "inverse-surface": "#e2e2eb",
+              "tertiary-fixed-dim": "#c1c7cf",
+              "secondary": "#bdc7da",
+              "secondary-container": "#3d4757",
+              "on-background": "#e2e2eb"
+            },
+            fontFamily: {
+              "headline": ["Space Grotesk"],
+              "body": ["Inter"],
+              "label": ["Space Grotesk"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body {
+        background-color: #111319;
+        color: #e2e2eb;
+        font-family: 'Inter', sans-serif;
+      }
+      .font-space { font-family: 'Space Grotesk', sans-serif; }
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: #111319; }
+      ::-webkit-scrollbar-thumb { background: #33343b; border-radius: 10px; }
+    </style>
+</head>
+<body class="overflow-hidden">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full flex justify-between items-center px-6 h-16 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/50 z-50 font-['Space_Grotesk'] tracking-tight">
+<div class="flex items-center gap-4">
+<span class="text-xl font-bold tracking-tighter text-slate-100">DocuExtract</span>
+<div class="h-4 w-[1px] bg-slate-800 mx-2"></div>
+<div class="hidden md:flex items-center bg-surface-container-lowest px-3 py-1.5 rounded border border-outline-variant/10">
+<span class="material-symbols-outlined text-sm text-slate-500 mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm text-on-surface-variant w-64 p-0" placeholder="Search resources..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-slate-400 hover:text-blue-300 transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-slate-400 hover:text-blue-300 transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-primary-container/20 border border-primary/20 flex items-center justify-center overflow-hidden">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="minimalist 2d avatar of a professional developer with glasses and dark hair on a clean blue background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAz4s3opFP18Nez5njE-8cojEWAdQk7WK-u5nVAFB5FydpXi2SjsBDid7o-utVgsji9I7DhJM-cWJqnOtXp2ptPgKDb8mMaxICbDyW7cW2b4VLmntb0g8dqya8YOeHYoRBhOBUNRMosKx0PLBngxZwxuFSbzCSU61NWjOi2k-1COzALfbtfAIYlAJLkJdd8DZngfDUwvMVGhMwRUuPY1bnvVRavdXdIUjZvY4KLVFnXzp-y4vv1FFRlYo06J0S2J1KoC-zoxlXpEro"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-slate-950 flex flex-col py-8 gap-2 border-r border-slate-900/50 z-40">
+<div class="px-6 mb-4">
+<h3 class="font-['Space_Grotesk'] uppercase text-[10px] tracking-[0.1em] text-slate-500">INFRASTRUCTURE</h3>
+<p class="font-['Space_Grotesk'] uppercase text-[9px] tracking-[0.05em] text-slate-600">CORE ACCESS</p>
+</div>
+<nav class="flex-1 px-3 space-y-1">
+<a class="flex items-center px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900 transition-all duration-200 rounded group" href="#">
+<span class="material-symbols-outlined mr-3 group-hover:text-blue-400">rocket_launch</span>
+<span class="font-['Space_Grotesk'] uppercase text-[10px] tracking-[0.1em]">Quick Start</span>
+</a>
+<a class="flex items-center px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900 transition-all duration-200 rounded group" href="#">
+<span class="material-symbols-outlined mr-3 group-hover:text-blue-400">dashboard</span>
+<span class="font-['Space_Grotesk'] uppercase text-[10px] tracking-[0.1em]">Overview</span>
+</a>
+<a class="flex items-center px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900 transition-all duration-200 rounded group" href="#">
+<span class="material-symbols-outlined mr-3 group-hover:text-blue-400">description</span>
+<span class="font-['Space_Grotesk'] uppercase text-[10px] tracking-[0.1em]">Extractions</span>
+</a>
+<a class="flex items-center px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900 transition-all duration-200 rounded group" href="#">
+<span class="material-symbols-outlined mr-3 group-hover:text-blue-400">terminal</span>
+<span class="font-['Space_Grotesk'] uppercase text-[10px] tracking-[0.1em]">Playground</span>
+</a>
+<a class="flex items-center px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900 transition-all duration-200 rounded group" href="#">
+<span class="material-symbols-outlined mr-3 group-hover:text-blue-400">vpn_key</span>
+<span class="font-['Space_Grotesk'] uppercase text-[10px] tracking-[0.1em]">API Keys</span>
+</a>
+<a class="flex items-center px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900 transition-all duration-200 rounded group" href="#">
+<span class="material-symbols-outlined mr-3 group-hover:text-blue-400">menu_book</span>
+<span class="font-['Space_Grotesk'] uppercase text-[10px] tracking-[0.1em]">Docs</span>
+</a>
+<a class="flex items-center px-3 py-2 text-blue-400 bg-blue-400/10 border-r-2 border-blue-400 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined mr-3">webhook</span>
+<span class="font-['Space_Grotesk'] uppercase text-[10px] tracking-[0.1em]">Webhooks</span>
+</a>
+<a class="flex items-center px-3 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900 transition-all duration-200 rounded group" href="#">
+<span class="material-symbols-outlined mr-3 group-hover:text-blue-400">history</span>
+<span class="font-['Space_Grotesk'] uppercase text-[10px] tracking-[0.1em]">Logs</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content -->
+<main class="ml-64 mt-16 p-8 h-[calc(100vh-4rem)] overflow-y-auto bg-background">
+<div class="max-w-7xl mx-auto space-y-8">
+<!-- Header Section -->
+<div class="flex justify-between items-end">
+<div>
+<h1 class="font-headline text-3xl font-bold tracking-tight text-on-surface">Webhooks</h1>
+<p class="text-on-surface-variant text-sm mt-1">Manage external endpoints to receive real-time event notifications.</p>
+</div>
+<button class="bg-primary-container hover:bg-primary transition-all text-on-primary-container px-6 py-2.5 rounded-lg flex items-center gap-2 font-medium">
+<span class="material-symbols-outlined text-xl">add</span>
+<span>Add Endpoint</span>
+</button>
+</div>
+<!-- Endpoint List (Top Section) -->
+<section class="grid grid-cols-1 gap-4">
+<div class="flex items-center justify-between mb-2">
+<h2 class="font-headline text-xs font-bold uppercase tracking-widest text-slate-500">Active Endpoints</h2>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<!-- Endpoint Card 1 -->
+<div class="bg-surface-container-low border border-outline-variant/10 p-6 rounded-xl relative overflow-hidden group hover:border-primary/30 transition-all duration-300">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-3">
+<div class="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+<code class="text-primary font-mono text-sm">https://myapp.com/webhooks/docuextract</code>
+</div>
+<div class="flex items-center gap-4">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-9 h-5 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="px-2 py-0.5 bg-surface-container-highest text-[10px] font-bold font-label tracking-wider text-on-surface-variant rounded uppercase">extraction.completed</span>
+<span class="px-2 py-0.5 bg-surface-container-highest text-[10px] font-bold font-label tracking-wider text-on-surface-variant rounded uppercase">extraction.failed</span>
+</div>
+<div class="flex items-center justify-between mt-auto">
+<div class="text-xs text-on-surface-variant">
+<span class="block opacity-50 uppercase text-[9px] tracking-tighter mb-1">Last Delivery</span>
+<span class="font-medium text-on-surface">2 mins ago</span>
+</div>
+<button class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary bg-primary/5 hover:bg-primary/10 px-4 py-2 rounded transition-all">
+<span class="material-symbols-outlined text-sm">send</span>
+                                Send Test Event
+                            </button>
+</div>
+</div>
+<!-- Endpoint Card 2 -->
+<div class="bg-surface-container-low border border-outline-variant/10 p-6 rounded-xl relative overflow-hidden group hover:border-primary/30 transition-all duration-300">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-3">
+<div class="w-3 h-3 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></div>
+<code class="text-primary font-mono text-sm">https://staging.internal.io/webhooks/prod</code>
+</div>
+<div class="flex items-center gap-4">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-9 h-5 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="px-2 py-0.5 bg-surface-container-highest text-[10px] font-bold font-label tracking-wider text-on-surface-variant rounded uppercase">extraction.completed</span>
+</div>
+<div class="flex items-center justify-between mt-auto">
+<div class="text-xs text-on-surface-variant">
+<span class="block opacity-50 uppercase text-[9px] tracking-tighter mb-1">Last Delivery</span>
+<span class="font-medium text-on-surface">1 hour ago</span>
+</div>
+<button class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary bg-primary/5 hover:bg-primary/10 px-4 py-2 rounded transition-all">
+<span class="material-symbols-outlined text-sm">send</span>
+                                Send Test Event
+                            </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Delivery History / Logs (Bottom Section) -->
+<section class="space-y-6">
+<div class="flex items-center justify-between">
+<h2 class="font-headline text-xs font-bold uppercase tracking-widest text-slate-500">Delivery History</h2>
+<div class="flex items-center gap-3">
+<select class="bg-surface-container-low border-none text-xs text-on-surface-variant rounded px-3 py-1.5 focus:ring-1 focus:ring-primary/30">
+<option>All Events</option>
+<option>extraction.completed</option>
+<option>extraction.failed</option>
+</select>
+<select class="bg-surface-container-low border-none text-xs text-on-surface-variant rounded px-3 py-1.5 focus:ring-1 focus:ring-primary/30">
+<option>All Status</option>
+<option>Success</option>
+<option>Failure</option>
+</select>
+<select class="bg-surface-container-low border-none text-xs text-on-surface-variant rounded px-3 py-1.5 focus:ring-1 focus:ring-primary/30">
+<option>All Endpoints</option>
+</select>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/10 overflow-hidden shadow-2xl">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-high/50 border-b border-outline-variant/10">
+<th class="px-6 py-4 text-[10px] font-bold font-label uppercase tracking-widest text-slate-500">Event Type</th>
+<th class="px-6 py-4 text-[10px] font-bold font-label uppercase tracking-widest text-slate-500">Endpoint URL</th>
+<th class="px-6 py-4 text-[10px] font-bold font-label uppercase tracking-widest text-slate-500 text-center">Status</th>
+<th class="px-6 py-4 text-[10px] font-bold font-label uppercase tracking-widest text-slate-500 text-center">Code</th>
+<th class="px-6 py-4 text-[10px] font-bold font-label uppercase tracking-widest text-slate-500">Timestamp</th>
+<th class="px-6 py-4 text-[10px] font-bold font-label uppercase tracking-widest text-slate-500 text-center">Retry</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container/50 transition-colors">
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 bg-blue-400/10 text-blue-400 text-[9px] font-bold font-label tracking-wider rounded uppercase">extraction.completed</span>
+</td>
+<td class="px-6 py-4">
+<span class="text-xs text-on-surface-variant font-mono">...webhooks/docuextract</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center justify-center text-emerald-500 gap-1.5">
+<span class="material-symbols-outlined text-lg">check_circle</span>
+<span class="text-xs font-medium">Success</span>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="text-xs font-mono text-emerald-400 bg-emerald-400/5 px-2 py-0.5 rounded">200</span>
+</td>
+<td class="px-6 py-4 text-xs text-on-surface-variant">
+                                    2023-11-24 14:22:11
+                                </td>
+<td class="px-6 py-4 text-center text-xs text-on-surface-variant">
+                                    0
+                                </td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container/50 transition-colors">
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 bg-error/10 text-error text-[9px] font-bold font-label tracking-wider rounded uppercase">extraction.failed</span>
+</td>
+<td class="px-6 py-4">
+<span class="text-xs text-on-surface-variant font-mono">...webhooks/docuextract</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center justify-center text-error gap-1.5">
+<span class="material-symbols-outlined text-lg">cancel</span>
+<span class="text-xs font-medium">Failure</span>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="text-xs font-mono text-error bg-error/5 px-2 py-0.5 rounded">500</span>
+</td>
+<td class="px-6 py-4 text-xs text-on-surface-variant">
+                                    2023-11-24 14:18:45
+                                </td>
+<td class="px-6 py-4 text-center text-xs text-on-surface-variant">
+                                    2
+                                </td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container/50 transition-colors">
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 bg-blue-400/10 text-blue-400 text-[9px] font-bold font-label tracking-wider rounded uppercase">extraction.completed</span>
+</td>
+<td class="px-6 py-4">
+<span class="text-xs text-on-surface-variant font-mono">...staging.internal.io/webhooks</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center justify-center text-emerald-500 gap-1.5">
+<span class="material-symbols-outlined text-lg">check_circle</span>
+<span class="text-xs font-medium">Success</span>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="text-xs font-mono text-emerald-400 bg-emerald-400/5 px-2 py-0.5 rounded">200</span>
+</td>
+<td class="px-6 py-4 text-xs text-on-surface-variant">
+                                    2023-11-24 13:05:22
+                                </td>
+<td class="px-6 py-4 text-center text-xs text-on-surface-variant">
+                                    0
+                                </td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container/50 transition-colors">
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 bg-blue-400/10 text-blue-400 text-[9px] font-bold font-label tracking-wider rounded uppercase">extraction.completed</span>
+</td>
+<td class="px-6 py-4">
+<span class="text-xs text-on-surface-variant font-mono">...webhooks/docuextract</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center justify-center text-emerald-500 gap-1.5">
+<span class="material-symbols-outlined text-lg">check_circle</span>
+<span class="text-xs font-medium">Success</span>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="text-xs font-mono text-emerald-400 bg-emerald-400/5 px-2 py-0.5 rounded">200</span>
+</td>
+<td class="px-6 py-4 text-xs text-on-surface-variant">
+                                    2023-11-24 12:45:10
+                                </td>
+<td class="px-6 py-4 text-center text-xs text-on-surface-variant">
+                                    0
+                                </td>
+</tr>
+</tbody>
+</table>
+<div class="px-6 py-4 bg-surface-container-high/30 flex items-center justify-between border-t border-outline-variant/10">
+<span class="text-xs text-slate-500">Showing 1 to 4 of 24 deliveries</span>
+<div class="flex gap-2">
+<button class="px-3 py-1 bg-surface-container-high border border-outline-variant/20 rounded text-[10px] font-bold text-slate-400 uppercase tracking-widest hover:text-white transition-colors">Prev</button>
+<button class="px-3 py-1 bg-surface-container-high border border-outline-variant/20 rounded text-[10px] font-bold text-slate-400 uppercase tracking-widest hover:text-white transition-colors">Next</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Billing &amp; Subscription | TerminalAPI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "secondary-fixed": "#d9e3f7",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-tertiary-container": "#262d33",
+                        "surface-variant": "#33343b",
+                        "on-background": "#e2e2eb",
+                        "on-tertiary": "#2b3137",
+                        "surface-container-lowest": "#0c0e14",
+                        "on-primary-fixed": "#00174c",
+                        "surface-dim": "#111319",
+                        "surface": "#111319",
+                        "on-primary-fixed-variant": "#103ea3",
+                        "on-secondary-container": "#acb6c8",
+                        "outline": "#8e909e",
+                        "on-primary-container": "#00256f",
+                        "secondary": "#bdc7da",
+                        "inverse-primary": "#3258bc",
+                        "on-error": "#690005",
+                        "outline-variant": "#434652",
+                        "on-tertiary-fixed-variant": "#41474e",
+                        "on-secondary-fixed": "#121c2a",
+                        "on-primary": "#002979",
+                        "primary-container": "#6c8ef5",
+                        "on-tertiary-fixed": "#161c22",
+                        "tertiary": "#c1c7cf",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed-dim": "#c1c7cf",
+                        "on-surface": "#e2e2eb",
+                        "surface-tint": "#b4c5ff",
+                        "surface-container-high": "#282a30",
+                        "surface-container": "#1e1f26",
+                        "secondary-fixed-dim": "#bdc7da",
+                        "on-surface-variant": "#c4c6d5",
+                        "primary": "#b4c5ff",
+                        "secondary-container": "#3d4757",
+                        "surface-bright": "#373940",
+                        "on-secondary": "#273140",
+                        "error-container": "#93000a",
+                        "background": "#111319",
+                        "tertiary-fixed": "#dde3eb",
+                        "tertiary-container": "#8d949b",
+                        "surface-container-low": "#191b22",
+                        "surface-container-highest": "#33343b",
+                        "on-secondary-fixed-variant": "#3d4757",
+                        "inverse-surface": "#e2e2eb",
+                        "inverse-on-surface": "#2e3037",
+                        "on-error-container": "#ffdad6",
+                        "primary-fixed": "#dbe1ff"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Space Grotesk"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .glass-panel {
+            background: rgba(51, 52, 59, 0.4);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- SideNavBar Anchor -->
+<aside class="fixed left-0 top-0 h-full flex flex-col py-8 bg-slate-950 w-64 border-r border-outline-variant/10 z-50">
+<div class="px-6 mb-8">
+<h1 class="text-lg font-black text-blue-400 font-headline tracking-tighter">TerminalAPI</h1>
+<p class="font-label uppercase tracking-widest text-[10px] text-slate-500 mt-1">v2.4.0-stable</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center px-6 py-3 text-slate-500 hover:bg-slate-900/50 hover:text-slate-200 transition-all font-label uppercase tracking-widest text-[10px] group" href="#">
+<span class="material-symbols-outlined mr-3 text-[20px]" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center px-6 py-3 text-slate-500 hover:bg-slate-900/50 hover:text-slate-200 transition-all font-label uppercase tracking-widest text-[10px] group" href="#">
+<span class="material-symbols-outlined mr-3 text-[20px]" data-icon="vpn_key">vpn_key</span>
+                API Keys
+            </a>
+<a class="flex items-center px-6 py-3 text-slate-500 hover:bg-slate-900/50 hover:text-slate-200 transition-all font-label uppercase tracking-widest text-[10px] group" href="#">
+<span class="material-symbols-outlined mr-3 text-[20px]" data-icon="leaderboard">leaderboard</span>
+                Analytics
+            </a>
+<a class="flex items-center px-6 py-3 bg-blue-500/10 text-blue-400 border-r-2 border-blue-400 font-label uppercase tracking-widest text-[10px] group" href="#">
+<span class="material-symbols-outlined mr-3 text-[20px]" data-icon="payments">payments</span>
+                Billing
+            </a>
+<a class="flex items-center px-6 py-3 text-slate-500 hover:bg-slate-900/50 hover:text-slate-200 transition-all font-label uppercase tracking-widest text-[10px] group" href="#">
+<span class="material-symbols-outlined mr-3 text-[20px]" data-icon="terminal">terminal</span>
+                Logs
+            </a>
+</nav>
+<div class="mt-auto px-6 space-y-4 pt-6 border-t border-outline-variant/10">
+<a class="flex items-center text-slate-500 hover:text-slate-200 transition-all font-label uppercase tracking-widest text-[10px]" href="#">
+<span class="material-symbols-outlined mr-3 text-[18px]" data-icon="description">description</span>
+                Documentation
+            </a>
+<a class="flex items-center text-slate-500 hover:text-slate-200 transition-all font-label uppercase tracking-widest text-[10px]" href="#">
+<span class="material-symbols-outlined mr-3 text-[18px]" data-icon="help">help</span>
+                Support
+            </a>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-64 min-h-screen">
+<!-- TopAppBar Anchor -->
+<header class="flex justify-between items-center w-full px-8 py-4 bg-slate-900/80 backdrop-blur-xl border-b border-slate-800/50 sticky top-0 z-40">
+<div class="flex items-center gap-4">
+<h2 class="text-xl font-bold tracking-tighter text-blue-400 font-headline uppercase">Billing</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4">
+<button class="text-slate-400 hover:text-blue-300 transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-slate-400 hover:text-blue-300 transition-colors">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</div>
+<div class="h-8 w-8 rounded-full bg-surface-container-high border border-outline-variant/30 flex items-center justify-center overflow-hidden">
+<img alt="User profile" data-alt="professional portrait of a developer with glasses in a tech office setting with soft blue lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgF7GYFmMJaQEZN-wNABdm5u-Gy_ksGxmNOeCdV0XR16t9XNng8RoYRlYHDZQmYPQhfCKOFcs15j0-JAnUHxS-ezatV8f85BCjYnLQfRAwO70Wyw5WZr1R4CbWsAZSFB8cqmRjQy78A3iISZHQ0xxp80BcxY3cO8vX6fdgrE6NWeXqXl9ukWRljc60PhXeCCJMHE_SPW-3B8co-jGwIfFUxeZXg8uGFaBOg5-XRKV66ZrAHfXhP1KDG8esgwx5JSZh86zz18Y6Pf8"/>
+</div>
+</div>
+</header>
+<div class="p-8 max-w-7xl mx-auto space-y-12">
+<!-- Section 1: Current Plan Hero -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+<div class="lg:col-span-2 bg-surface-container-low p-8 rounded-xl relative overflow-hidden flex flex-col justify-between min-h-[320px]">
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
+<div>
+<div class="flex justify-between items-start mb-6">
+<div>
+<span class="bg-primary/10 text-primary font-label text-[10px] uppercase tracking-widest px-2 py-1 rounded mb-2 inline-block">Subscription Status: Active</span>
+<h3 class="text-4xl font-headline font-bold text-on-surface">Free Tier</h3>
+</div>
+<div class="text-right">
+<p class="text-3xl font-headline font-bold">$0<span class="text-sm text-on-surface-variant">/month</span></p>
+<p class="text-[10px] font-label uppercase text-on-surface-variant tracking-wider">Billed Monthly</p>
+</div>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant mb-8">
+<span class="material-symbols-outlined text-sm" data-icon="calendar_today">calendar_today</span>
+<span class="text-sm font-medium">Billing Period: Mar 24 - Apr 24, 2024</span>
+</div>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-end text-sm">
+<span class="font-label uppercase tracking-widest text-[11px] text-on-surface-variant">API Usage Progress</span>
+<span class="font-headline font-bold">67 / 100 calls</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[67%]"></div>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-high p-8 rounded-xl flex flex-col justify-center gap-6">
+<div class="space-y-2">
+<h4 class="font-headline font-bold text-xl">Manage Subscription</h4>
+<p class="text-sm text-on-surface-variant leading-relaxed">Update your billing details, download tax invoices, or switch your payment method at any time.</p>
+</div>
+<button class="w-full py-4 bg-primary-container text-on-primary-container font-headline font-bold rounded-lg hover:brightness-110 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="open_in_new">open_in_new</span>
+                        Customer Portal
+                    </button>
+<div class="pt-4 border-t border-outline-variant/20">
+<div class="flex items-center gap-3">
+<div class="w-10 h-6 bg-slate-800 rounded border border-outline-variant/30 flex items-center justify-center">
+<span class="text-[8px] font-bold">VISA</span>
+</div>
+<div>
+<p class="text-xs font-bold">Visa ending in 4242</p>
+<p class="text-[10px] text-on-surface-variant">Expires 12/26</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Usage Breakdown -->
+<section class="space-y-6">
+<div class="flex justify-between items-end">
+<h3 class="text-xs font-label uppercase tracking-[0.2em] text-primary">Volume Analysis</h3>
+<div class="flex items-center gap-2 bg-surface-container p-1 rounded-lg">
+<button class="px-3 py-1 text-[10px] font-label bg-surface-container-high rounded shadow-sm">30 DAYS</button>
+<button class="px-3 py-1 text-[10px] font-label text-on-surface-variant hover:text-on-surface">90 DAYS</button>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+<div class="lg:col-span-3 bg-surface-container-low p-8 rounded-xl">
+<h4 class="text-sm font-label uppercase tracking-widest text-on-surface-variant mb-8">Usage by Document Type</h4>
+<div class="space-y-6">
+<div class="group">
+<div class="flex justify-between text-[11px] font-label mb-2">
+<span class="text-on-surface-variant">INVOICE PROCESSING</span>
+<span class="text-on-surface">32 CALLS (48%)</span>
+</div>
+<div class="h-2 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[48%] group-hover:brightness-125 transition-all"></div>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between text-[11px] font-label mb-2">
+<span class="text-on-surface-variant">RECEIPT EXTRACTION</span>
+<span class="text-on-surface">18 CALLS (27%)</span>
+</div>
+<div class="h-2 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[27%] group-hover:brightness-125 transition-all"></div>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between text-[11px] font-label mb-2">
+<span class="text-on-surface-variant">RESUME PARSING</span>
+<span class="text-on-surface">12 CALLS (18%)</span>
+</div>
+<div class="h-2 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-outline w-[18%] group-hover:brightness-125 transition-all"></div>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between text-[11px] font-label mb-2">
+<span class="text-on-surface-variant">OTHER / GENERIC</span>
+<span class="text-on-surface">5 CALLS (7%)</span>
+</div>
+<div class="h-2 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-surface-variant w-[7%] group-hover:brightness-125 transition-all"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-container p-6 rounded-xl flex flex-col justify-between">
+<div>
+<h4 class="text-[10px] font-label uppercase tracking-widest text-on-surface-variant mb-1">Daily Volume</h4>
+<p class="text-2xl font-headline font-bold">4.2 <span class="text-xs font-normal text-on-surface-variant">avg/day</span></p>
+</div>
+<div class="h-24 flex items-end gap-1">
+<div class="flex-1 bg-primary/20 h-[30%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/20 h-[45%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/40 h-[60%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/20 h-[25%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/60 h-[80%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/30 h-[40%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary-container h-full rounded-t-sm"></div>
+</div>
+<p class="text-[9px] font-label text-center text-on-surface-variant mt-2">LAST 7 DAYS ACTIVITY</p>
+</div>
+</div>
+</section>
+<!-- Section 3: Plan Comparison Grid -->
+<section class="space-y-8">
+<div class="text-center space-y-2">
+<h2 class="text-3xl font-headline font-bold">Scaling Infrastructure</h2>
+<p class="text-on-surface-variant max-w-xl mx-auto text-sm leading-relaxed">Upgrade to a production-grade plan to increase your extraction limits and unlock advanced enterprise features.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+<!-- Free Plan -->
+<div class="bg-surface-container-low border border-outline-variant/10 p-6 rounded-xl flex flex-col hover:border-outline-variant/30 transition-all">
+<div class="mb-6">
+<p class="text-[10px] font-label uppercase tracking-widest text-on-surface-variant mb-1">Entry</p>
+<h4 class="text-xl font-headline font-bold">Free</h4>
+</div>
+<div class="mb-6">
+<p class="text-3xl font-headline font-bold">$0<span class="text-sm font-normal text-on-surface-variant">/mo</span></p>
+</div>
+<ul class="space-y-4 mb-8 flex-1">
+<li class="flex items-center gap-2 text-xs">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="check_circle">check_circle</span>
+                                100 API Calls / Mo
+                            </li>
+<li class="flex items-center gap-2 text-xs">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="check_circle">check_circle</span>
+                                Standard OCR Engine
+                            </li>
+<li class="flex items-center gap-2 text-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="block">block</span>
+                                Webhook Support
+                            </li>
+</ul>
+<button class="w-full py-3 bg-surface-container-highest text-on-surface font-label uppercase tracking-widest text-[10px] rounded hover:bg-surface-variant transition-colors disabled:opacity-50" disabled="">Current Plan</button>
+</div>
+<!-- Starter Plan -->
+<div class="bg-surface-container-low border border-outline-variant/10 p-6 rounded-xl flex flex-col hover:border-outline-variant/30 transition-all">
+<div class="mb-6">
+<p class="text-[10px] font-label uppercase tracking-widest text-on-surface-variant mb-1">Growth</p>
+<h4 class="text-xl font-headline font-bold">Starter</h4>
+</div>
+<div class="mb-6">
+<p class="text-3xl font-headline font-bold">$49<span class="text-sm font-normal text-on-surface-variant">/mo</span></p>
+</div>
+<ul class="space-y-4 mb-8 flex-1">
+<li class="flex items-center gap-2 text-xs font-bold">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="check_circle">check_circle</span>
+                                2.5k API Calls / Mo
+                            </li>
+<li class="flex items-center gap-2 text-xs">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="check_circle">check_circle</span>
+                                Priority Email Support
+                            </li>
+<li class="flex items-center gap-2 text-xs">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="check_circle">check_circle</span>
+                                Webhook Integration
+                            </li>
+</ul>
+<button class="w-full py-3 outline outline-1 outline-outline-variant/40 text-primary font-label uppercase tracking-widest text-[10px] rounded hover:bg-surface-container-high transition-all">Upgrade Now</button>
+</div>
+<!-- Pro Plan -->
+<div class="bg-surface-container border-2 border-primary-container p-6 rounded-xl flex flex-col relative scale-105 shadow-2xl shadow-primary-container/10">
+<div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary-container text-on-primary-container px-4 py-1 rounded-full text-[10px] font-label font-bold uppercase tracking-widest">Most Popular</div>
+<div class="mb-6">
+<p class="text-[10px] font-label uppercase tracking-widest text-primary mb-1">Production</p>
+<h4 class="text-xl font-headline font-bold">Pro</h4>
+</div>
+<div class="mb-6">
+<p class="text-3xl font-headline font-bold">$99<span class="text-sm font-normal text-on-surface-variant">/mo</span></p>
+</div>
+<ul class="space-y-4 mb-8 flex-1">
+<li class="flex items-center gap-2 text-xs font-bold">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="check_circle">check_circle</span>
+                                10k API Calls / Mo
+                            </li>
+<li class="flex items-center gap-2 text-xs">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="check_circle">check_circle</span>
+                                Advanced LLM Extraction
+                            </li>
+<li class="flex items-center gap-2 text-xs">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="check_circle">check_circle</span>
+                                24/7 Priority Support
+                            </li>
+</ul>
+<button class="w-full py-3 bg-primary-container text-on-primary-container font-label uppercase tracking-widest text-[10px] rounded hover:brightness-110 transition-all font-bold">Choose Pro</button>
+</div>
+<!-- Scale Plan -->
+<div class="bg-surface-container-low border border-outline-variant/10 p-6 rounded-xl flex flex-col hover:border-outline-variant/30 transition-all">
+<div class="mb-6">
+<p class="text-[10px] font-label uppercase tracking-widest text-on-surface-variant mb-1">Enterprise</p>
+<h4 class="text-xl font-headline font-bold">Scale</h4>
+</div>
+<div class="mb-6">
+<p class="text-3xl font-headline font-bold">$249<span class="text-sm font-normal text-on-surface-variant">/mo</span></p>
+</div>
+<ul class="space-y-4 mb-8 flex-1">
+<li class="flex items-center gap-2 text-xs font-bold">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="check_circle">check_circle</span>
+                                50k API Calls / Mo
+                            </li>
+<li class="flex items-center gap-2 text-xs">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="check_circle">check_circle</span>
+                                Dedicated Account Manager
+                            </li>
+<li class="flex items-center gap-2 text-xs">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="check_circle">check_circle</span>
+                                custom SLAs
+                            </li>
+</ul>
+<button class="w-full py-3 outline outline-1 outline-outline-variant/40 text-primary font-label uppercase tracking-widest text-[10px] rounded hover:bg-surface-container-high transition-all">Contact Sales</button>
+</div>
+</div>
+</section>
+<!-- Section 4: Payment History -->
+<section class="space-y-6">
+<div class="flex justify-between items-center">
+<h3 class="text-xs font-label uppercase tracking-[0.2em] text-on-surface-variant">Past Transactions</h3>
+<button class="text-[10px] font-label text-primary hover:underline uppercase tracking-widest">View All History</button>
+</div>
+<div class="bg-surface-container-low rounded-xl overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container text-[10px] font-label uppercase tracking-widest text-on-surface-variant">
+<th class="px-8 py-4 font-medium">Date</th>
+<th class="px-8 py-4 font-medium">Description</th>
+<th class="px-8 py-4 font-medium">Amount</th>
+<th class="px-8 py-4 font-medium">Status</th>
+<th class="px-8 py-4 font-medium text-right">Invoice</th>
+</tr>
+</thead>
+<tbody class="text-sm">
+<tr class="border-b border-outline-variant/5 hover:bg-surface-container/30 transition-colors">
+<td class="px-8 py-4 font-medium">Mar 01, 2024</td>
+<td class="px-8 py-4 text-on-surface-variant">Free Tier Usage - March</td>
+<td class="px-8 py-4 font-headline font-bold">$0.00</td>
+<td class="px-8 py-4">
+<span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-surface-container-highest text-on-surface">Paid</span>
+</td>
+<td class="px-8 py-4 text-right">
+<button class="text-primary hover:text-blue-300">
+<span class="material-symbols-outlined text-lg" data-icon="download">download</span>
+</button>
+</td>
+</tr>
+<tr class="border-b border-outline-variant/5 hover:bg-surface-container/30 transition-colors">
+<td class="px-8 py-4 font-medium">Feb 01, 2024</td>
+<td class="px-8 py-4 text-on-surface-variant">Free Tier Usage - February</td>
+<td class="px-8 py-4 font-headline font-bold">$0.00</td>
+<td class="px-8 py-4">
+<span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-surface-container-highest text-on-surface">Paid</span>
+</td>
+<td class="px-8 py-4 text-right">
+<button class="text-primary hover:text-blue-300">
+<span class="material-symbols-outlined text-lg" data-icon="download">download</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container/30 transition-colors">
+<td class="px-8 py-4 font-medium">Jan 01, 2024</td>
+<td class="px-8 py-4 text-on-surface-variant">Free Tier Usage - January</td>
+<td class="px-8 py-4 font-headline font-bold">$0.00</td>
+<td class="px-8 py-4">
+<span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-surface-container-highest text-on-surface">Paid</span>
+</td>
+<td class="px-8 py-4 text-right">
+<button class="text-primary hover:text-blue-300">
+<span class="material-symbols-outlined text-lg" data-icon="download">download</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Section 5: Cancellation/Footer Actions -->
+<section class="pt-12 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="max-w-md text-center md:text-left">
+<h4 class="font-headline font-bold text-lg mb-2">Cancel Subscription</h4>
+<p class="text-sm text-on-surface-variant leading-relaxed">Closing your account will immediately revoke API access and delete all stored training models. This action is permanent and cannot be reversed.</p>
+</div>
+<button class="px-6 py-3 outline outline-1 outline-error/30 text-error font-label uppercase tracking-widest text-[10px] rounded hover:bg-error/5 transition-all">Terminate Account</button>
+</section>
+</div>
+<footer class="p-8 text-center border-t border-outline-variant/5">
+<p class="text-[10px] font-label uppercase tracking-[0.3em] text-on-surface-variant">© 2024 TERMINALAPI SYSTEMS • ENGINEERED FOR PRECISION</p>
+</footer>
+</main>
+</body></html>
