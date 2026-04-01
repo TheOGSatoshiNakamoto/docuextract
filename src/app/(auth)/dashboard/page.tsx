@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { getSupabaseClient } from '@/lib/supabase';
 import MetricCard from '@/components/dashboard/MetricCard';
 import ExtractionsTable from '@/components/dashboard/ExtractionsTable';
 import QuickStartCard from '@/components/dashboard/QuickStartCard';
 import QuickLinkCard from '@/components/dashboard/QuickLinkCard';
+import QuickStartFlow from '@/components/dashboard/QuickStartFlow';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -26,6 +27,126 @@ interface Extraction {
   created_at: string;
 }
 
+// ── Overview Content ──────────────────────────────────────────────────────────
+
+function OverviewContent({
+  apiKey,
+  usage,
+  extractions,
+  loadingUsage,
+  loadingExtractions,
+  hasExtractions,
+}: {
+  apiKey: string | null;
+  usage: UsageData | null;
+  extractions: Extraction[];
+  loadingUsage: boolean;
+  loadingExtractions: boolean;
+  hasExtractions: boolean;
+}) {
+  const sparkData = usage?.breakdown?.slice(-30).map((d) => d.count) ?? [];
+  const usedPct = usage ? Math.min(100, (usage.used / usage.limit) * 100) : 0;
+
+  const successRate =
+    extractions.length > 0
+      ? Math.round((extractions.filter((e) => e.status === 'success').length / extractions.length) * 100)
+      : null;
+
+  const latencyArr = extractions.filter((e) => e.processing_time_ms != null).map((e) => e.processing_time_ms!);
+  const avgLatency =
+    latencyArr.length > 0 ? Math.round(latencyArr.reduce((a, b) => a + b, 0) / latencyArr.length) : null;
+
+  return (
+    <div className="p-6 md:p-8 max-w-7xl w-full mx-auto space-y-8">
+      {/* Header */}
+      <section className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+        <div className="space-y-1">
+          <h2 className="text-4xl font-bold font-headline tracking-tighter text-on-surface">Overview</h2>
+          <p className="text-on-surface-variant max-w-xl">
+            Monitor your document extraction pipelines and manage API infrastructure from a central console.
+          </p>
+        </div>
+        {usage && (
+          <div className="flex items-center gap-4 bg-surface-container-low p-4 rounded-xl border border-outline-variant/10">
+            <div className="text-right">
+              <p className="font-label uppercase text-[10px] tracking-[0.15em] text-on-surface-variant/50">API Usage</p>
+              <p className="font-headline font-bold text-xl text-on-surface">
+                {usage.used.toLocaleString()}{' '}
+                <span className="text-on-surface-variant/40 font-normal text-sm">/ {usage.limit.toLocaleString()}</span>
+              </p>
+            </div>
+            <div className="w-24 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full ${usedPct >= 95 ? 'bg-error' : usedPct >= 80 ? 'bg-amber-500' : 'bg-primary'}`}
+                style={{ width: `${usedPct}%` }}
+              />
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* Metrics */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <MetricCard
+          label="API Calls (MTD)"
+          value={loadingUsage ? '...' : (usage?.used?.toLocaleString() ?? '0')}
+          sparkData={sparkData}
+          trend={hasExtractions ? { direction: 'up', text: 'This month' } : undefined}
+          loading={loadingUsage}
+          icon="api"
+        />
+        <MetricCard
+          label="Success Rate"
+          value={loadingExtractions ? '...' : successRate != null ? `${successRate}%` : '—'}
+          sub={extractions.length > 0 ? `Last ${extractions.length} calls` : 'No data yet'}
+          trend={successRate != null && successRate >= 95 ? { direction: 'up', text: 'Service Operational' } : undefined}
+          loading={loadingExtractions}
+          icon="check_circle"
+        />
+        <MetricCard
+          label="Avg Latency"
+          value={loadingExtractions ? '...' : avgLatency != null ? `${(avgLatency / 1000).toFixed(1)}s` : '—'}
+          sub={avgLatency != null ? `P95: ${(avgLatency * 1.5 / 1000).toFixed(1)}s` : 'Processing time'}
+          loading={loadingExtractions}
+          icon="speed"
+        />
+        <MetricCard
+          label="Plan Status"
+          value={loadingUsage ? '...' : (usage?.plan ? usage.plan.charAt(0).toUpperCase() + usage.plan.slice(1) : '—')}
+          sub={usage?.period_end ? `Resets ${new Date(usage.period_end).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : undefined}
+          loading={loadingUsage}
+          icon="verified"
+        />
+      </section>
+
+      {/* Recent Extractions */}
+      <ExtractionsTable extractions={extractions} loading={loadingExtractions} />
+
+      {/* Quick Links */}
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
+        <QuickLinkCard
+          href="/docs"
+          icon="menu_book"
+          title="Documentation"
+          description="Explore our full API reference, SDKs, and integration guides for multiple languages."
+        />
+        <QuickLinkCard
+          href="/playground"
+          icon="terminal"
+          title="API Playground"
+          description="Test extractions in real-time with our interactive sandbox. No code required."
+        />
+        <QuickLinkCard
+          href="/dashboard/keys"
+          icon="vpn_key"
+          title="Manage Keys"
+          description="Create, revoke, and rotate API keys for different environments and services."
+        />
+      </section>
+    </div>
+  );
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
@@ -34,21 +155,28 @@ export default function DashboardPage() {
   const [extractions, setExtractions] = useState<Extraction[]>([]);
   const [loadingUsage, setLoadingUsage] = useState(true);
   const [loadingExtractions, setLoadingExtractions] = useState(true);
-  const [quickStartDismissed, setQuickStartDismissed] = useState(false);
+  const [onboardingComplete, setOnboardingComplete] = useState<boolean | null>(null); // null = loading
 
+  // Check onboarding state
   useEffect(() => {
     try {
-      setQuickStartDismissed(localStorage.getItem('gs-dismissed') === 'true');
-    } catch { /* SSR */ }
+      const dismissed = localStorage.getItem('gs-dismissed') === 'true';
+      const keyCopied = localStorage.getItem('gs-key-copied') === 'true';
+      const viewedExtractions = localStorage.getItem('gs-viewed-extractions') === 'true';
+      // Consider onboarding complete if dismissed or all steps done
+      setOnboardingComplete(dismissed || (keyCopied && viewedExtractions));
+    } catch {
+      setOnboardingComplete(false);
+    }
   }, []);
 
+  // Fetch data
   useEffect(() => {
     const supabase = getSupabaseClient();
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) return;
 
-      // Fetch user data
       const { data: userData } = await supabase
         .from('users')
         .select('api_key, plan, monthly_limit')
@@ -57,7 +185,7 @@ export default function DashboardPage() {
 
       if (userData?.api_key) setApiKey(userData.api_key);
 
-      // Fetch usage stats
+      // Usage stats
       try {
         const now = new Date();
         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
@@ -100,7 +228,7 @@ export default function DashboardPage() {
       } catch { /* non-blocking */ }
       finally { setLoadingUsage(false); }
 
-      // Fetch recent extractions
+      // Recent extractions
       try {
         const { data: exData } = await supabase
           .from('api_usage')
@@ -115,125 +243,61 @@ export default function DashboardPage() {
   }, []);
 
   const hasExtractions = (usage?.used ?? 0) > 0;
-  const allDone = hasExtractions && quickStartDismissed;
-  const sparkData = usage?.breakdown?.slice(-30).map((d) => d.count) ?? [];
 
-  // Compute derived stats
-  const successRate =
-    extractions.length > 0
-      ? Math.round((extractions.filter((e) => e.status === 'success').length / extractions.length) * 100)
-      : null;
+  // Update onboarding state when extractions data loads
+  useEffect(() => {
+    if (!loadingUsage && hasExtractions) {
+      try {
+        const dismissed = localStorage.getItem('gs-dismissed') === 'true';
+        const keyCopied = localStorage.getItem('gs-key-copied') === 'true';
+        const viewedExtractions = localStorage.getItem('gs-viewed-extractions') === 'true';
+        if (dismissed || (keyCopied && hasExtractions && viewedExtractions)) {
+          setOnboardingComplete(true);
+        }
+      } catch { /* SSR */ }
+    }
+  }, [loadingUsage, hasExtractions]);
 
-  const latencyArr = extractions.filter((e) => e.processing_time_ms != null).map((e) => e.processing_time_ms!);
-  const avgLatency =
-    latencyArr.length > 0 ? Math.round(latencyArr.reduce((a, b) => a + b, 0) / latencyArr.length) : null;
-
-  const usedPct = usage ? Math.min(100, (usage.used / usage.limit) * 100) : 0;
-
-  function dismissQuickStart() {
-    setQuickStartDismissed(true);
+  const handleOnboardingComplete = useCallback(() => {
+    setOnboardingComplete(true);
     try { localStorage.setItem('gs-dismissed', 'true'); } catch { /* SSR */ }
+  }, []);
+
+  const handleSkip = useCallback(() => {
+    setOnboardingComplete(true);
+    try { localStorage.setItem('gs-dismissed', 'true'); } catch { /* SSR */ }
+  }, []);
+
+  // Loading state
+  if (onboardingComplete === null) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-on-surface-variant/50 text-sm font-headline">Loading&hellip;</div>
+      </div>
+    );
   }
 
+  // Show Quick Start for new users
+  if (!onboardingComplete) {
+    return (
+      <QuickStartFlow
+        apiKey={apiKey}
+        hasExtractions={hasExtractions}
+        onComplete={handleOnboardingComplete}
+        onSkip={handleSkip}
+      />
+    );
+  }
+
+  // Show Overview for onboarded users
   return (
-    <div className="p-6 md:p-8 max-w-7xl w-full mx-auto space-y-8">
-      {/* Header Section — Correction #8: "Overview" not "Developer Dashboard" */}
-      <section className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-        <div className="space-y-1">
-          <h2 className="text-4xl font-bold font-headline tracking-tighter text-on-surface">Overview</h2>
-          <p className="text-on-surface-variant max-w-xl">
-            Monitor your document extraction pipelines and manage API infrastructure from a central console.
-          </p>
-        </div>
-        {/* Usage summary in header */}
-        {usage && (
-          <div className="flex items-center gap-4 bg-surface-container-low p-4 rounded-xl border border-outline-variant/10">
-            <div className="text-right">
-              <p className="font-label uppercase text-[10px] tracking-[0.15em] text-on-surface-variant/50">API Usage</p>
-              <p className="font-headline font-bold text-xl text-on-surface">
-                {usage.used.toLocaleString()}{' '}
-                <span className="text-on-surface-variant/40 font-normal text-sm">/ {usage.limit.toLocaleString()}</span>
-              </p>
-            </div>
-            <div className="w-24 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
-              <div
-                className={`h-full rounded-full ${usedPct >= 95 ? 'bg-error' : usedPct >= 80 ? 'bg-amber-500' : 'bg-primary'}`}
-                style={{ width: `${usedPct}%` }}
-              />
-            </div>
-          </div>
-        )}
-      </section>
-
-      {/* Quick Integration — corrections #1-4, #9, #10 applied in QuickStartCard */}
-      {!allDone && (
-        <QuickStartCard
-          apiKey={apiKey}
-          hasExtractions={hasExtractions}
-          dismissed={quickStartDismissed}
-          onDismiss={dismissQuickStart}
-        />
-      )}
-
-      {/* Metrics Grid — corrections #6 (dates from real data), #7 (real plan) */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <MetricCard
-          label="API Calls (MTD)"
-          value={loadingUsage ? '...' : (usage?.used?.toLocaleString() ?? '0')}
-          sparkData={sparkData}
-          trend={hasExtractions ? { direction: 'up', text: 'This month' } : undefined}
-          loading={loadingUsage}
-          icon="api"
-        />
-        <MetricCard
-          label="Success Rate"
-          value={loadingExtractions ? '...' : successRate != null ? `${successRate}%` : '—'}
-          sub={extractions.length > 0 ? `Last ${extractions.length} calls` : 'No data yet'}
-          trend={successRate != null && successRate >= 95 ? { direction: 'up', text: 'Service Operational' } : undefined}
-          loading={loadingExtractions}
-          icon="check_circle"
-        />
-        <MetricCard
-          label="Avg Latency"
-          value={loadingExtractions ? '...' : avgLatency != null ? `${(avgLatency / 1000).toFixed(1)}s` : '—'}
-          sub={avgLatency != null ? `P95: ${(avgLatency * 1.5 / 1000).toFixed(1)}s` : 'Processing time'}
-          loading={loadingExtractions}
-          icon="speed"
-        />
-        {/* Correction #7: show user's actual plan from database, not "Enterprise" */}
-        <MetricCard
-          label="Plan Status"
-          value={loadingUsage ? '...' : (usage?.plan ? usage.plan.charAt(0).toUpperCase() + usage.plan.slice(1) : '—')}
-          sub={usage?.period_end ? `Resets ${new Date(usage.period_end).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : undefined}
-          loading={loadingUsage}
-          icon="verified"
-        />
-      </section>
-
-      {/* Recent Extractions — correction #6: real dates from DB */}
-      <ExtractionsTable extractions={extractions} loading={loadingExtractions} />
-
-      {/* Quick Links — correction #11: fix typo "environments and environments" → "environments and services" */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
-        <QuickLinkCard
-          href="/docs"
-          icon="menu_book"
-          title="Documentation"
-          description="Explore our full API reference, SDKs, and integration guides for multiple languages."
-        />
-        <QuickLinkCard
-          href="/playground"
-          icon="terminal"
-          title="API Playground"
-          description="Test extractions in real-time with our interactive sandbox. No code required."
-        />
-        <QuickLinkCard
-          href="/dashboard/keys"
-          icon="vpn_key"
-          title="Manage Keys"
-          description="Create, revoke, and rotate API keys for different environments and services."
-        />
-      </section>
-    </div>
+    <OverviewContent
+      apiKey={apiKey}
+      usage={usage}
+      extractions={extractions}
+      loadingUsage={loadingUsage}
+      loadingExtractions={loadingExtractions}
+      hasExtractions={hasExtractions}
+    />
   );
 }

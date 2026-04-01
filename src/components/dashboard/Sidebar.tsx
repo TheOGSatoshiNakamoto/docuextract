@@ -29,6 +29,7 @@ export default function Sidebar() {
   const [isMobile, setIsMobile] = useState(false);
   const [usage, setUsage] = useState<UsageMini | null>(null);
   const [hasExtractions, setHasExtractions] = useState(false);
+  const [onboardingComplete, setOnboardingComplete] = useState(true);
   const [signingOut, setSigningOut] = useState(false);
   const [userEmail, setUserEmail] = useState('');
 
@@ -45,6 +46,8 @@ export default function Sidebar() {
     window.addEventListener('resize', checkMobile);
     try {
       if (localStorage.getItem('sidebar-collapsed') === 'true') setCollapsed(true);
+      const dismissed = localStorage.getItem('gs-dismissed') === 'true';
+      setOnboardingComplete(dismissed);
     } catch { /* SSR safe */ }
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
@@ -119,7 +122,7 @@ export default function Sidebar() {
   const barColorClass = usedPct >= 95 ? 'bg-error' : usedPct >= 80 ? 'bg-amber-500' : 'bg-primary-container';
 
   const coreNav: NavItem[] = [
-    { label: 'Quick Start', href: '/dashboard', icon: 'rocket_launch', showWhen: !hasExtractions },
+    { label: 'Quick Start', href: '/dashboard', icon: 'rocket_launch', showWhen: !onboardingComplete },
     { label: 'Overview', href: '/dashboard', icon: 'dashboard' },
     { label: 'Extractions', href: '/dashboard/extractions', icon: 'description' },
     { label: 'Playground', href: '/playground', icon: 'terminal' },
