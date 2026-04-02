@@ -70,3 +70,18 @@ Thumbs.db
 .yarn/install-state.gz
 .pnp.*
 .vercel
+
+# TypeScript build info
+tsconfig.tsbuildinfo
+
+# MCP / Claude Code tools
+.mcp.json
+.playwright-mcp/
+
+# Audit screenshots (keep .md reports, ignore images)
+.audits/**/*.png
+audit-*.png
+
+# Setup scripts (one-time, not needed in repo)
+setup-ux-audit.sh
+ux-audit.md
