@@ -50,7 +50,17 @@ export default function Sidebar() {
       const dismissed = localStorage.getItem('gs-dismissed') === 'true';
       setOnboardingComplete(dismissed);
     } catch { /* SSR safe */ }
-    return () => window.removeEventListener('resize', checkMobile);
+
+    // Listen for onboarding state changes from the Quick Start page (same tab)
+    function onOnboardingComplete() {
+      setOnboardingComplete(true);
+    }
+    window.addEventListener('docuextract:onboarding-complete', onOnboardingComplete);
+
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('docuextract:onboarding-complete', onOnboardingComplete);
+    };
   }, []);
 
   useEffect(() => {
@@ -122,12 +132,12 @@ export default function Sidebar() {
   const usedPct = usage && usage.limit > 0 ? Math.min(100, (usage.used / usage.limit) * 100) : 0;
   const barColorClass = usedPct >= 95 ? 'bg-error' : usedPct >= 80 ? 'bg-amber-500' : 'bg-primary-container';
 
-  // When onboarding is incomplete, Quick Start is the active item at /dashboard.
-  // When complete, Overview is the active item. They share the same href but
-  // only one should ever highlight — the other is either hidden or non-active.
+  // Quick Start and Overview are mutually exclusive at /dashboard.
+  // New users see Quick Start. After completing onboarding or clicking Skip,
+  // Quick Start disappears and Overview takes its place.
   const coreNav: NavItem[] = [
     { label: 'Quick Start', href: '/dashboard', icon: 'rocket_launch', showWhen: !onboardingComplete, id: 'quickstart' },
-    { label: 'Overview', href: '/dashboard', icon: 'dashboard', id: 'overview' },
+    { label: 'Overview', href: '/dashboard', icon: 'dashboard', showWhen: onboardingComplete, id: 'overview' },
     { label: 'Extractions', href: '/dashboard/extractions', icon: 'description' },
     { label: 'Playground', href: '/playground', icon: 'terminal' },
   ];

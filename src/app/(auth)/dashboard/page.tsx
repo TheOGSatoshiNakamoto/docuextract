@@ -292,11 +292,15 @@ export default function DashboardPage() {
   const handleOnboardingComplete = useCallback(() => {
     setOnboardingComplete(true);
     try { localStorage.setItem('gs-dismissed', 'true'); } catch { /* SSR */ }
+    // Notify sidebar to swap Quick Start → Overview
+    window.dispatchEvent(new CustomEvent('docuextract:onboarding-complete'));
   }, []);
 
   const handleSkip = useCallback(() => {
     setOnboardingComplete(true);
     try { localStorage.setItem('gs-dismissed', 'true'); } catch { /* SSR */ }
+    // Notify sidebar to swap Quick Start → Overview
+    window.dispatchEvent(new CustomEvent('docuextract:onboarding-complete'));
   }, []);
 
   // Loading state
