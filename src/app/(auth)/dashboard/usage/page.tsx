@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { getSupabaseClient } from '@/lib/supabase';
+import { sanitizeApiUsageRows, sanitizeUserData } from '@/lib/sanitize';
 import MetricCard from '@/components/dashboard/MetricCard';
 import UsageEmptyState from '@/components/dashboard/usage/EmptyState';
 import Link from 'next/link';
@@ -331,7 +332,13 @@ export default function UsagePage() {
         .select('api_key, plan, monthly_limit')
         .eq('id', session.user.id)
         .single();
-      if (ud) { setUserData(ud as UserData); setApiKey(ud.api_key); }
+      if (ud) {
+        const safe = sanitizeUserData(ud as Record<string, unknown>);
+        if (safe) {
+          setUserData({ api_key: safe.api_key ?? '', plan: safe.plan, monthly_limit: safe.monthly_limit });
+          setApiKey(safe.api_key);
+        }
+      }
 
       try {
         const { data } = await supabase
@@ -340,7 +347,7 @@ export default function UsagePage() {
           .eq('user_id', session.user.id)
           .order('created_at', { ascending: true })
           .limit(2000);
-        setRows(data ?? []);
+        setRows(sanitizeApiUsageRows(data ?? []) as ApiUsageRow[]);
       } catch { /* non-blocking */ }
       finally { setLoading(false); }
     });

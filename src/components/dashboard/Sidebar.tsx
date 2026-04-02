@@ -119,7 +119,7 @@ export default function Sidebar() {
     router.replace('/login');
   }
 
-  const usedPct = usage ? Math.min(100, (usage.used / usage.limit) * 100) : 0;
+  const usedPct = usage && usage.limit > 0 ? Math.min(100, (usage.used / usage.limit) * 100) : 0;
   const barColorClass = usedPct >= 95 ? 'bg-error' : usedPct >= 80 ? 'bg-amber-500' : 'bg-primary-container';
 
   // When onboarding is incomplete, Quick Start is the active item at /dashboard.

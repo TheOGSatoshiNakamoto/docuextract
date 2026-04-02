@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { getSupabaseClient } from '@/lib/supabase';
 import { ensureUserRow } from '@/lib/supabase-ensure-user';
+import { sanitizeUserData, sanitizeApiUsageRows, type SafeApiUsageRow } from '@/lib/sanitize';
 import MetricCard from '@/components/dashboard/MetricCard';
 import ExtractionsTable from '@/components/dashboard/ExtractionsTable';
 import QuickStartCard from '@/components/dashboard/QuickStartCard';
@@ -189,16 +190,18 @@ export default function DashboardPage() {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) return;
 
-      let { data: userData } = await supabase
+      let { data: rawUserData } = await supabase
         .from('users')
         .select('api_key, plan, monthly_limit')
         .eq('id', session.user.id)
         .single();
 
       // Auto-recover missing public.users row (defensive trigger may have failed)
-      if (!userData) {
-        userData = await ensureUserRow(supabase, session.user.id, session.user.email ?? '');
+      if (!rawUserData) {
+        rawUserData = await ensureUserRow(supabase, session.user.id, session.user.email ?? '');
       }
+
+      const userData = sanitizeUserData(rawUserData as Record<string, unknown> | null);
 
       if (!userData) {
         setDataError('Unable to load your account. Please sign out and sign in again, or contact support.');
@@ -262,7 +265,7 @@ export default function DashboardPage() {
           .eq('user_id', session.user.id)
           .order('created_at', { ascending: false })
           .limit(10);
-        setExtractions(exData ?? []);
+        setExtractions(sanitizeApiUsageRows(exData ?? []));
       } catch (err) {
         console.error('Extractions fetch failed:', err);
         setDataError('Failed to load recent extractions.');

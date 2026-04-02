@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { getSupabaseClient } from '@/lib/supabase';
+import { sanitizeApiUsageRows } from '@/lib/sanitize';
 import ExtractionsEmptyState from '@/components/dashboard/extractions/EmptyState';
 import SummaryStats from '@/components/dashboard/extractions/SummaryStats';
 import FilterBar, { type Filters } from '@/components/dashboard/extractions/FilterBar';
@@ -74,7 +75,7 @@ export default function ExtractionsPage() {
           .eq('user_id', session.user.id)
           .order('created_at', { ascending: false })
           .limit(500);
-        setExtractions(data ?? []);
+        setExtractions(sanitizeApiUsageRows(data ?? []) as Extraction[]);
       } catch { /* non-blocking */ }
       finally { setLoading(false); }
     });
