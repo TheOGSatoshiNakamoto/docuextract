@@ -2,6 +2,7 @@
 
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
+import DashboardErrorBoundary from './ErrorBoundary';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -13,7 +14,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0">
         <TopBar />
-        <main className="flex-1">{children}</main>
+        <main className="flex-1">
+          <DashboardErrorBoundary>{children}</DashboardErrorBoundary>
+        </main>
         <footer className="border-t border-outline-variant/10 py-4 px-8 flex justify-between items-center text-[10px] font-headline uppercase tracking-[0.15em] text-on-surface-variant/30">
           <div>&copy; 2026 DocuExtract</div>
           <div className="flex gap-6">
