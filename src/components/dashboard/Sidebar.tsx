@@ -136,7 +136,7 @@ export default function Sidebar() {
     { label: 'API Keys', href: '/dashboard/keys', icon: 'vpn_key' },
     { label: 'Documentation', href: '/docs', icon: 'menu_book', external: true },
     { label: 'Webhooks', href: '/dashboard/webhooks', icon: 'webhook' },
-    { label: 'Logs', href: '/dashboard/logs', icon: 'list_alt', badge: 'Soon' },
+    { label: 'Logs', href: '/dashboard/logs', icon: 'list_alt' },
   ];
 
   const accountNav: NavItem[] = [
