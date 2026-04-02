@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { getSupabaseClient } from '@/lib/supabase';
+import { useOnboardingStatus } from '@/hooks/useOnboarding';
 import Link from 'next/link';
 
 interface UsageMini {
@@ -30,7 +31,7 @@ export default function Sidebar() {
   const [isMobile, setIsMobile] = useState(false);
   const [usage, setUsage] = useState<UsageMini | null>(null);
   const [hasExtractions, setHasExtractions] = useState(false);
-  const [onboardingComplete, setOnboardingComplete] = useState(true);
+  const { isComplete: onboardingComplete } = useOnboardingStatus();
   const [signingOut, setSigningOut] = useState(false);
   const [userEmail, setUserEmail] = useState('');
 
@@ -47,20 +48,9 @@ export default function Sidebar() {
     window.addEventListener('resize', checkMobile);
     try {
       if (localStorage.getItem('sidebar-collapsed') === 'true') setCollapsed(true);
-      const dismissed = localStorage.getItem('gs-dismissed') === 'true';
-      setOnboardingComplete(dismissed);
     } catch { /* SSR safe */ }
 
-    // Listen for onboarding state changes from the Quick Start page (same tab)
-    function onOnboardingComplete() {
-      setOnboardingComplete(true);
-    }
-    window.addEventListener('docuextract:onboarding-complete', onOnboardingComplete);
-
-    return () => {
-      window.removeEventListener('resize', checkMobile);
-      window.removeEventListener('docuextract:onboarding-complete', onOnboardingComplete);
-    };
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   useEffect(() => {

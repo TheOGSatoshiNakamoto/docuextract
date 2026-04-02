@@ -4,9 +4,9 @@ import { useEffect, useState, useCallback } from 'react';
 import { getSupabaseClient } from '@/lib/supabase';
 import { ensureUserRow } from '@/lib/supabase-ensure-user';
 import { sanitizeUserData, sanitizeApiUsageRows, type SafeApiUsageRow } from '@/lib/sanitize';
+import { useOnboarding } from '@/hooks/useOnboarding';
 import MetricCard from '@/components/dashboard/MetricCard';
 import ExtractionsTable from '@/components/dashboard/ExtractionsTable';
-import QuickStartCard from '@/components/dashboard/QuickStartCard';
 import QuickLinkCard from '@/components/dashboard/QuickLinkCard';
 import QuickStartFlow from '@/components/dashboard/QuickStartFlow';
 
@@ -168,20 +168,6 @@ export default function DashboardPage() {
   const [loadingUsage, setLoadingUsage] = useState(true);
   const [loadingExtractions, setLoadingExtractions] = useState(true);
   const [dataError, setDataError] = useState<string | null>(null);
-  const [onboardingComplete, setOnboardingComplete] = useState<boolean | null>(null); // null = loading
-
-  // Check onboarding state
-  useEffect(() => {
-    try {
-      const dismissed = localStorage.getItem('gs-dismissed') === 'true';
-      const keyCopied = localStorage.getItem('gs-key-copied') === 'true';
-      const viewedExtractions = localStorage.getItem('gs-viewed-extractions') === 'true';
-      // Consider onboarding complete if dismissed or all steps done
-      setOnboardingComplete(dismissed || (keyCopied && viewedExtractions));
-    } catch {
-      setOnboardingComplete(false);
-    }
-  }, []);
 
   // Fetch data
   useEffect(() => {
@@ -274,37 +260,10 @@ export default function DashboardPage() {
   }, []);
 
   const hasExtractions = (usage?.used ?? 0) > 0;
-
-  // Update onboarding state when extractions data loads
-  useEffect(() => {
-    if (!loadingUsage && hasExtractions) {
-      try {
-        const dismissed = localStorage.getItem('gs-dismissed') === 'true';
-        const keyCopied = localStorage.getItem('gs-key-copied') === 'true';
-        const viewedExtractions = localStorage.getItem('gs-viewed-extractions') === 'true';
-        if (dismissed || (keyCopied && hasExtractions && viewedExtractions)) {
-          setOnboardingComplete(true);
-        }
-      } catch { /* SSR */ }
-    }
-  }, [loadingUsage, hasExtractions]);
-
-  const handleOnboardingComplete = useCallback(() => {
-    setOnboardingComplete(true);
-    try { localStorage.setItem('gs-dismissed', 'true'); } catch { /* SSR */ }
-    // Notify sidebar to swap Quick Start → Overview
-    window.dispatchEvent(new CustomEvent('docuextract:onboarding-complete'));
-  }, []);
-
-  const handleSkip = useCallback(() => {
-    setOnboardingComplete(true);
-    try { localStorage.setItem('gs-dismissed', 'true'); } catch { /* SSR */ }
-    // Notify sidebar to swap Quick Start → Overview
-    window.dispatchEvent(new CustomEvent('docuextract:onboarding-complete'));
-  }, []);
+  const onboarding = useOnboarding(hasExtractions);
 
   // Loading state
-  if (onboardingComplete === null) {
+  if (onboarding.isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-on-surface-variant/50 text-sm font-headline">Loading&hellip;</div>
@@ -313,13 +272,13 @@ export default function DashboardPage() {
   }
 
   // Show Quick Start for new users
-  if (!onboardingComplete) {
+  if (!onboarding.isComplete) {
     return (
       <QuickStartFlow
         apiKey={apiKey}
         hasExtractions={hasExtractions}
-        onComplete={handleOnboardingComplete}
-        onSkip={handleSkip}
+        onComplete={onboarding.markComplete}
+        onSkip={onboarding.skip}
       />
     );
   }

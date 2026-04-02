@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import OnboardingStep from './OnboardingStep';
+import { useOnboarding } from '@/hooks/useOnboarding';
 
 interface QuickStartFlowProps {
   apiKey: string | null;
@@ -17,17 +18,11 @@ export default function QuickStartFlow({ apiKey, hasExtractions, onComplete, onS
   const [uploadState, setUploadState] = useState<'idle' | 'dragging' | 'uploading' | 'done' | 'error'>('idle');
   const [uploadFileName, setUploadFileName] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [step1Done, setStep1Done] = useState(false);
-  const [step3Done, setStep3Done] = useState(false);
+  const onboarding = useOnboarding(hasExtractions);
 
-  useEffect(() => {
-    try {
-      setStep1Done(localStorage.getItem('gs-key-copied') === 'true');
-      setStep3Done(localStorage.getItem('gs-viewed-extractions') === 'true');
-    } catch { /* SSR */ }
-  }, []);
-
+  const step1Done = onboarding.steps.keyCopied;
   const step2Done = hasExtractions;
+  const step3Done = onboarding.steps.viewedExtractions;
   const allDone = step1Done && step2Done && step3Done;
 
   useEffect(() => {
@@ -37,21 +32,18 @@ export default function QuickStartFlow({ apiKey, hasExtractions, onComplete, onS
     }
   }, [allDone, onComplete]);
 
-  // Determine active step
   const activeStep = !step1Done ? 1 : !step2Done ? 2 : !step3Done ? 3 : 0;
 
   function copyKey() {
     if (!apiKey) return;
     navigator.clipboard.writeText(apiKey).catch(() => {});
     setKeyCopied(true);
-    setStep1Done(true);
-    try { localStorage.setItem('gs-key-copied', 'true'); } catch { /* SSR */ }
+    onboarding.completeStep('keyCopied');
     setTimeout(() => setKeyCopied(false), 2000);
   }
 
   function markStep3() {
-    setStep3Done(true);
-    try { localStorage.setItem('gs-viewed-extractions', 'true'); } catch { /* SSR */ }
+    onboarding.completeStep('viewedExtractions');
   }
 
   async function handleFileUpload(file: File) {
