@@ -194,7 +194,7 @@ export default function LogsPage() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [endpointFilter, setEndpointFilter] = useState('all');
-  const [timeRange, setTimeRange] = useState<TimeRange>('24h');
+  const [timeRange, setTimeRange] = useState<TimeRange>('7d');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [live, setLive] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
