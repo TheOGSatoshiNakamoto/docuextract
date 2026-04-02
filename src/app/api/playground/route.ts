@@ -7,6 +7,9 @@ import type { DocumentType, ModelMode } from '@/lib/types';
 // Playground: no auth required, rate limit enforced client-side via localStorage.
 // Server-side protection: tight body size limit + Vercel's built-in DDoS protection.
 
+export const runtime = 'nodejs';
+export const maxDuration = 30;
+
 const VALID_TYPES = new Set<DocumentType>([
   'invoice', 'receipt', 'bank_statement', 'resume',
   'contract', 'form', 'id_document', 'unknown',
