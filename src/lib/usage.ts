@@ -71,15 +71,51 @@ export async function getMonthlyUsageCount(userId: string): Promise<number> {
 }
 
 /**
+ * Sanitizes a usage record before database insertion.
+ * Ensures no NaN, Infinity, or out-of-range values reach PostgreSQL.
+ * A bad field becomes null rather than crashing the insert.
+ */
+function sanitizeRecord(record: UsageRecord): UsageRecord {
+  const safeNum = (v: number | null): number | null => {
+    if (v == null) return null;
+    if (!Number.isFinite(v)) return null;
+    return v;
+  };
+  const safeConf = (v: number | null): number | null => {
+    const n = safeNum(v);
+    if (n == null) return null;
+    if (n < 0 || n > 1) return Math.max(0, Math.min(1, n));
+    return n;
+  };
+
+  return {
+    user_id: record.user_id,
+    endpoint: record.endpoint || '/v1/extract',
+    document_type: record.document_type ?? null,
+    model_used: record.model_used || 'unknown',
+    input_tokens: safeNum(record.input_tokens),
+    output_tokens: safeNum(record.output_tokens),
+    processing_time_ms: safeNum(record.processing_time_ms),
+    confidence_score: safeConf(record.confidence_score),
+    status: ['success', 'error', 'rate_limited'].includes(record.status) ? record.status : 'error',
+    error_message: record.error_message ?? null,
+  };
+}
+
+/**
  * Inserts a usage record into the api_usage table.
  *
  * This is intentionally fire-and-forget on the request path — failures are
  * logged but never propagated to the caller. A missing usage record is better
  * than a failed API response.
+ *
+ * Records are sanitized before insertion to prevent NaN, Infinity, or
+ * out-of-range values from reaching PostgreSQL.
  */
 export async function logUsage(record: UsageRecord): Promise<void> {
   try {
-    const { error } = await getSupabaseAdmin().from('api_usage').insert(record);
+    const sanitized = sanitizeRecord(record);
+    const { error } = await getSupabaseAdmin().from('api_usage').insert(sanitized);
     if (error) {
       console.error(
         JSON.stringify({ level: 'error', message: 'Failed to log usage', error: error.message, userId: record.user_id }),
