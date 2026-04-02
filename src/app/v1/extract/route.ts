@@ -19,6 +19,48 @@ import type { ExtractRequest, DocumentType, ModelMode } from '@/lib/types';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+// ── Output sanitization ─────────────────────────────────────────────────────
+// Claude's extracted JSON goes directly to developers. Sanitize to prevent:
+// - XSS vectors in string values (developers might render without escaping)
+// - Internal/debug fields leaking prompt details
+// - Excessive nesting that could crash downstream parsers
+// - Non-finite numbers (NaN, Infinity)
+
+const BLOCKED_KEYS = new Set(['_debug', '_prompt', '_system', '_internal', 'system_prompt']);
+const MAX_DEPTH = 10;
+
+function sanitizeExtractionOutput(data: Record<string, unknown>, depth = 0): Record<string, unknown> {
+  if (depth > MAX_DEPTH) return {};
+  const result: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(data)) {
+    if (BLOCKED_KEYS.has(key.toLowerCase())) continue;
+
+    if (value === null || value === undefined) {
+      result[key] = null;
+    } else if (typeof value === 'string') {
+      // Strip HTML tags to prevent XSS when developers render extracted text
+      result[key] = value.replace(/<[^>]*>/g, '');
+    } else if (typeof value === 'number') {
+      result[key] = Number.isFinite(value) ? value : null;
+    } else if (typeof value === 'boolean') {
+      result[key] = value;
+    } else if (Array.isArray(value)) {
+      result[key] = value.map(item => {
+        if (item != null && typeof item === 'object' && !Array.isArray(item)) {
+          return sanitizeExtractionOutput(item as Record<string, unknown>, depth + 1);
+        }
+        if (typeof item === 'string') return item.replace(/<[^>]*>/g, '');
+        if (typeof item === 'number') return Number.isFinite(item) ? item : null;
+        return item;
+      });
+    } else if (typeof value === 'object') {
+      result[key] = sanitizeExtractionOutput(value as Record<string, unknown>, depth + 1);
+    }
+  }
+  return result;
+}
+
 const VALID_TYPES = new Set<DocumentType>([
   'invoice', 'receipt', 'bank_statement', 'resume',
   'contract', 'form', 'id_document', 'unknown',
@@ -146,14 +188,21 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     })();
   }
 
-  // ── 8. Respond ────────────────────────────────────────────────────────────
+  // ── 8. Sanitize output and respond ─────────────────────────────────────────
+  // Claude is an LLM — its JSON output can contain anything. Sanitize before
+  // sending to developers to prevent prompt leakage, XSS vectors in extracted
+  // text, and out-of-range metadata values.
+  const sanitizedData = sanitizeExtractionOutput(result.data);
+  const clampedConfidence = Math.max(0, Math.min(1, Math.round(result.confidence * 1000) / 1000));
+  const safeProcessingTime = Number.isFinite(result.processingTimeMs) ? result.processingTimeMs : 0;
+
   const resp = NextResponse.json({
-    data: result.data,
+    data: sanitizedData,
     metadata: {
       type: documentType,
-      confidence: result.confidence,
+      confidence: clampedConfidence,
       model: result.modelUsed,
-      processing_time_ms: result.processingTimeMs,
+      processing_time_ms: safeProcessingTime,
       page_count: 1,
     },
   });
