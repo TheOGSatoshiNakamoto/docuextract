@@ -122,12 +122,13 @@ export default function Sidebar() {
   const usedPct = usage && usage.limit > 0 ? Math.min(100, (usage.used / usage.limit) * 100) : 0;
   const barColorClass = usedPct >= 95 ? 'bg-error' : usedPct >= 80 ? 'bg-amber-500' : 'bg-primary-container';
 
-  // Quick Start and Overview are mutually exclusive at /dashboard.
-  // New users see Quick Start. After completing onboarding or clicking Skip,
-  // Quick Start disappears and Overview takes its place.
+  // Overview is always visible. Quick Start only shows for new users.
+  // When both are visible at /dashboard, Quick Start is the active one
+  // (because the page renders Quick Start content). After skip/complete,
+  // Quick Start disappears and Overview becomes active.
   const coreNav: NavItem[] = [
     { label: 'Quick Start', href: '/dashboard', icon: 'rocket_launch', showWhen: !onboardingComplete, id: 'quickstart' },
-    { label: 'Overview', href: '/dashboard', icon: 'dashboard', showWhen: onboardingComplete, id: 'overview' },
+    { label: 'Overview', href: '/dashboard', icon: 'dashboard', id: 'overview' },
     { label: 'Extractions', href: '/dashboard/extractions', icon: 'description' },
     { label: 'Playground', href: '/playground', icon: 'terminal' },
   ];
