@@ -142,7 +142,7 @@ export default function Sidebar() {
   const accountNav: NavItem[] = [
     { label: 'Usage', href: '/dashboard/usage', icon: 'bar_chart' },
     { label: 'Billing', href: '/dashboard/billing', icon: 'credit_card' },
-    { label: 'Settings', href: '/dashboard/settings', icon: 'settings', badge: 'Soon' },
+    { label: 'Settings', href: '/dashboard/settings', icon: 'settings' },
   ];
 
   function isActive(item: NavItem) {
