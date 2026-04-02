@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { getSupabaseClient } from '@/lib/supabase';
+import { ensureUserRow } from '@/lib/supabase-ensure-user';
 import MetricCard from '@/components/dashboard/MetricCard';
 import ExtractionsTable from '@/components/dashboard/ExtractionsTable';
 import QuickStartCard from '@/components/dashboard/QuickStartCard';
@@ -188,20 +189,25 @@ export default function DashboardPage() {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) return;
 
-      const { data: userData } = await supabase
+      let { data: userData } = await supabase
         .from('users')
         .select('api_key, plan, monthly_limit')
         .eq('id', session.user.id)
         .single();
 
-      if (userData?.api_key) setApiKey(userData.api_key);
+      // Auto-recover missing public.users row (defensive trigger may have failed)
+      if (!userData) {
+        userData = await ensureUserRow(supabase, session.user.id, session.user.email ?? '');
+      }
 
       if (!userData) {
-        setDataError('Unable to load your account data. Please try refreshing the page.');
+        setDataError('Unable to load your account. Please sign out and sign in again, or contact support.');
         setLoadingUsage(false);
         setLoadingExtractions(false);
         return;
       }
+
+      if (userData.api_key) setApiKey(userData.api_key);
 
       // Usage stats
       try {

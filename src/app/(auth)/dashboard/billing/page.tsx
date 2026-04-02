@@ -173,22 +173,43 @@ export default function BillingPage() {
           </div>
         </div>
 
-        {/* Manage subscription */}
+        {/* Manage subscription / Upgrade prompt */}
         <div className="bg-surface-container-high p-8 rounded-xl flex flex-col justify-center gap-6">
-          <div className="space-y-2">
-            <h4 className="font-headline font-bold text-xl text-on-surface">Manage Subscription</h4>
-            <p className="text-sm text-on-surface-variant leading-relaxed">
-              Update your billing details, download tax invoices, or switch your payment method.
-            </p>
-          </div>
-          <button
-            onClick={handlePortal}
-            disabled={portalLoading}
-            className="w-full py-3 bg-primary-container text-white font-headline font-bold rounded-lg hover:brightness-110 transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
-          >
-            <span className="material-symbols-outlined">open_in_new</span>
-            {portalLoading ? 'Opening...' : 'Customer Portal'}
-          </button>
+          {userPlan === 'free' ? (
+            <>
+              <div className="space-y-2">
+                <h4 className="font-headline font-bold text-xl text-on-surface">Upgrade Your Plan</h4>
+                <p className="text-sm text-on-surface-variant leading-relaxed">
+                  You&apos;re on the Free plan. Upgrade to unlock more API calls, advanced AI models, and priority support.
+                </p>
+              </div>
+              <button
+                onClick={() => handleCheckout('starter')}
+                disabled={checkoutLoading === 'starter'}
+                className="w-full py-3 bg-primary-container text-white font-headline font-bold rounded-lg hover:brightness-110 transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                <span className="material-symbols-outlined">upgrade</span>
+                {checkoutLoading === 'starter' ? 'Loading...' : 'Upgrade to Starter — $49/mo'}
+              </button>
+            </>
+          ) : (
+            <>
+              <div className="space-y-2">
+                <h4 className="font-headline font-bold text-xl text-on-surface">Manage Subscription</h4>
+                <p className="text-sm text-on-surface-variant leading-relaxed">
+                  Update your billing details, download tax invoices, or switch your payment method.
+                </p>
+              </div>
+              <button
+                onClick={handlePortal}
+                disabled={portalLoading}
+                className="w-full py-3 bg-primary-container text-white font-headline font-bold rounded-lg hover:brightness-110 transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                <span className="material-symbols-outlined">open_in_new</span>
+                {portalLoading ? 'Opening...' : 'Customer Portal'}
+              </button>
+            </>
+          )}
         </div>
       </section>
 

@@ -15,15 +15,32 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     const supabase = getSupabaseClient();
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session && pathname !== '/login') {
         router.replace('/login');
-      } else if (session && pathname === '/login') {
-        router.replace('/dashboard');
-      } else {
-        setUser(session?.user ?? null);
-        setLoading(false);
+        return;
       }
+      if (session && pathname === '/login') {
+        router.replace('/dashboard');
+        return;
+      }
+
+      // Proactively verify the session is still valid by attempting a refresh.
+      // This catches stale/corrupted JWTs that getSession() returns without error.
+      if (session) {
+        const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession();
+        if (refreshError || !refreshed.session) {
+          // Session is dead — clear it and redirect to login
+          await supabase.auth.signOut();
+          if (pathname !== '/login') {
+            router.replace('/login?error=session_expired');
+            return;
+          }
+        }
+      }
+
+      setUser(session?.user ?? null);
+      setLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
