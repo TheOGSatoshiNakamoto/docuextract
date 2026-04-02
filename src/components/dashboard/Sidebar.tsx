@@ -19,6 +19,7 @@ interface NavItem {
   external?: boolean;
   badge?: string;
   showWhen?: boolean;
+  id?: string;
 }
 
 export default function Sidebar() {
@@ -121,9 +122,12 @@ export default function Sidebar() {
   const usedPct = usage ? Math.min(100, (usage.used / usage.limit) * 100) : 0;
   const barColorClass = usedPct >= 95 ? 'bg-error' : usedPct >= 80 ? 'bg-amber-500' : 'bg-primary-container';
 
+  // When onboarding is incomplete, Quick Start is the active item at /dashboard.
+  // When complete, Overview is the active item. They share the same href but
+  // only one should ever highlight — the other is either hidden or non-active.
   const coreNav: NavItem[] = [
-    { label: 'Quick Start', href: '/dashboard', icon: 'rocket_launch', showWhen: !onboardingComplete },
-    { label: 'Overview', href: '/dashboard', icon: 'dashboard' },
+    { label: 'Quick Start', href: '/dashboard', icon: 'rocket_launch', showWhen: !onboardingComplete, id: 'quickstart' },
+    { label: 'Overview', href: '/dashboard', icon: 'dashboard', id: 'overview' },
     { label: 'Extractions', href: '/dashboard/extractions', icon: 'description' },
     { label: 'Playground', href: '/playground', icon: 'terminal' },
   ];
@@ -141,9 +145,16 @@ export default function Sidebar() {
     { label: 'Settings', href: '/dashboard/settings', icon: 'settings', badge: 'Soon' },
   ];
 
-  function isActive(href: string) {
-    if (href === '/dashboard') return pathname === '/dashboard';
-    return pathname.startsWith(href);
+  function isActive(item: NavItem) {
+    if (item.href === '/dashboard') {
+      if (pathname !== '/dashboard') return false;
+      // Both Quick Start and Overview point to /dashboard —
+      // only one should highlight based on onboarding state
+      if (item.id === 'quickstart') return !onboardingComplete;
+      if (item.id === 'overview') return onboardingComplete;
+      return true;
+    }
+    return pathname.startsWith(item.href);
   }
 
   const isExpanded = isMobile ? true : !collapsed;
@@ -151,7 +162,7 @@ export default function Sidebar() {
 
   function NavLink({ item }: { item: NavItem }) {
     if (item.showWhen === false) return null;
-    const active = isActive(item.href);
+    const active = isActive(item);
     const Comp = item.external ? 'a' : Link;
     const extraProps = item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {};
 
