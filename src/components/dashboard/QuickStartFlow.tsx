@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import OnboardingStep from './OnboardingStep';
 
@@ -13,6 +13,10 @@ interface QuickStartFlowProps {
 
 export default function QuickStartFlow({ apiKey, hasExtractions, onComplete, onSkip }: QuickStartFlowProps) {
   const [keyCopied, setKeyCopied] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadState, setUploadState] = useState<'idle' | 'dragging' | 'uploading' | 'done' | 'error'>('idle');
+  const [uploadFileName, setUploadFileName] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [step1Done, setStep1Done] = useState(false);
   const [step3Done, setStep3Done] = useState(false);
 
@@ -48,6 +52,62 @@ export default function QuickStartFlow({ apiKey, hasExtractions, onComplete, onS
   function markStep3() {
     setStep3Done(true);
     try { localStorage.setItem('gs-viewed-extractions', 'true'); } catch { /* SSR */ }
+  }
+
+  async function handleFileUpload(file: File) {
+    if (!apiKey) {
+      setUploadError('API key not loaded. Copy your key first (Step 1).');
+      return;
+    }
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      setUploadError('File too large. Maximum size is 10MB.');
+      return;
+    }
+    const validTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      setUploadError('Invalid file type. Upload a PDF, PNG, JPG, or WEBP.');
+      return;
+    }
+
+    setUploadState('uploading');
+    setUploadFileName(file.name);
+    setUploadError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', 'invoice');
+
+      const res = await fetch('/v1/extract', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${apiKey}` },
+        body: formData,
+      });
+
+      if (res.ok) {
+        setUploadState('done');
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setUploadError(data?.error?.message ?? `Extraction failed (${res.status}). Try again.`);
+        setUploadState('error');
+      }
+    } catch {
+      setUploadError('Network error. Check your connection and try again.');
+      setUploadState('error');
+    }
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setUploadState('idle');
+    const file = e.dataTransfer.files[0];
+    if (file) handleFileUpload(file);
+  }
+
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) handleFileUpload(file);
   }
 
   const maskedKey = apiKey ? `dk_live_${'•'.repeat(16)}${apiKey.slice(-4)}` : 'dk_live_••••••••••••••••••••';
@@ -133,11 +193,53 @@ export default function QuickStartFlow({ apiKey, hasExtractions, onComplete, onS
               </div>
             </div>
             <div className="lg:col-span-2">
-              <div className="h-full border-2 border-dashed border-outline-variant/30 rounded-lg flex flex-col items-center justify-center p-6 bg-surface-container-lowest/50 hover:bg-surface-container-lowest hover:border-primary/40 transition-all cursor-pointer">
-                <span className="material-symbols-outlined text-primary mb-2 text-3xl">cloud_upload</span>
-                <span className="text-xs font-headline font-bold uppercase tracking-[0.15em] text-on-surface mb-1">Upload Document</span>
-                <span className="text-[10px] text-on-surface-variant/50">Drop PDF, PNG, or JPG</span>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.png,.jpg,.jpeg,.webp"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                onDragOver={(e) => { e.preventDefault(); setUploadState('dragging'); }}
+                onDragLeave={() => setUploadState('idle')}
+                onDrop={handleDrop}
+                className={`h-full border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-6 transition-all cursor-pointer ${
+                  uploadState === 'dragging'
+                    ? 'border-primary bg-primary/5'
+                    : uploadState === 'uploading'
+                    ? 'border-primary/40 bg-surface-container-lowest'
+                    : uploadState === 'done'
+                    ? 'border-green-500/40 bg-green-500/5'
+                    : uploadState === 'error'
+                    ? 'border-error/40 bg-error/5'
+                    : 'border-outline-variant/30 bg-surface-container-lowest/50 hover:bg-surface-container-lowest hover:border-primary/40'
+                }`}
+              >
+                {uploadState === 'uploading' ? (
+                  <>
+                    <span className="material-symbols-outlined text-primary mb-2 text-3xl animate-pulse">hourglass_top</span>
+                    <span className="text-xs font-headline font-bold uppercase tracking-[0.15em] text-on-surface mb-1">Extracting...</span>
+                    <span className="text-[10px] text-on-surface-variant/50">{uploadFileName}</span>
+                  </>
+                ) : uploadState === 'done' ? (
+                  <>
+                    <span className="material-symbols-outlined text-green-400 mb-2 text-3xl">check_circle</span>
+                    <span className="text-xs font-headline font-bold uppercase tracking-[0.15em] text-green-400 mb-1">Extraction Complete</span>
+                    <span className="text-[10px] text-on-surface-variant/50">{uploadFileName}</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-primary mb-2 text-3xl">cloud_upload</span>
+                    <span className="text-xs font-headline font-bold uppercase tracking-[0.15em] text-on-surface mb-1">Upload Document</span>
+                    <span className="text-[10px] text-on-surface-variant/50">Drop PDF, PNG, or JPG</span>
+                  </>
+                )}
               </div>
+              {uploadError && (
+                <p className="text-xs text-error mt-2">{uploadError}</p>
+              )}
             </div>
           </div>
         </OnboardingStep>
