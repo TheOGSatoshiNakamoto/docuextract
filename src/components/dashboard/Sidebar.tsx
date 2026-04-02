@@ -135,7 +135,7 @@ export default function Sidebar() {
   const infraNav: NavItem[] = [
     { label: 'API Keys', href: '/dashboard/keys', icon: 'vpn_key' },
     { label: 'Documentation', href: '/docs', icon: 'menu_book', external: true },
-    { label: 'Webhooks', href: '/dashboard/webhooks', icon: 'webhook', badge: 'Soon' },
+    { label: 'Webhooks', href: '/dashboard/webhooks', icon: 'webhook' },
     { label: 'Logs', href: '/dashboard/logs', icon: 'list_alt', badge: 'Soon' },
   ];
 
