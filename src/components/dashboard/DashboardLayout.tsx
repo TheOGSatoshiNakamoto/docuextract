@@ -12,9 +12,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         rel="stylesheet"
       />
       <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
         <TopBar />
-        <main className="flex-1">
+        <main className="flex-1 overflow-y-auto">
           <DashboardErrorBoundary>{children}</DashboardErrorBoundary>
         </main>
         <footer className="border-t border-outline-variant/10 py-4 px-8 flex justify-between items-center text-[10px] font-headline uppercase tracking-[0.15em] text-on-surface-variant/30">
