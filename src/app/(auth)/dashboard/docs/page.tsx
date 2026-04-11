@@ -16,11 +16,6 @@ const css = `
 .docs-toc { width: clamp(200px, 22%, 260px); border-right: 1px solid var(--border); height: 100%; overflow-y: auto; padding: 24px 0; flex-shrink: 0; background: var(--bg-card); z-index: 5; transition: width 0.2s; }
 .docs-main-wrapper { flex: 1; overflow-y: auto; scroll-behavior: smooth; min-width: 0; }
 .docs-toc-toggle { display: none; }
-.docs-toc-logo { padding: 0 16px 16px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
-.docs-toc-logo a { text-decoration: none; display: flex; align-items: center; gap: 10px; }
-.docs-toc-logo .logo-icon { width: 28px; height: 28px; background: var(--accent); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
-.docs-toc-logo .logo-text { font-size: 15px; font-weight: 700; color: var(--text); }
-.docs-toc-logo .logo-badge { font-size: 11px; color: var(--text-muted); font-weight: 400; }
 .docs-nav-group { padding: 0 10px; margin-bottom: 8px; }
 .docs-nav-group-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); padding: 6px 8px; margin-bottom: 2px; }
 .docs-nav-link { display: block; padding: 5px 8px; border-radius: 6px; text-decoration: none; color: var(--text-muted); font-size: 13px; transition: all 0.15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -136,15 +131,6 @@ export default function DashboardDocsPage() {
 
         {/* Docs table of contents sidebar */}
         <nav className="docs-toc" id="docs-toc">
-          <div className="docs-toc-logo">
-            <a href="#introduction">
-              <div className="logo-icon">📄</div>
-              <div>
-                <div className="logo-text">DocuExtract</div>
-                <div className="logo-badge">API Reference v1</div>
-              </div>
-            </a>
-          </div>
           {tocItems.map((group) => (
             <div className="docs-nav-group" key={group.group}>
               <div className="docs-nav-group-title">{group.group}</div>
