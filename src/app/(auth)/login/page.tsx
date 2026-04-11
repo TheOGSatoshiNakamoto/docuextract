@@ -23,7 +23,7 @@ export default function LoginPage() {
 
   const planLabel = plan ? PLAN_LABELS[plan] : null;
   const oauthRedirectTo = `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback${plan ? `?plan=${plan}` : ''}`;
-  const magicLinkRedirectTo = `${process.env.NEXT_PUBLIC_APP_URL}/auth/confirm${plan ? `?plan=${plan}` : ''}`;
+  const magicLinkRedirectTo = `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback${plan ? `?plan=${plan}` : ''}`;
 
   async function handleOAuth(provider: 'github' | 'google') {
     setOauthLoading(provider);
@@ -274,7 +274,7 @@ export default function LoginPage() {
 
               <div className="features">
                 <div className="feature"><div className="feature-dot" /> No password — one-click OAuth or magic link</div>
-                <div className="feature"><div className="feature-dot" /> Free tier: 100 extractions/month, no credit card</div>
+                <div className="feature"><div className="feature-dot" /> Free tier: 50 extractions/month, no credit card</div>
                 <div className="feature"><div className="feature-dot" /> API key ready in your dashboard instantly</div>
               </div>
             </>
