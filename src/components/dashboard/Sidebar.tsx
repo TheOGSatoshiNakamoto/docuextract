@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { getSupabaseClient } from '@/lib/supabase';
 import { useOnboardingStatus } from '@/hooks/useOnboarding';
@@ -81,6 +81,23 @@ export default function Sidebar() {
 
   useEffect(() => { setMobileOpen(false); }, [pathname]);
 
+  // Auto-collapse sidebar when viewing /dashboard/docs to give docs more room.
+  // Auto-expand when navigating away. Stores the pre-docs state to restore it.
+  const prevCollapsedRef = useRef<boolean | null>(null);
+  useEffect(() => {
+    if (isMobile) return;
+    if (pathname === '/dashboard/docs') {
+      if (prevCollapsedRef.current === null) {
+        prevCollapsedRef.current = collapsed;
+      }
+      if (!collapsed) setCollapsed(true);
+    } else if (prevCollapsedRef.current !== null) {
+      setCollapsed(prevCollapsedRef.current);
+      prevCollapsedRef.current = null;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname, isMobile]);
+
   useEffect(() => {
     const supabase = getSupabaseClient();
     supabase.auth.getSession().then(async ({ data: { session } }) => {
@@ -135,7 +152,7 @@ export default function Sidebar() {
 
   const infraNav: NavItem[] = [
     { label: 'API Keys', href: '/dashboard/keys', icon: 'vpn_key' },
-    { label: 'Documentation', href: '/docs', icon: 'menu_book', external: true },
+    { label: 'Documentation', href: '/dashboard/docs', icon: 'menu_book' },
     { label: 'Webhooks', href: '/dashboard/webhooks', icon: 'webhook' },
     { label: 'Logs', href: '/dashboard/logs', icon: 'list_alt' },
   ];
