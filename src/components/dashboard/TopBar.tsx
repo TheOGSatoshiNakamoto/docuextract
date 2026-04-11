@@ -2,11 +2,24 @@
 
 import { useEffect, useState } from 'react';
 import { getSupabaseClient } from '@/lib/supabase';
+import CommandPalette from './CommandPalette';
 
 export default function TopBar() {
   const [userName, setUserName] = useState('');
   const [userPlan, setUserPlan] = useState('free');
   const [userAvatar, setUserAvatar] = useState('');
+  const [paletteOpen, setPaletteOpen] = useState(false);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setPaletteOpen((o) => !o);
+      }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   useEffect(() => {
     const supabase = getSupabaseClient();
@@ -29,16 +42,15 @@ export default function TopBar() {
   return (
     <header className="bg-[#0a0c12]/80 backdrop-blur-xl sticky top-0 z-40 border-b border-outline-variant/10 flex justify-between items-center px-6 md:px-8 py-3 w-full">
       <div className="flex items-center gap-6">
-        <div className="relative group">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40 text-sm">
-            search
-          </span>
-          <input
-            className="bg-surface-container-lowest border-none text-xs text-on-surface-variant w-64 md:w-80 pl-10 pr-4 py-2.5 rounded-lg focus:ring-1 focus:ring-primary/50 focus:outline-none transition-all placeholder:text-on-surface-variant/30"
-            placeholder="Search resources, logs, or documentation..."
-            type="text"
-          />
-        </div>
+        <button
+          onClick={() => setPaletteOpen(true)}
+          className="flex items-center gap-2 bg-surface-container-lowest text-xs text-on-surface-variant/30 w-64 md:w-80 pl-3 pr-3 py-2.5 rounded-lg hover:bg-surface-container-low transition-all text-left"
+        >
+          <span className="material-symbols-outlined text-sm">search</span>
+          <span className="flex-1">Search or jump to...</span>
+          <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono bg-surface-container-high text-on-surface-variant/40 rounded border border-outline-variant/15">⌘K</kbd>
+        </button>
+        <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
       </div>
       <div className="flex items-center gap-3">
         <button className="p-2 text-on-surface-variant/50 hover:text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg">
