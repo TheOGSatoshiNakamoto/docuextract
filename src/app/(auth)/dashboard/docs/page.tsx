@@ -12,8 +12,8 @@ const css = `
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'SF Mono', 'Fira Code', Consolas, monospace;
 }
-.docs-layout { display: flex; height: 100%; font-family: var(--font-sans); color: var(--text); font-size: 15px; line-height: 1.6; overflow: hidden; }
-.docs-toc { width: clamp(200px, 22%, 260px); border-right: 1px solid var(--border); position: sticky; top: 0; height: 100vh; overflow-y: auto; padding: 24px 0; flex-shrink: 0; background: var(--bg-card); z-index: 5; transition: width 0.2s; }
+.docs-layout { display: flex; height: calc(100vh - 90px); font-family: var(--font-sans); color: var(--text); font-size: 15px; line-height: 1.6; overflow: hidden; }
+.docs-toc { width: clamp(200px, 22%, 260px); border-right: 1px solid var(--border); height: 100%; overflow-y: auto; padding: 24px 0; flex-shrink: 0; background: var(--bg-card); z-index: 5; transition: width 0.2s; }
 .docs-main-wrapper { flex: 1; overflow-y: auto; scroll-behavior: smooth; min-width: 0; }
 .docs-toc-toggle { display: none; }
 .docs-toc-logo { padding: 0 16px 16px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
