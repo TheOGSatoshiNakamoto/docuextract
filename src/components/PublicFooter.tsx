@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Shared footer for ALL public pages. Single source of truth for site-wide navigation.
  * Uses inline CSS pattern (no Tailwind) matching the public page design system.
