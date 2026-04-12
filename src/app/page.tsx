@@ -1006,8 +1006,8 @@ result = client.<span class="tok-fn">extract</span>(
         <div class="plan-period">forever</div>
         <a href="/playground" class="plan-cta plan-cta-outline">Get started</a>
         <ul class="plan-features">
-          <li><strong>100</strong> extractions / month</li>
-          <li>10 requests / minute</li>
+          <li><strong>50</strong> extractions / month</li>
+          <li>5 requests / minute</li>
           <li>Haiku model (fast)</li>
           <li>PDF, PNG, JPG, WEBP</li>
           <li>Custom JSON schemas</li>
@@ -1023,12 +1023,12 @@ result = client.<span class="tok-fn">extract</span>(
         <div class="plan-period">billed monthly</div>
         <a href="/playground" class="plan-cta plan-cta-filled">Start free trial</a>
         <ul class="plan-features">
-          <li><strong>2,500</strong> extractions / month</li>
+          <li><strong>1,500</strong> extractions / month</li>
           <li>30 requests / minute</li>
-          <li>Haiku + Sonnet models</li>
+          <li>Haiku + Sonnet (3x cost)</li>
           <li>Custom JSON schemas</li>
           <li>Email support</li>
-          <li>$0.05 / extra extraction</li>
+          <li>$0.04 / extra extraction</li>
         </ul>
       </div>
 
@@ -1039,12 +1039,12 @@ result = client.<span class="tok-fn">extract</span>(
         <div class="plan-period">billed monthly</div>
         <a href="/playground" class="plan-cta plan-cta-outline">Get started</a>
         <ul class="plan-features">
-          <li><strong>10,000</strong> extractions / month</li>
+          <li><strong>5,000</strong> extractions / month</li>
           <li>60 requests / minute</li>
-          <li>Haiku + Sonnet models</li>
+          <li>Haiku + Sonnet (3x cost)</li>
           <li>Custom JSON schemas</li>
           <li>Priority email support</li>
-          <li>$0.05 / extra extraction</li>
+          <li>$0.025 / extra extraction</li>
         </ul>
       </div>
 
@@ -1055,12 +1055,12 @@ result = client.<span class="tok-fn">extract</span>(
         <div class="plan-period">billed monthly</div>
         <a href="/playground" class="plan-cta plan-cta-outline">Get started</a>
         <ul class="plan-features">
-          <li><strong>50,000</strong> extractions / month</li>
+          <li><strong>20,000</strong> extractions / month</li>
           <li>120 requests / minute</li>
           <li>All models + priority queue</li>
           <li>Custom JSON schemas</li>
           <li>Slack + email support</li>
-          <li>$0.05 / extra extraction</li>
+          <li>$0.015 / extra extraction</li>
         </ul>
       </div>
     </div>
@@ -1118,7 +1118,7 @@ result = client.<span class="tok-fn">extract</span>(
 <section class="cta-banner">
   <div class="container">
     <h2>Start extracting in 5 minutes</h2>
-    <p>Free tier includes 100 extractions/month. No credit card required.</p>
+    <p>Free tier includes 50 extractions/month. No credit card required.</p>
     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
       <a href="/playground" class="btn btn-primary">Try it free</a>
       <a href="/docs" class="btn btn-outline">Read the docs</a>
@@ -1136,6 +1136,8 @@ result = client.<span class="tok-fn">extract</span>(
       <a href="/playground">Playground</a>
       <a href="/dashboard">Dashboard</a>
       <a href="/pricing">Pricing</a>
+      <a href="/blog">Blog</a>
+      <a href="/changelog">Changelog</a>
       <a href="https://github.com/TheOGSatoshiNakamoto/docuextract" target="_blank">GitHub</a>
     </div>
 

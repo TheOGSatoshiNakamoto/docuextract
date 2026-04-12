@@ -30,9 +30,11 @@ export default function PublicNav() {
 
   const links = [
     { href: '/playground', label: 'Playground' },
+    { href: '/use-cases', label: 'Use Cases' },
     { href: '/docs', label: 'Docs' },
     { href: '/pricing', label: 'Pricing' },
     { href: '/blog', label: 'Blog' },
+    { href: '/changelog', label: 'Changelog' },
   ];
 
   return (
