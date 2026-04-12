@@ -23,6 +23,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {/* TODO: Re-add status page link when BetterUptime/Statuspage is configured */}
             <a className="hover:text-primary transition-colors" href="/terms">Terms</a>
             <a className="hover:text-primary transition-colors" href="/privacy">Privacy</a>
+            <a className="hover:text-primary transition-colors" href="/acceptable-use">Acceptable Use</a>
             <a className="hover:text-primary transition-colors" href="/security">Security</a>
           </div>
         </footer>

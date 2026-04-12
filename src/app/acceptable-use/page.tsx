@@ -1,4 +1,5 @@
 import PublicNav from '@/components/PublicNav';
+import PublicFooter from '@/components/PublicFooter';
 import { legalCss } from '@/content/legal-styles';
 
 export default function AcceptableUsePage() {
@@ -144,15 +145,7 @@ export default function AcceptableUsePage() {
           </p>
         </div>
       </div>
-      <footer className="legal-footer">
-        <span className="brand">Docu<em>Extract</em></span>
-        <div className="legal-footer-links">
-          <a href="/terms">Terms</a>
-          <a href="/privacy">Privacy</a>
-          <a href="/acceptable-use">Acceptable Use</a>
-          <a href="/security">Security</a>
-        </div>
-      </footer>
+      <PublicFooter />
     </>
   );
 }

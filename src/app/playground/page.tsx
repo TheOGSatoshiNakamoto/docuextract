@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import PublicNav from '@/components/PublicNav';
+import PublicFooter from '@/components/PublicFooter';
 
 // ── Inline CSS ────────────────────────────────────────────────────────────────
 
@@ -119,16 +120,6 @@ a:hover { text-decoration: underline; }
 .cta-inner { background: linear-gradient(135deg, rgba(108,142,245,0.1), rgba(192,132,252,0.06)); border: 1px solid rgba(108,142,245,0.2); border-radius: 12px; padding: 28px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
 .cta-inner h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
 .cta-inner p { color: var(--text-muted); font-size: 13px; }
-
-/* ── FOOTER ── */
-footer { border-top: 1px solid var(--border); padding: 40px 24px; }
-.footer-inner { max-width: var(--max-w); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
-.footer-logo { font-weight: 700; font-size: 16px; color: var(--text); }
-.footer-logo span { color: var(--accent); }
-.footer-links { display: flex; gap: 24px; }
-.footer-links a { font-size: 13px; color: var(--text-muted); transition: color 0.15s; }
-.footer-links a:hover { color: var(--text); text-decoration: none; }
-.footer-copy { font-size: 13px; color: var(--text-muted); }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
@@ -585,19 +576,7 @@ print(data)`,
         </div>
       )}
 
-      {/* FOOTER */}
-      <footer>
-        <div className="footer-inner">
-          <span className="footer-logo">Docu<span>Extract</span></span>
-          <div className="footer-links">
-            <a href="/docs">Docs</a>
-            <a href="/pricing">Pricing</a>
-            <a href="/playground">Playground</a>
-            <a href="/use-cases">Use Cases</a>
-          </div>
-          <span className="footer-copy">Built with Claude AI</span>
-        </div>
-      </footer>
+      <PublicFooter />
     </>
   );
 }

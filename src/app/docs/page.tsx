@@ -2,6 +2,7 @@
 
 import Script from 'next/script';
 import { DocsSections, publicContext, tocItems, docsScript } from '@/content/docs-data';
+import PublicFooter from '@/components/PublicFooter';
 
 const css = `
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -163,32 +164,7 @@ export default function DocsPage() {
         </main>
       </div>
 
-      <footer style={{
-        borderTop: '1px solid var(--border)',
-        padding: '40px 24px',
-        marginLeft: 0,
-      }}>
-        <div style={{
-          maxWidth: 1100,
-          margin: '0 auto',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap' as const,
-          gap: 20,
-        }}>
-          <span style={{ fontWeight: 700, fontSize: 16, color: 'var(--text)' }}>
-            Docu<span style={{ color: 'var(--accent)' }}>Extract</span>
-          </span>
-          <div style={{ display: 'flex', gap: 24 }}>
-            <a href="/docs" style={{ fontSize: 13, color: 'var(--text-muted)', textDecoration: 'none', transition: 'color 0.15s' }}>Docs</a>
-            <a href="/pricing" style={{ fontSize: 13, color: 'var(--text-muted)', textDecoration: 'none', transition: 'color 0.15s' }}>Pricing</a>
-            <a href="/playground" style={{ fontSize: 13, color: 'var(--text-muted)', textDecoration: 'none', transition: 'color 0.15s' }}>Playground</a>
-            <a href="/blog" style={{ fontSize: 13, color: 'var(--text-muted)', textDecoration: 'none', transition: 'color 0.15s' }}>Blog</a>
-          </div>
-          <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Built with Claude AI</span>
-        </div>
-      </footer>
+      <PublicFooter />
 
       <Script id="docs-js" strategy="afterInteractive">{`
         ${docsScript}

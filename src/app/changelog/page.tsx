@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import PublicNav from '@/components/PublicNav';
+import PublicFooter from '@/components/PublicFooter';
 
 export const metadata: Metadata = {
   title: 'Changelog | DocuExtract',
@@ -49,15 +50,6 @@ a:hover { text-decoration: underline; }
 .entry-body ul { margin: 8px 0 0 18px; }
 .entry-body li { margin-bottom: 4px; }
 .entry-body code { background: var(--bg-code); border: 1px solid var(--border); padding: 1px 5px; border-radius: 4px; font-family: var(--font-mono); font-size: 12px; }
-
-footer { border-top: 1px solid var(--border); padding: 40px 24px; }
-.footer-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
-.footer-logo { font-weight: 700; font-size: 16px; color: var(--text); }
-.footer-logo span { color: var(--accent); }
-.footer-links { display: flex; gap: 24px; }
-.footer-links a { font-size: 13px; color: var(--text-muted); transition: color 0.15s; }
-.footer-links a:hover { color: var(--text); text-decoration: none; }
-.footer-copy { font-size: 13px; color: var(--text-muted); }
 
 @media (max-width: 600px) {
   .timeline::before { left: calc(16px + 7px); }
@@ -127,7 +119,7 @@ const ENTRIES = [
     body: `<ul>
       <li>Stripe webhook handler with signature verification and idempotent processing</li>
       <li>Checkout and billing portal endpoints</li>
-      <li>Metered overage: $0.05/extraction beyond plan limit, auto-reported to Stripe</li>
+      <li>Metered overage: per-plan rates ($0.04–$0.015/extraction) beyond plan limit, auto-reported to Stripe</li>
       <li>E2E billing test script for full lifecycle verification</li>
     </ul>`,
   },
@@ -191,19 +183,7 @@ export default function ChangelogPage() {
         ))}
       </div>
 
-      <footer>
-        <div className="footer-inner">
-          <span className="footer-logo">Docu<span>Extract</span></span>
-          <div className="footer-links">
-            <a href="/docs">Docs</a>
-            <a href="/pricing">Pricing</a>
-            <a href="/playground">Playground</a>
-            <a href="/blog">Blog</a>
-            <a href="/changelog">Changelog</a>
-          </div>
-          <span className="footer-copy">Built with Claude AI</span>
-        </div>
-      </footer>
+      <PublicFooter />
     </>
   );
 }

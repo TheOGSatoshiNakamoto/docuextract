@@ -1,4 +1,5 @@
 import PublicNav from '@/components/PublicNav';
+import PublicFooter from '@/components/PublicFooter';
 
 // Static CSS — no user input, safe for dangerouslySetInnerHTML.
 const css = `
@@ -24,11 +25,6 @@ body { font-family: var(--font-sans); background: var(--bg); color: var(--text);
 .legal a:hover { text-decoration: underline; }
 .legal .badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.2); color: var(--green); font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; margin-bottom: 32px; }
 .legal .badge::before { content: ''; width: 6px; height: 6px; background: var(--green); border-radius: 50%; }
-.legal-footer { max-width: var(--max-w); margin: 0 auto; padding: 40px 24px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
-.legal-footer span { font-weight: 700; font-size: 16px; }
-.legal-footer span em { color: var(--accent); font-style: normal; }
-.legal-footer a { font-size: 13px; color: var(--text-muted); text-decoration: none; }
-.legal-footer a:hover { color: var(--text); }
 `;
 
 export default function SecurityPage() {
@@ -81,15 +77,7 @@ export default function SecurityPage() {
         <p>We are working toward SOC 2 Type II certification. All infrastructure providers are already SOC 2 compliant. Contact us at <a href="mailto:security@docuextract.dev">security@docuextract.dev</a> for security questionnaires or vendor assessments.</p>
       </div>
 
-      <footer className="legal-footer">
-        <span>Docu<em>Extract</em></span>
-        <div style={{ display: 'flex', gap: 24 }}>
-          <a href="/docs">Docs</a>
-          <a href="/pricing">Pricing</a>
-          <a href="/security">Security</a>
-          <a href="/privacy">Privacy</a>
-        </div>
-      </footer>
+      <PublicFooter />
     </>
   );
 }

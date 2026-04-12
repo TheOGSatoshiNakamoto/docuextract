@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import PublicNav from '@/components/PublicNav';
+import PublicFooter from '@/components/PublicFooter';
 
 // Pricing values below are verified to match src/lib/plans.ts (server-only).
 // Free: 50/$0, Starter: 1500/$49, Pro: 5000/$99, Scale: 20000/$249.
@@ -205,19 +206,6 @@ a:hover { text-decoration: underline; }
 }
 .cta-banner h2 { font-size: clamp(22px, 4vw, 38px); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 14px; }
 .cta-banner p { color: var(--text-muted); font-size: 16px; margin-bottom: 28px; }
-
-/* ── FOOTER ── */
-footer { border-top: 1px solid var(--border); padding: 40px 24px; }
-.footer-inner {
-  max-width: var(--max-w); margin: 0 auto;
-  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;
-}
-.footer-logo { font-weight: 700; font-size: 16px; color: var(--text); }
-.footer-logo span { color: var(--accent); }
-.footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
-.footer-links a { font-size: 13px; color: var(--text-muted); transition: color 0.15s; }
-.footer-links a:hover { color: var(--text); text-decoration: none; }
-.footer-copy { font-size: 13px; color: var(--text-muted); }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 900px) {
@@ -539,20 +527,7 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer>
-        <div className="footer-inner">
-          <span className="footer-logo">Docu<span>Extract</span></span>
-          <div className="footer-links">
-            <a href="/docs">Docs</a>
-            <a href="/pricing">Pricing</a>
-            <a href="/playground">Playground</a>
-            <a href="/blog">Blog</a>
-            <a href="/changelog">Changelog</a>
-          </div>
-          <span className="footer-copy">Built with Claude AI</span>
-        </div>
-      </footer>
+      <PublicFooter />
     </>
   );
 }

@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { notFound } from 'next/navigation';
 import PublicNav from '@/components/PublicNav';
+import PublicFooter from '@/components/PublicFooter';
 
 // ── Markdown parsing (lightweight, no external deps) ──────────────────────────
 
@@ -176,15 +177,6 @@ a:hover { text-decoration: underline; }
 .btn-primary { background: var(--accent); color: #fff; }
 .btn-primary:hover { background: var(--accent-hover); text-decoration: none; }
 
-footer { border-top: 1px solid var(--border); padding: 40px 24px; }
-.footer-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
-.footer-logo { font-weight: 700; font-size: 16px; color: var(--text); }
-.footer-logo span { color: var(--accent); }
-.footer-links { display: flex; gap: 24px; }
-.footer-links a { font-size: 13px; color: var(--text-muted); transition: color 0.15s; }
-.footer-links a:hover { color: var(--text); text-decoration: none; }
-.footer-copy { font-size: 13px; color: var(--text-muted); }
-
 @media (max-width: 600px) {
   .article-header { padding-top: 40px; }
 }
@@ -228,25 +220,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       <div className="article-cta">
         <div className="cta-card">
           <h3>Try DocuExtract for free</h3>
-          <p>100 extractions/month. No credit card. Extract data from any document in seconds.</p>
+          <p>50 extractions/month. No credit card. Extract data from any document in seconds.</p>
           <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
             <a href="/playground" className="btn btn-primary">Try the playground →</a>
           </div>
         </div>
       </div>
 
-      <footer>
-        <div className="footer-inner">
-          <span className="footer-logo">Docu<span>Extract</span></span>
-          <div className="footer-links">
-            <a href="/docs">Docs</a>
-            <a href="/pricing">Pricing</a>
-            <a href="/playground">Playground</a>
-            <a href="/blog">Blog</a>
-          </div>
-          <span className="footer-copy">Built with Claude AI</span>
-        </div>
-      </footer>
+      <PublicFooter />
     </>
   );
 }

@@ -2,6 +2,7 @@
 
 import Script from 'next/script';
 import PublicNav from '@/components/PublicNav';
+import PublicFooter from '@/components/PublicFooter';
 
 const css = `
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -692,46 +693,6 @@ const css = `
 
     .cta-banner .btn { font-size: 15px; padding: 14px 28px; }
 
-    /* ── FOOTER ── */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 40px 24px;
-    }
-
-    .footer-inner {
-      max-width: var(--max-w);
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-
-    .footer-logo {
-      font-weight: 700;
-      font-size: 16px;
-      color: var(--text);
-    }
-
-    .footer-logo span { color: var(--accent); }
-
-    .footer-links {
-      display: flex;
-      gap: 24px;
-      flex-wrap: wrap;
-    }
-
-    .footer-links a {
-      font-size: 13px;
-      color: var(--text-muted);
-      transition: color 0.15s;
-    }
-
-    .footer-links a:hover { color: var(--text); text-decoration: none; }
-
-    .footer-copy { font-size: 13px; color: var(--text-muted); }
-
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
       .nav-links { display: none; }
@@ -1126,24 +1087,6 @@ result = client.<span class="tok-fn">extract</span>(
   </div>
 </section>
 
-<!-- ── FOOTER ─────────────────────────────────────────────────────────────── -->
-<footer>
-  <div class="footer-inner">
-    <div class="footer-logo">Docu<span>Extract</span></div>
-
-    <div class="footer-links">
-      <a href="/docs">Documentation</a>
-      <a href="/playground">Playground</a>
-      <a href="/dashboard">Dashboard</a>
-      <a href="/pricing">Pricing</a>
-      <a href="/blog">Blog</a>
-      <a href="/changelog">Changelog</a>
-      <a href="https://github.com/TheOGSatoshiNakamoto/docuextract" target="_blank">GitHub</a>
-    </div>
-
-    <div class="footer-copy">&copy; 2026 DocuExtract. All rights reserved.</div>
-  </div>
-</footer>
 `;
 
 export default function HomePage() {
@@ -1152,6 +1095,7 @@ export default function HomePage() {
       <style dangerouslySetInnerHTML={{ __html: css }} />
       <PublicNav />
       <div dangerouslySetInnerHTML={{ __html: bodyHtml }} />
+      <PublicFooter />
       <Script id="landing-js" strategy="afterInteractive">{`
 // ── Code tab switcher ──────────────────────────────────────────────────────
   document.querySelectorAll('.code-tab').forEach(tab => {

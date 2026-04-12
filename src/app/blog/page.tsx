@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import fs from 'fs';
 import path from 'path';
 import PublicNav from '@/components/PublicNav';
+import PublicFooter from '@/components/PublicFooter';
 
 export const metadata: Metadata = {
   title: 'Blog | DocuExtract',
@@ -104,15 +105,6 @@ a:hover { text-decoration: underline; }
 .post-tag { font-size: 11px; padding: 2px 8px; background: var(--accent-dim); border: 1px solid rgba(108,142,245,0.2); color: var(--accent); border-radius: 12px; }
 .post-cta { font-size: 13px; color: var(--accent); font-weight: 500; margin-top: 12px; }
 
-footer { border-top: 1px solid var(--border); padding: 40px 24px; }
-.footer-inner { max-width: var(--max-w); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
-.footer-logo { font-weight: 700; font-size: 16px; color: var(--text); }
-.footer-logo span { color: var(--accent); }
-.footer-links { display: flex; gap: 24px; }
-.footer-links a { font-size: 13px; color: var(--text-muted); transition: color 0.15s; }
-.footer-links a:hover { color: var(--text); text-decoration: none; }
-.footer-copy { font-size: 13px; color: var(--text-muted); }
-
 @media (max-width: 600px) {
   .posts-grid { grid-template-columns: 1fr; }
 }
@@ -164,18 +156,7 @@ export default function BlogPage() {
         </div>
       )}
 
-      <footer>
-        <div className="footer-inner">
-          <span className="footer-logo">Docu<span>Extract</span></span>
-          <div className="footer-links">
-            <a href="/docs">Docs</a>
-            <a href="/pricing">Pricing</a>
-            <a href="/playground">Playground</a>
-            <a href="/blog">Blog</a>
-          </div>
-          <span className="footer-copy">Built with Claude AI</span>
-        </div>
-      </footer>
+      <PublicFooter />
     </>
   );
 }
