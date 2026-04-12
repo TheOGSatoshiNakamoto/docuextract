@@ -12,6 +12,7 @@ import ExtractionDetailPanel from '@/components/dashboard/extractions/Extraction
 
 interface Extraction {
   id: string;
+  external_id: string | null;
   document_type: string | null;
   status: string;
   processing_time_ms: number | null;
@@ -71,7 +72,7 @@ export default function ExtractionsPage() {
       try {
         const { data } = await supabase
           .from('api_usage')
-          .select('id, document_type, status, processing_time_ms, confidence_score, created_at, model_used, input_tokens, output_tokens, error_message')
+          .select('id, external_id, document_type, status, processing_time_ms, confidence_score, created_at, model_used, input_tokens, output_tokens, error_message')
           .eq('user_id', session.user.id)
           .order('created_at', { ascending: false })
           .limit(500);
@@ -213,7 +214,7 @@ export default function ExtractionsPage() {
                         <td className="p-4">
                           <div className="text-xs text-on-surface">{relativeTime(ex.created_at)}</div>
                           <div className="text-[10px] text-on-surface-variant/50 font-mono">
-                            {new Date(ex.created_at).toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                            {ex.external_id ?? ex.id.slice(0, 8)}
                           </div>
                         </td>
                         <td className="p-4">

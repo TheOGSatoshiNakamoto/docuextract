@@ -1,7 +1,16 @@
 import 'server-only';
 import { createClient } from '@supabase/supabase-js';
+import { nanoid } from 'nanoid';
 import type { UsageDayBreakdown, UsageRecord, UsageResponse } from './types';
 import type { User } from './types';
+
+/**
+ * Generates a user-facing extraction ID in the format ext_<8chars>.
+ * Uses nanoid with URL-safe alphabet for compact, collision-resistant IDs.
+ */
+export function generateExternalId(): string {
+  return `ext_${nanoid(8)}`;
+}
 
 function getSupabaseAdmin() {
   const url = process.env['SUPABASE_URL'];
@@ -111,19 +120,28 @@ function sanitizeRecord(record: UsageRecord): UsageRecord {
  *
  * Records are sanitized before insertion to prevent NaN, Infinity, or
  * out-of-range values from reaching PostgreSQL.
+ *
+ * Returns the generated external_id (ext_<8chars>) for use in API responses
+ * and webhook payloads. Returns null if the insert fails.
  */
-export async function logUsage(record: UsageRecord): Promise<void> {
+export async function logUsage(record: UsageRecord): Promise<string | null> {
   try {
     const sanitized = sanitizeRecord(record);
-    const { error } = await getSupabaseAdmin().from('api_usage').insert(sanitized);
+    const externalId = generateExternalId();
+    const { error } = await getSupabaseAdmin()
+      .from('api_usage')
+      .insert({ ...sanitized, external_id: externalId });
     if (error) {
       console.error(
         JSON.stringify({ level: 'error', message: 'Failed to log usage', error: error.message, userId: record.user_id }),
       );
+      return null;
     }
+    return externalId;
   } catch (err) {
     console.error(
       JSON.stringify({ level: 'error', message: 'Usage logging exception', error: String(err), userId: record.user_id }),
     );
+    return null;
   }
 }

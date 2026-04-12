@@ -7,10 +7,10 @@ import Link from 'next/link';
 // ── Plan definitions (static, correction #14: added rate limits) ──────────────
 
 const PLANS = [
-  { key: 'free', label: 'Free', subtitle: 'Entry', price: 0, calls: 100, rateLimit: '10/min', model: 'AI-Powered Extraction (Haiku)', features: ['100 API Calls / Mo', 'AI-Powered Extraction (Haiku)', '10 req/min rate limit'], cta: 'current' },
-  { key: 'starter', label: 'Starter', subtitle: 'Growth', price: 49, calls: 2500, rateLimit: '30/min', model: 'All AI Models (Haiku + Sonnet)', features: ['2,500 API Calls / Mo', 'All AI Models (Haiku + Sonnet)', '30 req/min rate limit', 'Priority Email Support', 'Webhook Integration'], cta: 'upgrade' },
-  { key: 'pro', label: 'Pro', subtitle: 'Production', price: 99, calls: 10000, rateLimit: '60/min', model: 'All AI Models (Haiku + Sonnet)', features: ['10,000 API Calls / Mo', 'All AI Models (Haiku + Sonnet)', '60 req/min rate limit', 'Priority Email Support', 'Webhook Integration'], cta: 'upgrade', popular: true },
-  { key: 'scale', label: 'Scale', subtitle: 'Volume', price: 249, calls: 50000, rateLimit: '120/min', model: 'All AI Models + Priority Processing', features: ['50,000 API Calls / Mo', 'All AI Models + Priority Processing', '120 req/min rate limit', 'Priority Processing + Dedicated Support', 'Custom Rate Limits'], cta: 'upgrade' },
+  { key: 'free', label: 'Free', subtitle: 'Entry', price: 0, calls: 50, rateLimit: '5/min', model: 'AI-Powered Extraction (Haiku only)', features: ['50 API Calls / Mo', 'AI-Powered Extraction (Haiku only)', '5 req/min rate limit'], cta: 'current' },
+  { key: 'starter', label: 'Starter', subtitle: 'Growth', price: 49, calls: 1500, rateLimit: '30/min', model: 'Haiku + Sonnet (3x cost)', features: ['1,500 API Calls / Mo', 'Haiku + Sonnet (3x cost)', '30 req/min rate limit', 'Priority Email Support', '$0.04/call overage'], cta: 'upgrade' },
+  { key: 'pro', label: 'Pro', subtitle: 'Production', price: 99, calls: 5000, rateLimit: '60/min', model: 'Haiku + Sonnet (3x cost)', features: ['5,000 API Calls / Mo', 'Haiku + Sonnet (3x cost)', '60 req/min rate limit', 'Priority Email Support', '$0.025/call overage'], cta: 'upgrade', popular: true },
+  { key: 'scale', label: 'Scale', subtitle: 'Volume', price: 249, calls: 20000, rateLimit: '120/min', model: 'All AI Models + Priority Processing', features: ['20,000 API Calls / Mo', 'All AI Models + Priority Processing', '120 req/min rate limit', 'Priority Processing + Dedicated Support', '$0.015/call overage'], cta: 'upgrade' },
 ];
 
 // ── Page ──────────────────────────────────────────────────────────────────────
@@ -42,15 +42,16 @@ export default function BillingPage() {
         setMonthlyLimit(data.monthly_limit ?? 100);
       }
 
+      // Authoritative usage count from /api/usage/current (successful extractions only)
       try {
-        const now = new Date();
-        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-        const { count } = await supabase
-          .from('api_usage')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', session.user.id)
-          .gte('created_at', monthStart);
-        setUsageCount(count ?? 0);
+        const usageRes = await fetch('/api/usage/current');
+        if (usageRes.ok) {
+          const usageJson = await usageRes.json();
+          setUsageCount(usageJson.count ?? 0);
+          // Also update limit/plan from authoritative source
+          if (usageJson.limit) setMonthlyLimit(usageJson.limit);
+          if (usageJson.plan) setUserPlan(usageJson.plan);
+        }
       } catch { /* non-blocking */ }
       finally { setLoading(false); }
     });

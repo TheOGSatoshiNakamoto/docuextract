@@ -15,6 +15,7 @@ import {
 } from '@/lib/errors';
 import { captureException } from '@/lib/sentry';
 import type { ExtractRequest, DocumentType, ModelMode } from '@/lib/types';
+import { PLANS, SONNET_MULTIPLIER } from '@/lib/plans';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -85,7 +86,15 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       input_tokens: null, output_tokens: null, processing_time_ms: Date.now() - requestStart,
       confidence_score: null, status: 'rate_limited', error_message: 'Rate limit exceeded',
     });
-    const resp = errorRateLimited(60);
+
+    // Distinguish monthly cap (free users hard-blocked) from per-minute rate limit
+    const isMonthlyLimit = rateLimit.remainingMonth <= 0;
+    const rlPlanConfig = PLANS[user.plan as keyof typeof PLANS];
+    const message = isMonthlyLimit && user.plan === 'free'
+      ? `You've reached your ${rlPlanConfig.extractions} extraction limit for this month. Upgrade to Starter for ${PLANS.starter.extractions.toLocaleString()} monthly extractions.`
+      : `Rate limit exceeded: ${rlPlanConfig.rateLimit} requests per minute on your ${rlPlanConfig.name} plan.`;
+
+    const resp = errorRateLimited(60, message);
     Object.entries(rlHeaders).forEach(([k, v]) => resp.headers.set(k, v));
     return resp;
   }
@@ -103,6 +112,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 
   const modelMode: ModelMode = body.model === 'accurate' ? 'accurate' : 'fast';
+
+  // Block free users from Sonnet
+  const planConfig = PLANS[user.plan as keyof typeof PLANS];
+
+  // Block free users from Sonnet
+  if (modelMode === 'accurate' && !planConfig.sonnetAccess) {
+    return errorResponse(
+      'forbidden',
+      'Sonnet model is not available on the Free plan. Upgrade to Starter ($49/mo) for Sonnet access.',
+    );
+  }
 
   if (body.type !== undefined && !VALID_TYPES.has(body.type)) {
     return errorInvalidRequest(
@@ -160,7 +180,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 
   // ── 7. Log successful usage and report overage to Stripe ─────────────────
-  void logUsage({
+  // Await logUsage for success to get the external_id for the API response.
+  const externalId = await logUsage({
     user_id: user.id, endpoint, document_type: documentType,
     model_used: result.modelUsed,
     input_tokens: result.inputTokens,
@@ -171,14 +192,18 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     error_message: null,
   });
 
+  // Sonnet calls deduct 3 extractions from the plan allocation
+  const usageDeduction = modelMode === 'accurate' ? SONNET_MULTIPLIER : 1;
+
   // Overage reporting: fire-and-forget, never blocks the response.
-  // Free users are rate-limited at their cap — no Stripe reporting needed.
+  // Free users are hard-blocked at their cap — no Stripe reporting needed.
   if (user.plan !== 'free' && user.stripe_customer_id) {
     void (async () => {
       try {
         const monthlyCount = await getMonthlyUsageCount(user.id);
         if (monthlyCount >= user.monthly_limit) {
-          await reportUsageToStripe(user.stripe_customer_id as string, 1);
+          // Report overage quantity (Sonnet overage = 3x base overage rate)
+          await reportUsageToStripe(user.stripe_customer_id as string, usageDeduction);
         }
       } catch (err) {
         console.error(JSON.stringify({
@@ -199,6 +224,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const resp = NextResponse.json({
     data: sanitizedData,
     metadata: {
+      extraction_id: externalId ?? undefined,
       type: documentType,
       confidence: clampedConfidence,
       model: result.modelUsed,
@@ -207,5 +233,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     },
   });
   Object.entries(rlHeaders).forEach(([k, v]) => resp.headers.set(k, v));
+  resp.headers.set('X-Plan-Limit', String(user.monthly_limit));
+  if (modelMode === 'accurate') {
+    resp.headers.set('X-Sonnet-Multiplier', String(SONNET_MULTIPLIER));
+  }
   return resp;
 }

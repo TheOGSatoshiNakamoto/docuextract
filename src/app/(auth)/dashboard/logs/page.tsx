@@ -119,7 +119,7 @@ function InspectorPanel({ row, onClose }: { row: SafeApiUsageRow; onClose: () =>
           <>
             <div className="grid grid-cols-2 gap-3">
               {[
-                { label: 'Request ID', value: row.id.slice(0, 8) },
+                { label: 'Request ID', value: row.external_id ?? row.id.slice(0, 8) },
                 { label: 'Model', value: modelName },
                 { label: 'Auth', value: maskedKey },
                 { label: 'Tokens', value: `${row.input_tokens ?? '—'} in / ${row.output_tokens ?? '—'} out` },
@@ -210,7 +210,7 @@ export default function LogsPage() {
       try {
         const { data } = await supabase
           .from('api_usage')
-          .select('id, document_type, status, processing_time_ms, confidence_score, created_at, model_used, input_tokens, output_tokens, error_message')
+          .select('id, external_id, document_type, status, processing_time_ms, confidence_score, created_at, model_used, input_tokens, output_tokens, error_message')
           .eq('user_id', session.user.id)
           .order('created_at', { ascending: false })
           .limit(500);
@@ -230,7 +230,7 @@ export default function LogsPage() {
       const lastTs = rows[0]?.created_at;
       let query = supabase
         .from('api_usage')
-        .select('id, document_type, status, processing_time_ms, confidence_score, created_at, model_used, input_tokens, output_tokens, error_message')
+        .select('id, external_id, document_type, status, processing_time_ms, confidence_score, created_at, model_used, input_tokens, output_tokens, error_message')
         .eq('user_id', session.user.id)
         .order('created_at', { ascending: false })
         .limit(50);

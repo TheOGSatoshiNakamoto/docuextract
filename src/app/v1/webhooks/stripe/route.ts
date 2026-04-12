@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
-import { invalidateAuthCache } from '@/lib/auth';
+import { invalidateAuthCache, invalidateAuthCacheByUserId } from '@/lib/auth';
 import { captureException } from '@/lib/sentry';
 import type { Plan } from '@/lib/types';
 
@@ -77,7 +77,10 @@ async function handleSubscriptionUpsert(
     updated_at: new Date().toISOString(),
   }).eq('id', user.id);
 
+  // Invalidate all cached auth entries for this user so new plan limits take
+  // effect immediately — not after the 60-second cache TTL expires.
   invalidateAuthCache((user as { id: string; api_key: string }).api_key);
+  invalidateAuthCacheByUserId(user.id);
   console.log(JSON.stringify({ level: 'info', message: 'Plan updated', userId: user.id, plan: planInfo.plan }));
 }
 
@@ -107,6 +110,7 @@ async function handleSubscriptionDeleted(
   }).eq('id', user.id);
 
   invalidateAuthCache((user as { id: string; api_key: string }).api_key);
+  invalidateAuthCacheByUserId(user.id);
   console.log(JSON.stringify({ level: 'info', message: 'Subscription cancelled — plan reverted to free', userId: user.id }));
 }
 

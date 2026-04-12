@@ -198,24 +198,18 @@ export default function DashboardPage() {
 
       if (userData.api_key) setApiKey(userData.api_key);
 
-      // Usage stats
+      // Usage stats — authoritative count from /api/usage/current (successful extractions only)
       try {
-        const now = new Date();
-        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-        const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString();
+        const usageRes = await fetch('/api/usage/current');
+        const usageJson = usageRes.ok ? await usageRes.json() : null;
 
-        const { count: usedCount } = await supabase
-          .from('api_usage')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', session.user.id)
-          .gte('created_at', monthStart)
-          .lte('created_at', monthEnd);
-
+        // Daily breakdown for spark chart (still needs direct query)
         const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString();
         const { data: dailyData } = await supabase
           .from('api_usage')
           .select('created_at')
           .eq('user_id', session.user.id)
+          .eq('status', 'success')
           .gte('created_at', thirtyDaysAgo)
           .order('created_at', { ascending: true });
 
@@ -232,10 +226,10 @@ export default function DashboardPage() {
         }
 
         setUsage({
-          used: usedCount ?? 0,
-          limit: userData?.monthly_limit ?? 100,
-          plan: userData?.plan ?? 'free',
-          period_end: monthEnd,
+          used: usageJson?.count ?? 0,
+          limit: usageJson?.limit ?? userData?.monthly_limit ?? 100,
+          plan: usageJson?.plan ?? userData?.plan ?? 'free',
+          period_end: usageJson?.period_end ?? new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString(),
           breakdown,
         });
       } catch (err) {

@@ -13,6 +13,7 @@
 
 export interface SafeApiUsageRow {
   id: string;
+  external_id: string | null;
   document_type: string;
   status: string;
   processing_time_ms: number | null;
@@ -27,6 +28,7 @@ export interface SafeApiUsageRow {
 export function sanitizeApiUsageRow(row: Record<string, unknown>): SafeApiUsageRow {
   return {
     id: String(row.id ?? ''),
+    external_id: row.external_id != null ? String(row.external_id) : null,
     document_type: String(row.document_type ?? 'generic'),
     status: String(row.status ?? 'error'),
     processing_time_ms: safeNumber(row.processing_time_ms),

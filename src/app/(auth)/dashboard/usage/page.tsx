@@ -245,7 +245,7 @@ function PlanUsageBar({ used, limit, plan, daysRemaining, projectedUsage }: {
           <div>
             <p className="text-xs font-bold text-on-surface mb-1">Projected to exceed limit</p>
             <p className="text-[10px] text-on-surface-variant/60">
-              On track to use ~{projectedUsage.toLocaleString()} calls. Overage: ~{overageCount.toLocaleString()} calls &times; $0.05 = ~${overageCost}
+              On track to use ~{projectedUsage.toLocaleString()} calls. Overage: ~{overageCount.toLocaleString()} calls at plan overage rate = ~${overageCost}
             </p>
           </div>
         </div>
@@ -256,7 +256,7 @@ function PlanUsageBar({ used, limit, plan, daysRemaining, projectedUsage }: {
           href="/dashboard/billing"
           className="inline-flex items-center gap-2 bg-primary-container text-white px-5 py-2.5 rounded-lg font-headline font-bold text-xs uppercase tracking-[0.15em] hover:brightness-110 transition-all"
         >
-          Upgrade to {plan === 'free' ? 'Starter' : 'Pro'} for {plan === 'free' ? '25x' : '4x'} the calls
+          Upgrade to {plan === 'free' ? 'Starter' : 'Pro'} for {plan === 'free' ? '30x' : '3x'} the calls
         </Link>
       ) : null}
     </div>
@@ -321,11 +321,28 @@ export default function UsagePage() {
   const [rows, setRows] = useState<ApiUsageRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<TimeRange>('billing');
+  const [authoritativeCount, setAuthoritativeCount] = useState<number | null>(null);
+  const [failedCount, setFailedCount] = useState<number>(0);
 
   useEffect(() => {
     const supabase = getSupabaseClient();
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) return;
+
+      // Authoritative usage count from /api/usage/current
+      try {
+        const usageRes = await fetch('/api/usage/current');
+        if (usageRes.ok) {
+          const usageJson = await usageRes.json();
+          setAuthoritativeCount(usageJson.count ?? 0);
+          setFailedCount(usageJson.failed ?? 0);
+          setUserData({
+            api_key: '',
+            plan: usageJson.plan ?? 'free',
+            monthly_limit: usageJson.limit ?? 100,
+          });
+        }
+      } catch { /* fall back to direct query below */ }
 
       const { data: ud } = await supabase
         .from('users')
@@ -335,7 +352,7 @@ export default function UsagePage() {
       if (ud) {
         const safe = sanitizeUserData(ud as Record<string, unknown>);
         if (safe) {
-          setUserData({ api_key: safe.api_key ?? '', plan: safe.plan, monthly_limit: safe.monthly_limit });
+          if (!userData) setUserData({ api_key: safe.api_key ?? '', plan: safe.plan, monthly_limit: safe.monthly_limit });
           setApiKey(safe.api_key);
         }
       }
@@ -351,6 +368,7 @@ export default function UsagePage() {
       } catch { /* non-blocking */ }
       finally { setLoading(false); }
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Compute all derived stats
@@ -529,12 +547,19 @@ export default function UsagePage() {
 
           {/* Plan usage bar */}
           <PlanUsageBar
-            used={stats.total}
+            used={authoritativeCount ?? stats.successCount}
             limit={limit}
             plan={plan}
             daysRemaining={stats.daysRemaining}
             projectedUsage={stats.projectedUsage}
           />
+
+          {/* Failed requests note */}
+          {failedCount > 0 && (
+            <p className="text-[10px] text-on-surface-variant/50 -mt-4 ml-1">
+              Includes only successful extractions. <a href="/dashboard/logs?status=4xx" className="text-primary hover:underline">{failedCount} request{failedCount !== 1 ? 's' : ''} failed</a> this period.
+            </p>
+          )}
 
           {/* Recent activity */}
           <RecentActivity rows={stats.recentRows} />
