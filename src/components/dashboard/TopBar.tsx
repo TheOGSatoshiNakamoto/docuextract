@@ -9,6 +9,11 @@ export default function TopBar() {
   const [userPlan, setUserPlan] = useState('free');
   const [userAvatar, setUserAvatar] = useState('');
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [isMac, setIsMac] = useState(true);
+
+  useEffect(() => {
+    setIsMac(/Mac|iPhone|iPad|iPod/.test(navigator.userAgent));
+  }, []);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -49,7 +54,7 @@ export default function TopBar() {
           <span className="material-symbols-outlined text-sm">search</span>
           <span className="flex-1">Search or jump to...</span>
           <span className="hidden sm:inline-flex items-center gap-1">
-            <kbd className="inline-flex items-center justify-center w-5 h-5 text-[11px] font-mono bg-surface-container-high text-on-surface-variant/60 rounded border border-outline-variant/20">⌘</kbd>
+            <kbd className="inline-flex items-center justify-center h-5 px-1.5 text-[11px] font-mono bg-surface-container-high text-on-surface-variant/60 rounded border border-outline-variant/20">{isMac ? '⌘' : 'Ctrl'}</kbd>
             <kbd className="inline-flex items-center justify-center w-5 h-5 text-[11px] font-mono bg-surface-container-high text-on-surface-variant/60 rounded border border-outline-variant/20">K</kbd>
           </span>
         </button>
