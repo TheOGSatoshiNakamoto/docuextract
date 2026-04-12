@@ -200,13 +200,6 @@ a:hover { text-decoration: underline; }
 }
 
 /* ── CTA BANNER ── */
-.cta-banner {
-  text-align: center; padding: 80px 24px;
-  background: var(--bg-card); border-top: 1px solid var(--border);
-}
-.cta-banner h2 { font-size: clamp(22px, 4vw, 38px); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 14px; }
-.cta-banner p { color: var(--text-muted); font-size: 16px; margin-bottom: 28px; }
-
 /* ── RESPONSIVE ── */
 @media (max-width: 900px) {
   .pricing-grid { grid-template-columns: repeat(2, 1fr); }
@@ -510,20 +503,6 @@ export default function PricingPage() {
               {openFaq === i && <div className="faq-a">{faq.a}</div>}
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* CTA BANNER */}
-      <section className="cta-banner">
-        <h2>Extract your first document in <span style={{ color: 'var(--accent)' }}>3 minutes</span></h2>
-        <p>Free tier. No credit card. No sales calls. Just an API key and a curl command.</p>
-        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <a href="/login" className="btn btn-primary" style={{ fontSize: 15, padding: '12px 24px' }}>
-            Get your free API key →
-          </a>
-          <a href="/playground" className="btn btn-outline" style={{ fontSize: 15, padding: '12px 24px' }}>
-            Try the playground
-          </a>
         </div>
       </section>
 

@@ -13,17 +13,21 @@ const footerCss = `
 .pub-footer { border-top: 1px solid var(--border, #2a3147); background: var(--bg-card, #161b27); }
 
 .pub-footer-cta {
-  max-width: var(--max-w, 1100px); margin: 0 auto; padding: 48px 24px 40px;
+  max-width: var(--max-w, 1100px); margin: 0 auto; padding: 80px 24px;
   text-align: center;
 }
-.pub-footer-cta h3 {
-  font-size: 22px; font-weight: 700; color: var(--text, #e2e8f0);
-  margin-bottom: 16px; letter-spacing: -0.3px;
+.pub-footer-cta h2 {
+  font-size: clamp(22px, 4vw, 38px); font-weight: 800; color: var(--text, #e2e8f0);
+  margin-bottom: 14px; letter-spacing: -0.5px;
+}
+.pub-footer-cta h2 .highlight { color: var(--accent, #6c8ef5); }
+.pub-footer-cta p {
+  color: var(--text-muted, #8892a4); font-size: 16px; margin-bottom: 28px;
 }
 .pub-footer-cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 .pub-footer-cta .pf-btn {
-  display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px;
-  border-radius: 7px; font-size: 14px; font-weight: 600; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px; padding: 12px 24px;
+  border-radius: 7px; font-size: 15px; font-weight: 600; cursor: pointer;
   transition: all 0.15s; text-decoration: none; border: none;
 }
 .pub-footer-cta .pf-btn-primary { background: var(--accent, #6c8ef5); color: #fff; }
@@ -64,8 +68,8 @@ const footerCss = `
 @media (max-width: 639px) {
   .pub-footer-cols { grid-template-columns: 1fr; gap: 28px; padding: 32px 20px; }
   .pub-footer-col a { padding: 6px 0; font-size: 14px; }
-  .pub-footer-cta { padding: 36px 20px 32px; }
-  .pub-footer-cta h3 { font-size: 18px; }
+  .pub-footer-cta { padding: 48px 20px 40px; }
+  .pub-footer-cta h2 { font-size: 22px; }
   .pub-footer-cta-row { flex-direction: column; align-items: center; }
   .pub-footer-cta .pf-btn { width: 100%; max-width: 280px; justify-content: center; }
   .pub-footer-bottom { padding: 20px 20px 28px; flex-direction: column; text-align: center; }
@@ -79,10 +83,11 @@ export default function PublicFooter() {
       <footer className="pub-footer">
         {/* CTA Band */}
         <div className="pub-footer-cta">
-          <h3>Start extracting documents in under 3 minutes</h3>
+          <h2>Extract your first document in <span className="highlight">3 minutes</span></h2>
+          <p>50 free extractions/month. No credit card. No templates. No training.</p>
           <div className="pub-footer-cta-row">
-            <Link href="/login?signup=1" className="pf-btn pf-btn-primary">Sign up free →</Link>
-            <Link href="/playground" className="pf-btn pf-btn-outline">Try the playground</Link>
+            <Link href="/playground" className="pf-btn pf-btn-primary">Try the playground</Link>
+            <Link href="/docs" className="pf-btn pf-btn-outline">Read the docs</Link>
           </div>
         </div>
 

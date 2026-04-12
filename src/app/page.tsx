@@ -673,26 +673,6 @@ const css = `
     .author-role { font-size: 12px; color: var(--text-muted); }
 
     /* ── CTA BANNER ── */
-    .cta-banner {
-      text-align: center;
-      padding: 80px 24px;
-    }
-
-    .cta-banner h2 {
-      font-size: clamp(24px, 4vw, 42px);
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      margin-bottom: 16px;
-    }
-
-    .cta-banner p {
-      color: var(--text-muted);
-      font-size: 17px;
-      margin-bottom: 32px;
-    }
-
-    .cta-banner .btn { font-size: 15px; padding: 14px 28px; }
-
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
       .nav-links { display: none; }
@@ -1071,18 +1051,6 @@ result = client.<span class="tok-fn">extract</span>(
           </div>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── BOTTOM CTA ─────────────────────────────────────────────────────────── -->
-<section class="cta-banner">
-  <div class="container">
-    <h2>Start extracting in 5 minutes</h2>
-    <p>Free tier includes 50 extractions/month. No credit card required.</p>
-    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-      <a href="/playground" class="btn btn-primary">Try it free</a>
-      <a href="/docs" class="btn btn-outline">Read the docs</a>
     </div>
   </div>
 </section>

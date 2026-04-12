@@ -2,7 +2,6 @@
 
 import Script from 'next/script';
 import { DocsSections, publicContext, tocItems, docsScript } from '@/content/docs-data';
-import PublicFooter from '@/components/PublicFooter';
 
 const css = `
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -163,8 +162,6 @@ export default function DocsPage() {
           <DocsSections ctx={publicContext} />
         </main>
       </div>
-
-      <PublicFooter />
 
       <Script id="docs-js" strategy="afterInteractive">{`
         ${docsScript}

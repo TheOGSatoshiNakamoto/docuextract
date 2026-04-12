@@ -150,13 +150,6 @@ section { padding: 80px 24px; }
 .code-mini .kw { color: var(--accent); }
 .code-mini .str { color: var(--green); }
 
-.cta-banner {
-  text-align: center; padding: 80px 24px;
-  background: var(--bg-card); border-top: 1px solid var(--border);
-}
-.cta-banner h2 { font-size: clamp(22px, 4vw, 38px); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 14px; }
-.cta-banner p { color: var(--text-muted); font-size: 16px; margin-bottom: 28px; }
-
 @media (max-width: 768px) {
   .use-case-grid { grid-template-columns: 1fr; }
   .use-case-grid.reversed { direction: ltr; }
@@ -822,20 +815,6 @@ export default function UseCasesPage() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* CTA BANNER */}
-      <section className="cta-banner">
-        <h2>Extract your first document in <span style={{ color: 'var(--accent)' }}>3 minutes</span></h2>
-        <p>50 free extractions/month. No credit card. No templates. No training.</p>
-        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <a href="/playground" className="btn btn-primary" style={{ fontSize: 15, padding: '12px 24px' }}>
-            Try the playground
-          </a>
-          <a href="/docs" className="btn btn-outline" style={{ fontSize: 15, padding: '12px 24px' }}>
-            Read the docs
-          </a>
         </div>
       </section>
 
