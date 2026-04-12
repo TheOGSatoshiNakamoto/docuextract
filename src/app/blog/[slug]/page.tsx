@@ -2,10 +2,11 @@ import type { Metadata } from 'next';
 import fs from 'fs';
 import path from 'path';
 import { notFound } from 'next/navigation';
+import DOMPurify from 'isomorphic-dompurify';
 import PublicNav from '@/components/PublicNav';
 import PublicFooter from '@/components/PublicFooter';
 
-// ── Markdown parsing (lightweight, no external deps) ──────────────────────────
+// ── Markdown parsing ─────────────────────────────────────────────────────────
 
 interface PostData {
   title: string;
@@ -49,8 +50,11 @@ function markdownToHtml(md: string): string {
       const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').trimEnd();
       return `<pre class="code-block" data-lang="${lang}"><code>${escaped}</code></pre>`;
     })
-    // Inline code
-    .replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>')
+    // Inline code (escape HTML inside backticks)
+    .replace(/`([^`]+)`/g, (_m, code) => {
+      const esc = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return `<code class="inline-code">${esc}</code>`;
+    })
     // Headers
     .replace(/^### (.+)$/gm, '<h3>$1</h3>')
     .replace(/^## (.+)$/gm, '<h2>$1</h2>')
@@ -83,7 +87,7 @@ function markdownToHtml(md: string): string {
     })
     .join('\n');
 
-  return html;
+  return DOMPurify.sanitize(html);
 }
 
 function getPost(slug: string): PostData | null {
