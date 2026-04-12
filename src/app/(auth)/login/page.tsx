@@ -282,7 +282,7 @@ export default function LoginPage() {
         </div>
 
         <p className="footnote">
-          By signing in you agree to our Terms of Service and Privacy Policy.
+          By signing in you agree to our <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.
         </p>
       </div>
     </>

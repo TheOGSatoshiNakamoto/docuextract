@@ -21,7 +21,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div>&copy; 2026 DocuExtract</div>
           <div className="flex gap-6">
             {/* TODO: Re-add status page link when BetterUptime/Statuspage is configured */}
-            <a className="hover:text-primary transition-colors" href="/privacy">Privacy Policy</a>
+            <a className="hover:text-primary transition-colors" href="/terms">Terms</a>
+            <a className="hover:text-primary transition-colors" href="/privacy">Privacy</a>
             <a className="hover:text-primary transition-colors" href="/security">Security</a>
           </div>
         </footer>
