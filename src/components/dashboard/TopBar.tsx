@@ -45,8 +45,8 @@ export default function TopBar() {
   }, []);
 
   return (
-    <header className="bg-[#0a0c12]/80 backdrop-blur-xl sticky top-0 z-40 border-b border-outline-variant/10 px-6 md:px-8 py-3 w-full">
-      <div className="max-w-7xl w-full mx-auto flex justify-between items-center">
+    <header className="bg-[#0a0c12]/80 backdrop-blur-xl sticky top-0 z-40 border-b border-outline-variant/10 py-3 w-full">
+      <div className="max-w-7xl w-full mx-auto px-6 md:px-8 flex justify-between items-center">
       <div className="flex items-center gap-6">
         <button
           onClick={() => setPaletteOpen(true)}
