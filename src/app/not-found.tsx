@@ -1,3 +1,6 @@
+import PublicNav from '@/components/PublicNav';
+import PublicFooter from '@/components/PublicFooter';
+
 const css = `
   :root {
     --bg: #0f1117;
@@ -113,21 +116,20 @@ export default function NotFound() {
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: css }} />
-      <div className="nf-home">
-        <a href="/">Docu<span>Extract</span></a>
-      </div>
+      <PublicNav />
       <div className="nf-wrap">
         <div className="nf-code">404</div>
-        <h1 className="nf-title">This page doesn't exist.</h1>
+        <h1 className="nf-title">This page doesn&apos;t exist.</h1>
         <p className="nf-desc">
           But our API does. Send any document, get structured JSON back in seconds.
         </p>
         <div className="nf-links">
-          <a href="/" className="nf-primary">Back to home</a>
-          <a href="/playground" className="nf-outline">Try the playground</a>
+          <a href="/playground" className="nf-primary">Try the playground</a>
           <a href="/docs" className="nf-outline">Read the docs</a>
+          <a href="/" className="nf-outline">Back to home</a>
         </div>
       </div>
+      <PublicFooter />
     </>
   );
 }

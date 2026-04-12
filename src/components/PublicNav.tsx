@@ -228,7 +228,7 @@ const navCss = `
   }
   .pn-mobile-cta:hover { background: var(--accent-hover, #5a7ef0); text-decoration: none; }
 
-  @media (max-width: 767px) {
+  @media (max-width: 1023px) {
     .pn-links { display: none; }
     .pn-cta { display: none; }
     .pn-burger { display: block; }
