@@ -160,9 +160,26 @@ const SAMPLES = [
 
 const MAX_FREE = 5;
 const STORAGE_KEY = 'dex_playground_used';
+const RESET_KEY = 'dex_playground_reset';
+const RESET_DAYS = 30;
+
+function checkReset(): void {
+  try {
+    const resetAt = localStorage.getItem(RESET_KEY);
+    if (!resetAt) {
+      localStorage.setItem(RESET_KEY, String(Date.now()));
+      return;
+    }
+    const elapsed = Date.now() - parseInt(resetAt, 10);
+    if (elapsed > RESET_DAYS * 24 * 60 * 60 * 1000) {
+      localStorage.setItem(STORAGE_KEY, '0');
+      localStorage.setItem(RESET_KEY, String(Date.now()));
+    }
+  } catch { /* SSR safe */ }
+}
 
 function getUsed(): number {
-  try { return parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10); } catch { return 0; }
+  try { checkReset(); return parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10); } catch { return 0; }
 }
 
 function incrementUsed(): number {
@@ -312,13 +329,13 @@ export default function PlaygroundPage() {
   const extractedType = result?.metadata?.type || docType || 'invoice';
   const snippets = {
     curl: `curl -X POST https://docuextract.dev/v1/extract \\
-  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -H "Authorization: Bearer dk_live_your_key_here" \\
   -H "Content-Type: application/json" \\
   -d '{"document": "https://example.com/doc.pdf", "type": "${extractedType}"}'`,
     javascript: `const resp = await fetch("https://docuextract.dev/v1/extract", {
   method: "POST",
   headers: {
-    "Authorization": "Bearer YOUR_API_KEY",
+    "Authorization": "Bearer dk_live_your_key_here",
     "Content-Type": "application/json",
   },
   body: JSON.stringify({
@@ -332,7 +349,7 @@ console.log(data);`,
 
 resp = requests.post(
     "https://docuextract.dev/v1/extract",
-    headers={"Authorization": "Bearer YOUR_API_KEY"},
+    headers={"Authorization": "Bearer dk_live_your_key_here"},
     json={
         "document": "https://example.com/doc.pdf",
         "type": "${extractedType}",
@@ -370,7 +387,7 @@ print(data)`,
         </div>
 
         <div className="usage-row">
-          <span className="usage-label">{used} / {MAX_FREE} free extractions</span>
+          <span className="usage-label">{Math.max(0, MAX_FREE - used)} of {MAX_FREE} free tests remaining</span>
           <div className="usage-track">
             <div className="usage-fill" style={{ width: `${usedPct}%`, background: barColor }} />
           </div>
@@ -381,11 +398,11 @@ print(data)`,
       {atLimit && (
         <div className="limit-banner">
           <div className="limit-banner-inner">
-            <span style={{ fontSize: 18 }}>⚠️</span>
+            <span style={{ fontSize: 18 }}>🔒</span>
             <div className="limit-banner-text">
-              <strong>Free playground limit reached.</strong> Sign up for a free account to get 100 extractions/month — no credit card required.
+              <strong>You&apos;ve used your {MAX_FREE} free tests.</strong> Sign up for a free account to continue — 50 more extractions per month, no credit card required.
             </div>
-            <a href="/login" className="btn btn-primary" style={{ fontSize: 13, padding: '8px 16px' }}>Create free account →</a>
+            <a href="/login?signup=1" className="btn btn-primary" style={{ fontSize: 13, padding: '8px 16px' }}>Sign up free →</a>
           </div>
         </div>
       )}
@@ -558,7 +575,7 @@ print(data)`,
           <div className="cta-inner">
             <div>
               <h3>Ready to integrate DocuExtract?</h3>
-              <p>Get your API key and make your first call in under 5 minutes. 100 free extractions/month.</p>
+              <p>Get your API key and make your first call in under 5 minutes. 50 free extractions/month.</p>
             </div>
             <div style={{ display: 'flex', gap: 10, flexShrink: 0 }}>
               <a href="/login" className="btn btn-primary" style={{ fontSize: 13, padding: '10px 18px' }}>Get API Key — Free</a>
