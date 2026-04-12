@@ -156,6 +156,18 @@ export default function CommandPalette({ open, onClose }: CommandPaletteProps) {
             />
           </div>
 
+          <style>{`
+            [cmdk-group-heading] {
+              font-size: 11px;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.15em;
+              color: #b4c5ff;
+              padding: 8px 12px 4px;
+            }
+            [cmdk-list]::-webkit-scrollbar { display: none; }
+            [cmdk-list] { scrollbar-width: none; }
+          `}</style>
           <CommandList className="max-h-[400px] overflow-y-auto p-2">
             <CommandEmpty className="py-8 text-center text-sm text-on-surface-variant/50">
               No results found.
