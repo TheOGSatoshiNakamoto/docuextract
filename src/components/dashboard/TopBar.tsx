@@ -48,7 +48,7 @@ export default function TopBar() {
         >
           <span className="material-symbols-outlined text-sm">search</span>
           <span className="flex-1">Search or jump to...</span>
-          <kbd className="hidden sm:inline-flex items-center gap-1 px-2 py-1 text-[11px] font-mono bg-surface-container-high text-on-surface-variant/60 rounded border border-outline-variant/20"><span className="text-[11px] leading-none">⌘</span> K</kbd>
+          <kbd className="hidden sm:inline-flex items-center gap-1 px-2 py-1 text-[11px] font-mono bg-surface-container-high text-on-surface-variant/60 rounded border border-outline-variant/20"><span className="text-[9px] leading-none">⌘</span> K</kbd>
         </button>
         <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
       </div>
