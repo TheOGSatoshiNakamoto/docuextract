@@ -119,7 +119,6 @@ export default function FeedbackWidget({ open, onClose, onOpen }: FeedbackWidget
         onClick={() => (open ? onClose() : onOpen())}
         className={`flex items-center gap-1.5 px-2.5 py-1.5 text-on-surface-variant/50 hover:text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg text-xs font-headline ${open ? 'bg-surface-container-high text-on-surface-variant' : ''}`}
       >
-        <span className="material-symbols-outlined text-[18px]">chat_bubble</span>
         <span className="hidden sm:inline">Feedback</span>
         <kbd className="hidden sm:inline-flex items-center justify-center w-5 h-5 text-[10px] font-mono bg-surface-container-high text-on-surface-variant/40 rounded border border-outline-variant/20 ml-0.5">
           F
@@ -132,7 +131,7 @@ export default function FeedbackWidget({ open, onClose, onOpen }: FeedbackWidget
           {/* Invisible backdrop for click-outside-to-close */}
           <div className="fixed inset-0 z-40" onClick={onClose} />
 
-          <div className="absolute top-full right-0 mt-2 z-50 w-80 bg-surface-container border border-outline-variant/20 rounded-xl shadow-2xl p-4">
+          <div className="absolute top-full right-0 mt-[7px] z-50 w-80 bg-surface-container border border-outline-variant/20 rounded-xl shadow-2xl p-4">
             <textarea
               ref={textareaRef}
               value={message}
@@ -167,9 +166,14 @@ export default function FeedbackWidget({ open, onClose, onOpen }: FeedbackWidget
                     className="flex items-center gap-1.5 px-3 py-1.5 bg-primary-container text-white text-xs font-semibold rounded-lg hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all font-headline"
                   >
                     {status === 'submitting' ? 'Sending...' : 'Send'}
-                    <kbd className="inline-flex items-center justify-center h-4 px-1 text-[9px] font-mono bg-white/10 text-white/60 rounded border border-white/15">
-                      {isMac ? '⌘' : 'Ctrl'}↵
-                    </kbd>
+                    <span className="inline-flex items-center gap-0.5">
+                      <kbd className="inline-flex items-center justify-center h-4 px-1 text-[9px] font-mono bg-white/10 text-white/60 rounded border border-white/15">
+                        {isMac ? '⌘' : 'Ctrl'}
+                      </kbd>
+                      <kbd className="inline-flex items-center justify-center h-4 px-1 text-[9px] font-mono bg-white/10 text-white/60 rounded border border-white/15">
+                        ↵
+                      </kbd>
+                    </span>
                   </button>
                 )}
               </div>
