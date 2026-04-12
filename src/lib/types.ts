@@ -3,15 +3,24 @@ import 'server-only';
 // Core domain types for DocuExtract API
 
 // ─── Plans ───────────────────────────────────────────────────────────────────
+// Re-export from the centralized plans.ts — single source of truth.
 
-export type Plan = 'free' | 'starter' | 'pro' | 'scale';
+import type { Plan as PlanType } from './plans';
+export { PLANS, PLAN_LIMITS, SONNET_MULTIPLIER } from './plans';
+export type { Plan } from './plans';
+type Plan = PlanType;
 
-export const PLAN_LIMITS: Record<Plan, { perMinute: number; perMonth: number }> = {
-  free:    { perMinute: 10,  perMonth: 100 },
-  starter: { perMinute: 30,  perMonth: 2500 },
-  pro:     { perMinute: 60,  perMonth: 10000 },
-  scale:   { perMinute: 120, perMonth: 50000 },
-};
+// ─── API Keys ─────────────────────────────────────────────────────────────────
+
+export interface ApiKey {
+  id: string;
+  name: string;
+  key_prefix: string;
+  status: 'active' | 'revoked';
+  created_at: string;
+  last_used_at: string | null;
+  revoked_at: string | null;
+}
 
 // ─── Users ────────────────────────────────────────────────────────────────────
 
@@ -63,10 +72,13 @@ export interface DetectRequest {
 
 export interface ExtractResponse {
   data: Record<string, unknown>;
-  confidence: number;        // 0–1 overall confidence score
-  type: DocumentType;
-  processing_time_ms: number;
-  model_used: string;
+  metadata: {
+    type: DocumentType;
+    confidence: number;      // 0–1 overall confidence score
+    model: string;
+    processing_time_ms: number;
+    page_count: number;
+  };
 }
 
 export interface DetectResponse {

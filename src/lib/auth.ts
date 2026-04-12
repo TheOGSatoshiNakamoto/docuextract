@@ -94,3 +94,16 @@ export async function authenticateRequest(request: NextRequest): Promise<AuthRes
 export function invalidateAuthCache(apiKey: string): void {
   cache.delete(apiKey);
 }
+
+/**
+ * Clears all auth cache entries for a given user ID.
+ * Call this when a user's key is revoked, so the revoked key stops working
+ * immediately instead of waiting for the 60-second TTL.
+ */
+export function invalidateAuthCacheByUserId(userId: string): void {
+  for (const [key, entry] of cache.entries()) {
+    if (entry.user.id === userId) {
+      cache.delete(key);
+    }
+  }
+}
