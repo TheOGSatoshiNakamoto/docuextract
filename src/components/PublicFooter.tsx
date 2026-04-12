@@ -1,9 +1,11 @@
 'use client';
 
+import Link from 'next/link';
+
 /**
  * Shared footer for ALL public pages. Single source of truth for site-wide navigation.
  * Uses inline CSS pattern (no Tailwind) matching the public page design system.
- * Static CSS string — no user input, safe for dangerouslySetInnerHTML.
+ * Static CSS string — no user input, safe for existing inline style approach.
  * Resolves 11 audit findings from 2026-04-12 UX audit.
  */
 
@@ -79,8 +81,8 @@ export default function PublicFooter() {
         <div className="pub-footer-cta">
           <h3>Start extracting documents in under 3 minutes</h3>
           <div className="pub-footer-cta-row">
-            <a href="/login?signup=1" className="pf-btn pf-btn-primary">Sign up free →</a>
-            <a href="/playground" className="pf-btn pf-btn-outline">Try the playground</a>
+            <Link href="/login?signup=1" className="pf-btn pf-btn-primary">Sign up free →</Link>
+            <Link href="/playground" className="pf-btn pf-btn-outline">Try the playground</Link>
           </div>
         </div>
 
@@ -88,34 +90,34 @@ export default function PublicFooter() {
         <div className="pub-footer-cols">
           <div className="pub-footer-col">
             <h4>Product</h4>
-            <a href="/playground">Playground</a>
-            <a href="/use-cases">Use Cases</a>
-            <a href="/pricing">Pricing</a>
-            <a href="/changelog">Changelog</a>
+            <Link href="/playground">Playground</Link>
+            <Link href="/use-cases">Use Cases</Link>
+            <Link href="/pricing">Pricing</Link>
+            <Link href="/changelog">Changelog</Link>
           </div>
           <div className="pub-footer-col">
             <h4>Developers</h4>
-            <a href="/docs">Documentation</a>
-            <a href="/blog">Blog</a>
+            <Link href="/docs">Documentation</Link>
+            <Link href="/blog">Blog</Link>
             <a href="https://github.com/TheOGSatoshiNakamoto/docuextract" target="_blank" rel="noopener noreferrer">GitHub</a>
           </div>
           <div className="pub-footer-col">
             <h4>Company</h4>
             <a href="mailto:hello@docuextract.dev">Contact</a>
-            <a href="/login">Sign In</a>
+            <Link href="/login">Sign In</Link>
           </div>
           <div className="pub-footer-col">
             <h4>Legal</h4>
-            <a href="/terms">Terms of Service</a>
-            <a href="/privacy">Privacy Policy</a>
-            <a href="/acceptable-use">Acceptable Use</a>
-            <a href="/security">Security</a>
+            <Link href="/terms">Terms of Service</Link>
+            <Link href="/privacy">Privacy Policy</Link>
+            <Link href="/acceptable-use">Acceptable Use</Link>
+            <Link href="/security">Security</Link>
           </div>
         </div>
 
         {/* Bottom Bar */}
         <div className="pub-footer-bottom">
-          <a href="/" className="pub-footer-logo">Docu<span>Extract</span></a>
+          <Link href="/" className="pub-footer-logo">Docu<span>Extract</span></Link>
           <span className="pub-footer-copy">&copy; 2026 DocuExtract. All rights reserved.</span>
         </div>
       </footer>

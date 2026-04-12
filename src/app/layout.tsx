@@ -32,11 +32,6 @@ const loaderCSS = `
   gap: 14px;
   transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s;
 }
-#docuextract-loader.loaded {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
 #docuextract-loader .loader-mark {
   width: 56px;
   height: 56px;
@@ -76,7 +71,7 @@ const loaderCSS = `
 const loaderScript = `
 (function(){
   var l=document.getElementById('docuextract-loader');
-  function d(){if(l)l.classList.add('loaded')}
+  function d(){if(l&&!l._d){l._d=1;l.style.opacity='0';l.style.visibility='hidden';l.style.pointerEvents='none';setTimeout(function(){l.style.display='none'},700)}}
   if(document.fonts&&document.fonts.ready){document.fonts.ready.then(d)}else{d()}
   setTimeout(d,2500);
 })();
@@ -106,7 +101,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="font-body">
         <style dangerouslySetInnerHTML={{ __html: loaderCSS }} />
         <noscript><style dangerouslySetInnerHTML={{ __html: '#docuextract-loader{display:none!important}' }} /></noscript>
-        <div id="docuextract-loader" aria-hidden="true">
+        <div id="docuextract-loader" aria-hidden="true" suppressHydrationWarning>
           <svg className="loader-mark" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
             <rect width="32" height="32" rx="6" fill="#0f1117"/>
             <text x="16" y="23" textAnchor="middle" fontFamily="-apple-system, BlinkMacSystemFont, sans-serif" fontSize="22" fontWeight="800" fill="#6c8ef5">D</text>

@@ -164,14 +164,11 @@ section { padding: 80px 24px; }
 }
 `;
 
-function Css() {
-  return <style>{css}</style>;
-}
-
 export default function UseCasesPage() {
   return (
     <>
-      <Css />
+      {/* Static CSS string — no user input, safe for inline style injection */}
+      <style dangerouslySetInnerHTML={{ __html: css }} />
 
       <PublicNav />
 

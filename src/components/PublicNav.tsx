@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 
 /**
  * Shared public navigation bar for all marketing pages.
@@ -42,26 +43,26 @@ export default function PublicNav() {
       <style dangerouslySetInnerHTML={{ __html: navCss }} />
       <nav>
         <div className="pn-inner">
-          <a href="/" className="pn-logo">
+          <Link href="/" className="pn-logo">
             Docu<span>Extract</span>
-          </a>
+          </Link>
 
           {/* Desktop links */}
           <ul className="pn-links">
             {links.map((l) => (
               <li key={l.href}>
-                <a
+                <Link
                   href={l.href}
                   className={pathname === l.href || pathname.startsWith(l.href + '/') ? 'pn-active' : ''}
                 >
                   {l.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
 
           {/* Desktop CTA */}
-          <a href="/login" className="pn-cta">Get API Key</a>
+          <Link href="/login" className="pn-cta">Get API Key</Link>
 
           {/* Mobile hamburger */}
           <button
@@ -87,17 +88,17 @@ export default function PublicNav() {
             <div className="pn-overlay" onClick={() => setMobileOpen(false)} />
             <div className="pn-mobile">
               {links.map((l) => (
-                <a
+                <Link
                   key={l.href}
                   href={l.href}
                   className={`pn-mobile-link ${pathname === l.href || pathname.startsWith(l.href + '/') ? 'pn-active' : ''}`}
                 >
                   {l.label}
-                </a>
+                </Link>
               ))}
-              <a href="/dashboard" className="pn-mobile-link">Dashboard</a>
+              <Link href="/dashboard" className="pn-mobile-link">Dashboard</Link>
               <div style={{ borderTop: '1px solid var(--border)', margin: '8px 0' }} />
-              <a href="/login" className="pn-mobile-cta">Get API Key</a>
+              <Link href="/login" className="pn-mobile-cta">Get API Key</Link>
             </div>
           </>
         )}
