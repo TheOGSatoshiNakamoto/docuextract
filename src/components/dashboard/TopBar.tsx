@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { getSupabaseClient } from '@/lib/supabase';
 import CommandPalette from './CommandPalette';
+import FeedbackWidget from './FeedbackWidget';
 
 export default function TopBar() {
   const [userName, setUserName] = useState('');
@@ -10,6 +11,7 @@ export default function TopBar() {
   const [userAvatar, setUserAvatar] = useState('');
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [isMac, setIsMac] = useState(true);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   useEffect(() => {
     setIsMac(/Mac|iPhone|iPad|iPod/.test(navigator.userAgent));
@@ -19,6 +21,7 @@ export default function TopBar() {
     function onKey(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
+        setFeedbackOpen(false);
         setPaletteOpen((o) => !o);
       }
     }
@@ -62,6 +65,11 @@ export default function TopBar() {
         <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
       </div>
       <div className="flex items-center gap-3">
+        <FeedbackWidget
+          open={feedbackOpen}
+          onClose={() => setFeedbackOpen(false)}
+          onOpen={() => setFeedbackOpen(true)}
+        />
         <button className="p-2 text-on-surface-variant/50 hover:text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg">
           <span className="material-symbols-outlined text-xl">notifications</span>
         </button>
