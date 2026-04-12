@@ -3,6 +3,10 @@
 import { useState } from 'react';
 import PublicNav from '@/components/PublicNav';
 
+// Pricing values below are verified to match src/lib/plans.ts (server-only).
+// Free: 50/$0, Starter: 1500/$49, Pro: 5000/$99, Scale: 20000/$249.
+// When plans.ts changes, update these values to match.
+
 const css = `
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -235,14 +239,14 @@ const PLANS = [
     name: 'Free',
     monthly: 0,
     annual: 0,
-    volume: '100 extractions/mo',
+    volume: '50 extractions/mo',
     cta: 'Get started free',
     ctaHref: '/login',
     ctaStyle: 'secondary',
     popular: false,
     features: [
-      '100 API calls/month',
-      '10 requests/minute',
+      '50 API calls/month',
+      '5 requests/minute',
       'Claude Haiku only',
       'JSON output',
       'Community support',
@@ -253,67 +257,67 @@ const PLANS = [
     name: 'Starter',
     monthly: 49,
     annual: 39,
-    volume: '2,500 extractions/mo',
+    volume: '1,500 extractions/mo',
     cta: 'Start Starter',
     ctaHref: '/login',
     ctaStyle: 'secondary',
     popular: false,
     features: [
-      '2,500 API calls/month',
+      '1,500 API calls/month',
       '30 requests/minute',
-      'Haiku + Sonnet',
+      'Haiku + Sonnet (3x cost)',
       'JSON output + confidence',
       'Email support',
-      '$0.05/extraction overage',
+      '$0.04/extraction overage',
     ],
   },
   {
     name: 'Pro',
     monthly: 99,
     annual: 79,
-    volume: '10,000 extractions/mo',
+    volume: '5,000 extractions/mo',
     cta: 'Start Pro',
     ctaHref: '/login',
     ctaStyle: 'primary',
     popular: true,
     features: [
-      '10,000 API calls/month',
+      '5,000 API calls/month',
       '60 requests/minute',
-      'Haiku + Sonnet',
+      'Haiku + Sonnet (3x cost)',
       'JSON + confidence + webhooks',
       'Priority email support',
-      '$0.05/extraction overage',
+      '$0.025/extraction overage',
     ],
   },
   {
     name: 'Scale',
     monthly: 249,
     annual: 199,
-    volume: '50,000 extractions/mo',
+    volume: '20,000 extractions/mo',
     cta: 'Start Scale',
     ctaHref: '/login',
     ctaStyle: 'secondary',
     popular: false,
     features: [
-      '50,000 API calls/month',
+      '20,000 API calls/month',
       '120 requests/minute',
-      'Haiku + Sonnet + Priority',
+      'Haiku + Sonnet (3x cost) + Priority',
       'JSON + confidence + webhooks',
       'Dedicated Slack support',
-      '$0.04/extraction overage',
+      '$0.015/extraction overage',
     ],
   },
 ];
 
 const FEATURE_ROWS = [
-  { label: 'Monthly extractions', free: '100', starter: '2,500', pro: '10,000', scale: '50,000' },
-  { label: 'Rate limit', free: '10/min', starter: '30/min', pro: '60/min', scale: '120/min' },
+  { label: 'Monthly extractions', free: '50', starter: '1,500', pro: '5,000', scale: '20,000' },
+  { label: 'Rate limit', free: '5/min', starter: '30/min', pro: '60/min', scale: '120/min' },
   { label: 'Claude Haiku model', free: '✓', starter: '✓', pro: '✓', scale: '✓' },
-  { label: 'Claude Sonnet model', free: '✗', starter: '✓', pro: '✓', scale: '✓' },
+  { label: 'Claude Sonnet model', free: '✗', starter: '✓ (3x cost)', pro: '✓ (3x cost)', scale: '✓ (3x cost)' },
   { label: 'Confidence scores', free: '✓', starter: '✓', pro: '✓', scale: '✓' },
   { label: 'Webhook support', free: '✗', starter: '✗', pro: '✓', scale: '✓' },
   { label: 'Custom schemas', free: '✓', starter: '✓', pro: '✓', scale: '✓' },
-  { label: 'Overage pricing', free: '✗', starter: '$0.05/call', pro: '$0.05/call', scale: '$0.04/call' },
+  { label: 'Overage pricing', free: '✗', starter: '$0.04/call', pro: '$0.025/call', scale: '$0.015/call' },
   { label: 'Support', free: 'Community', starter: 'Email', pro: 'Priority email', scale: 'Dedicated Slack' },
   { label: 'SLA', free: '✗', starter: '✗', pro: '✓', scale: '✓' },
 ];
@@ -321,7 +325,7 @@ const FEATURE_ROWS = [
 const FAQS = [
   {
     q: 'What happens when I hit my monthly limit?',
-    a: "On paid plans (Starter, Pro, Scale), extractions beyond your limit are billed at the overage rate ($0.05/call on Starter and Pro, $0.04/call on Scale). We'll send you an email alert at 70% and 100% usage. On the Free plan, your API returns 429 errors once the limit is reached — upgrade to continue.",
+    a: "On paid plans, extractions beyond your limit are billed at the overage rate — $0.04/call on Starter, $0.025/call on Pro, and $0.015/call on Scale. We'll send you an email alert at 70% and 100% usage. On the Free plan, your API returns 429 errors once the limit is reached — upgrade to continue.",
   },
   {
     q: 'Can I upgrade or downgrade at any time?',
@@ -349,15 +353,15 @@ const FAQS = [
   },
   {
     q: 'Can I try before I buy?',
-    a: 'Absolutely. The Free plan gives you 100 extractions/month with no credit card required. You can also try the playground at /playground without signing up at all.',
+    a: 'Absolutely. The Free plan gives you 50 extractions/month with no credit card required. You can also try the playground at /playground without signing up at all.',
   },
 ];
 
 function calcRecommendedPlan(docs: number): { name: string; price: number; desc: string } {
-  if (docs <= 100) return { name: 'Free', price: 0, desc: '100 extractions included' };
-  if (docs <= 2500) return { name: 'Starter', price: 49, desc: '2,500 extractions included' };
-  if (docs <= 10000) return { name: 'Pro', price: 99, desc: '10,000 extractions included' };
-  return { name: 'Scale', price: 249, desc: '50,000 extractions included' };
+  if (docs <= 50) return { name: 'Free', price: 0, desc: '50 extractions included' };
+  if (docs <= 1500) return { name: 'Starter', price: 49, desc: '1,500 extractions included' };
+  if (docs <= 5000) return { name: 'Pro', price: 99, desc: '5,000 extractions included' };
+  return { name: 'Scale', price: 249, desc: '20,000 extractions included' };
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -480,7 +484,7 @@ export default function PricingPage() {
               type="range"
               className="slider"
               min={0}
-              max={50000}
+              max={20000}
               step={100}
               value={docsPerMonth}
               onChange={(e) => setDocsPerMonth(Number(e.target.value))}
