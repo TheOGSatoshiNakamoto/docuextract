@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
-import { CommandDialog, CommandInput, CommandList, CommandGroup, CommandItem, CommandEmpty, CommandSeparator } from 'cmdk';
+import { Command, CommandInput, CommandList, CommandGroup, CommandItem, CommandEmpty, CommandSeparator } from 'cmdk';
 import { getSupabaseClient } from '@/lib/supabase';
 import { tocItems } from '@/content/docs-data';
 
@@ -109,17 +110,47 @@ export default function CommandPalette({ open, onClose }: CommandPaletteProps) {
     .map((href) => navItems.find((n) => n.href === href))
     .filter(Boolean);
 
-  return (
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Esc to close
+  useEffect(() => {
+    if (!open) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') { e.preventDefault(); onClose(); }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, onClose]);
+
+  // Auto-focus input on open
+  useEffect(() => {
+    if (open) setTimeout(() => inputRef.current?.focus(), 0);
+  }, [open]);
+
+  if (!open) return toast ? (
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[99999] bg-surface-container-highest border border-outline-variant/20 text-on-surface text-xs font-body px-4 py-2.5 rounded-lg shadow-lg">
+      {toast}
+    </div>
+  ) : null;
+
+  return createPortal(
     <>
-      <CommandDialog
-        open={open}
-        onOpenChange={(v) => { if (!v) onClose(); }}
-        label="Command palette"
-      >
-        <div className="flex flex-col bg-surface-container border border-outline-variant/20 rounded-xl overflow-hidden shadow-2xl max-w-[600px] w-full mx-auto">
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      {/* Centered palette */}
+      <div className="fixed inset-0 z-[10000] flex items-start justify-center pt-[20vh] pointer-events-none">
+        <Command
+          label="Command palette"
+          className="pointer-events-auto flex flex-col bg-surface-container border border-outline-variant/20 rounded-xl overflow-hidden shadow-2xl w-full max-w-[600px] mx-4"
+        >
           <div className="flex items-center gap-3 px-4 border-b border-outline-variant/15">
             <span className="material-symbols-outlined text-on-surface-variant/40 text-lg">search</span>
             <CommandInput
+              ref={inputRef}
               placeholder="Type a command or search..."
               className="flex-1 bg-transparent border-none outline-none text-sm text-on-surface py-3.5 placeholder:text-on-surface-variant/30 font-body"
             />
@@ -202,14 +233,15 @@ export default function CommandPalette({ open, onClose }: CommandPaletteProps) {
             <span>⏎ select</span>
             <span>esc close</span>
           </div>
-        </div>
-      </CommandDialog>
+        </Command>
+      </div>
 
       {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[99999] bg-surface-container-highest border border-outline-variant/20 text-on-surface text-xs font-body px-4 py-2.5 rounded-lg shadow-lg animate-in fade-in slide-in-from-bottom-2">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[99999] bg-surface-container-highest border border-outline-variant/20 text-on-surface text-xs font-body px-4 py-2.5 rounded-lg shadow-lg">
           {toast}
         </div>
       )}
-    </>
+    </>,
+    document.body
   );
 }
