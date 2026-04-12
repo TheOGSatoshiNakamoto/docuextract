@@ -10,7 +10,7 @@ const css = `
   --green: #4ade80;
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'SF Mono', 'Fira Code', Consolas, monospace;
-  --max-w: 800px;
+  --max-w: 1100px;
 }
 body { font-family: var(--font-sans); background: var(--bg); color: var(--text); line-height: 1.7; }
 .legal { max-width: var(--max-w); margin: 0 auto; padding: 80px 24px 120px; }

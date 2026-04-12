@@ -10,7 +10,7 @@ export const legalCss = `
   --green: #4ade80;
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'SF Mono', 'Fira Code', Consolas, monospace;
-  --max-w: 900px;
+  --max-w: 1100px;
 }
 body { font-family: var(--font-sans); background: var(--bg); color: var(--text); line-height: 1.7; }
 

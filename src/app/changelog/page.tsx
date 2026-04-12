@@ -15,7 +15,7 @@ const css = `
   --purple: #c084fc; --orange: #fb923c;
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'SF Mono', 'Fira Code', Consolas, monospace;
-  --max-w: 720px; --radius: 10px;
+  --max-w: 1100px; --radius: 10px;
 }
 body { font-family: var(--font-sans); background: var(--bg); color: var(--text); line-height: 1.6; font-size: 16px; }
 a { color: var(--accent); text-decoration: none; }
@@ -58,6 +58,25 @@ a:hover { text-decoration: underline; }
 `;
 
 const ENTRIES = [
+  {
+    date: 'April 12, 2026',
+    title: 'v1.4: Unified navigation, hydration fixes, and site-wide polish',
+    major: true,
+    badges: ['feature', 'fix', 'improvement'],
+    body: `<ul>
+      <li>Shared <code>PublicNav</code> and <code>PublicFooter</code> components — single source of truth for all public page navigation</li>
+      <li>Client-side navigation via Next.js <code>Link</code> — instant page transitions, no full reloads</li>
+      <li>Unified footer CTA across all public pages with consistent styling</li>
+      <li>Fixed loading overlay stuck on Server Component pages (<code>/use-cases</code>, <code>/blog</code>, <code>/changelog</code>) — hydration-safe inline styles</li>
+      <li>DOMPurify sanitization for blog markdown rendering</li>
+      <li>Legal pages: <code>/terms</code>, <code>/privacy</code>, <code>/acceptable-use</code></li>
+      <li><code>/security</code> page with compliance and infrastructure details</li>
+      <li>8 SEO blog posts — one per document type (invoices, receipts, bank statements, resumes, contracts, forms, IDs, business cards)</li>
+      <li>Mobile nav breakpoint at 1024px + 404 page gets shared nav/footer</li>
+      <li>Sentry error monitoring integration with session replay</li>
+      <li>Consistent <code>--max-w: 1100px</code> across all public pages</li>
+    </ul>`,
+  },
   {
     date: 'March 30, 2026',
     title: 'v1.3: Premium dashboard, pricing page, and playground upgrade',

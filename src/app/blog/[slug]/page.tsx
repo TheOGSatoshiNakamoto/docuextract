@@ -142,7 +142,7 @@ const css = `
   --accent-dim: rgba(108,142,245,0.12); --green: #4ade80; --purple: #c084fc;
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'SF Mono', 'Fira Code', Consolas, monospace;
-  --max-w: 720px; --radius: 10px;
+  --max-w: 1100px; --radius: 10px;
 }
 body { font-family: var(--font-sans); background: var(--bg); color: var(--text); line-height: 1.6; font-size: 16px; }
 a { color: var(--accent); text-decoration: none; }
