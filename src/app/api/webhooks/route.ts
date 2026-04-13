@@ -2,13 +2,12 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
+import { PLANS, type Plan } from '@/lib/plans';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const MAX_ENDPOINTS = 5;
-
-const VALID_EVENTS = [
+const ALL_EVENTS = [
   'extraction.completed',
   'extraction.failed',
   'usage.limit.approaching',
@@ -75,19 +74,29 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: 'URL must be a valid HTTPS URL' }, { status: 400 });
   }
 
-  const events = (body.events ?? []).filter(e => VALID_EVENTS.includes(e));
+  // Get user's plan for limit enforcement
+  const adminClient = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } });
+  const { data: userData } = await adminClient.from('users').select('plan').eq('id', session.user.id).single();
+  const plan = (userData?.plan ?? 'free') as Plan;
+  const planConfig = PLANS[plan];
+
+  // Validate events against plan access
+  const allowedEvents = planConfig.webhookEvents === '*' ? ALL_EVENTS : planConfig.webhookEvents;
+  const planEvents = planConfig.webhookEvents;
+  const events = (body.events ?? []).filter(e => ALL_EVENTS.includes(e) && (planEvents === '*' || planEvents.includes(e)));
   if (events.length === 0) {
-    return NextResponse.json({ error: 'At least one valid event must be selected' }, { status: 400 });
+    return NextResponse.json({ error: 'At least one valid event must be selected. Some events may require a higher plan.' }, { status: 400 });
   }
 
-  // Check endpoint limit
+  // Check endpoint limit based on plan
   const { count } = await supabase
     .from('webhook_endpoints')
     .select('id', { count: 'exact', head: true })
     .eq('user_id', session.user.id);
 
-  if ((count ?? 0) >= MAX_ENDPOINTS) {
-    return NextResponse.json({ error: `Maximum ${MAX_ENDPOINTS} endpoints allowed` }, { status: 400 });
+  const maxEndpoints = planConfig.webhookEndpoints;
+  if ((count ?? 0) >= maxEndpoints) {
+    return NextResponse.json({ error: `Maximum ${maxEndpoints} endpoints allowed on the ${planConfig.name} plan. Upgrade for more.` }, { status: 400 });
   }
 
   const signingSecret = generateSigningSecret();

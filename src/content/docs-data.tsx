@@ -58,6 +58,14 @@ export const tocItems = [
     { href: '#checkout', label: '/v1/billing/checkout', method: 'POST' as const },
     { href: '#portal', label: '/v1/billing/portal', method: 'POST' as const },
   ]},
+  { group: 'Webhooks', items: [
+    { href: '#webhooks-overview', label: 'Overview' },
+    { href: '#webhook-events', label: 'Event Types' },
+    { href: '#webhook-payload', label: 'Payload Format' },
+    { href: '#webhook-signatures', label: 'Signature Verification' },
+    { href: '#webhook-retry', label: 'Retry Policy' },
+    { href: '#webhook-best-practices', label: 'Best Practices' },
+  ]},
   { group: 'Reference', items: [
     { href: '#document-types', label: 'Document Types' },
     { href: '#errors', label: 'Error Codes' },
@@ -246,6 +254,178 @@ export function DocsSections({ ctx }: { ctx: DocsContext }) {
         <div className="callout callout-info">Requires an active Stripe subscription. Free plan users will receive a 400 error.</div>
         <h3>Response</h3>
         <div className="code-block"><div className="code-header"><span className="code-lang">json</span></div><pre dangerouslySetInnerHTML={{ __html: preBlocks.portalResponse }} /></div>
+      </section>
+
+      <hr />
+
+      {/* ── Webhooks ─────────────────────────────────────────────────────────── */}
+
+      <section id="webhooks-overview">
+        <h2>Webhooks</h2>
+        <p>Webhooks send real-time HTTP POST notifications to your server when events occur in DocuExtract — extractions complete, usage limits approach, or billing events happen.</p>
+        <p>Instead of polling the API, register an HTTPS endpoint and we&apos;ll push events to you. Each delivery is signed with HMAC-SHA256 so you can verify authenticity.</p>
+        <h3>How it works</h3>
+        <ol>
+          <li>Register a webhook endpoint in your <a href="/dashboard/webhooks">Dashboard → Webhooks</a></li>
+          <li>Select which events to subscribe to</li>
+          <li>Copy the signing secret (shown once)</li>
+          <li>We POST a JSON payload to your URL when subscribed events occur</li>
+          <li>Verify the signature and process the event</li>
+        </ol>
+        <p>Webhooks use <strong>hybrid payloads</strong>: the webhook body contains a summary (event type, extraction ID, confidence, document type). To get the full extracted data, call <code>GET /v1/extractions/{'{'}{'{'}extraction_id{'}'}{'}'}</code> using the <code>ext_</code> ID from the payload.</p>
+      </section>
+
+      <hr />
+
+      <section id="webhook-events">
+        <h2>Event Types</h2>
+        <p>DocuExtract supports 9 event types across three categories. Event access is gated by plan.</p>
+        <div className="table-wrap">
+          <table>
+            <thead><tr><th>Event</th><th>Category</th><th>Description</th><th>Plans</th></tr></thead>
+            <tbody>
+              <tr><td><code>extraction.completed</code></td><td>Core</td><td>Extraction finished successfully</td><td>All</td></tr>
+              <tr><td><code>extraction.failed</code></td><td>Core</td><td>Extraction encountered an error</td><td>All</td></tr>
+              <tr><td><code>usage.limit.approaching</code></td><td>Usage</td><td>Usage crossed 80% of monthly limit</td><td>Starter+</td></tr>
+              <tr><td><code>usage.limit.reached</code></td><td>Usage</td><td>Monthly extraction limit exhausted</td><td>Starter+</td></tr>
+              <tr><td><code>subscription.created</code></td><td>Billing</td><td>New subscription created</td><td>Pro+</td></tr>
+              <tr><td><code>subscription.updated</code></td><td>Billing</td><td>Subscription plan changed</td><td>Pro+</td></tr>
+              <tr><td><code>subscription.cancelled</code></td><td>Billing</td><td>Subscription cancelled</td><td>Pro+</td></tr>
+              <tr><td><code>invoice.payment_succeeded</code></td><td>Billing</td><td>Invoice payment processed</td><td>Pro+</td></tr>
+              <tr><td><code>invoice.payment_failed</code></td><td>Billing</td><td>Invoice payment failed</td><td>Pro+</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Endpoint limits by plan</h3>
+        <div className="table-wrap">
+          <table>
+            <thead><tr><th>Plan</th><th>Endpoints</th><th>Available Events</th></tr></thead>
+            <tbody>
+              <tr><td>Free</td><td>1</td><td>Core events only</td></tr>
+              <tr><td>Starter</td><td>3</td><td>Core + Usage</td></tr>
+              <tr><td>Pro</td><td>5</td><td>All events</td></tr>
+              <tr><td>Scale</td><td>10</td><td>All events</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <hr />
+
+      <section id="webhook-payload">
+        <h2>Payload Format</h2>
+        <p>Every webhook delivery sends a JSON payload in the following envelope format:</p>
+        <div className="code-block"><div className="code-header"><span className="code-lang">json</span></div><pre>{`{
+  "id": "evt_a1b2c3d4e5f67890",
+  "event": "extraction.completed",
+  "created": 1775059200,
+  "data": {
+    "extractionId": "ext_9z8y7x42",
+    "status": "success",
+    "confidence": 0.9942,
+    "documentType": "invoice"
+  }
+}`}</pre></div>
+        <h3>Headers</h3>
+        <div className="table-wrap">
+          <table>
+            <thead><tr><th>Header</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>X-DocuExtract-Signature</code></td><td>HMAC-SHA256 signature: <code>sha256=&lt;hex&gt;</code></td></tr>
+              <tr><td><code>X-DocuExtract-Event</code></td><td>Event type (e.g. <code>extraction.completed</code>)</td></tr>
+              <tr><td><code>X-DocuExtract-Delivery</code></td><td>Unique delivery ID (UUID) for idempotency</td></tr>
+              <tr><td><code>Content-Type</code></td><td><code>application/json</code></td></tr>
+              <tr><td><code>User-Agent</code></td><td><code>DocuExtract-Webhooks/1.0</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <hr />
+
+      <section id="webhook-signatures">
+        <h2>Signature Verification</h2>
+        <p>Every webhook delivery includes an <code>X-DocuExtract-Signature</code> header containing an HMAC-SHA256 signature of the request body using your endpoint&apos;s signing secret. Always verify this signature before processing events.</p>
+        <h3>Node.js</h3>
+        <div className="code-block"><div className="code-header"><span className="code-lang">javascript</span></div><pre>{`const crypto = require('crypto');
+
+function verifyWebhook(rawBody, signatureHeader, secret) {
+  const expected = 'sha256=' + crypto
+    .createHmac('sha256', secret)
+    .update(rawBody)
+    .digest('hex');
+  return crypto.timingSafeEqual(
+    Buffer.from(expected),
+    Buffer.from(signatureHeader)
+  );
+}
+
+// Express example
+app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+  const signature = req.headers['x-docuextract-signature'];
+  if (!verifyWebhook(req.body, signature, process.env.WEBHOOK_SECRET)) {
+    return res.status(401).send('Invalid signature');
+  }
+  const event = JSON.parse(req.body);
+  console.log('Received:', event.event, event.data);
+  res.status(200).send('OK');
+});`}</pre></div>
+        <h3>Python</h3>
+        <div className="code-block"><div className="code-header"><span className="code-lang">python</span></div><pre>{`import hmac
+import hashlib
+import json
+from flask import Flask, request, abort
+
+app = Flask(__name__)
+WEBHOOK_SECRET = "whsec_your_signing_secret"
+
+def verify_signature(payload: bytes, signature: str, secret: str) -> bool:
+    expected = "sha256=" + hmac.new(
+        secret.encode(), payload, hashlib.sha256
+    ).hexdigest()
+    return hmac.compare_digest(expected, signature)
+
+@app.route("/webhook", methods=["POST"])
+def handle_webhook():
+    signature = request.headers.get("X-DocuExtract-Signature", "")
+    if not verify_signature(request.data, signature, WEBHOOK_SECRET):
+        abort(401)
+    event = json.loads(request.data)
+    print(f"Received: {event['event']}", event["data"])
+    return "OK", 200`}</pre></div>
+      </section>
+
+      <hr />
+
+      <section id="webhook-retry">
+        <h2>Retry Policy</h2>
+        <p>If your endpoint returns a non-2xx status code or times out, DocuExtract retries the delivery automatically:</p>
+        <div className="table-wrap">
+          <table>
+            <thead><tr><th>Attempt</th><th>Delay</th><th>Timeout</th></tr></thead>
+            <tbody>
+              <tr><td>1st (initial)</td><td>Immediate</td><td>10 seconds</td></tr>
+              <tr><td>2nd retry</td><td>~30 seconds</td><td>10 seconds</td></tr>
+              <tr><td>3rd retry</td><td>~5 minutes</td><td>10 seconds</td></tr>
+              <tr><td>4th retry (final)</td><td>~30 minutes</td><td>10 seconds</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>After 4 failed attempts, the delivery is marked as failed. You can view delivery history in your dashboard and use the &quot;Send Test&quot; button to verify connectivity.</p>
+      </section>
+
+      <hr />
+
+      <section id="webhook-best-practices">
+        <h2>Best Practices</h2>
+        <ul>
+          <li><strong>Respond quickly.</strong> Return a 2xx status within 5 seconds. If you need to do heavy processing, acknowledge the webhook first, then process asynchronously.</li>
+          <li><strong>Verify signatures.</strong> Always validate the <code>X-DocuExtract-Signature</code> header before processing. Never skip this step.</li>
+          <li><strong>Handle duplicates.</strong> Use the <code>X-DocuExtract-Delivery</code> header (unique UUID per delivery attempt) as an idempotency key. Store processed delivery IDs and skip duplicates.</li>
+          <li><strong>Use HTTPS only.</strong> Webhook endpoints must use HTTPS. HTTP URLs are rejected at registration time.</li>
+          <li><strong>Fetch full data separately.</strong> Webhook payloads contain summaries. For full extraction results, call <code>GET /v1/extractions/{'{'}id{'}'}</code> with the <code>extraction_id</code> from the payload.</li>
+          <li><strong>Monitor delivery health.</strong> Check your webhook delivery logs in the dashboard to catch failures early. Use the &quot;Send Test&quot; button after deploying endpoint changes.</li>
+        </ul>
       </section>
 
       <hr />

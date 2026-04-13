@@ -80,6 +80,32 @@ export async function getMonthlyUsageCount(userId: string): Promise<number> {
 }
 
 /**
+ * Checks if usage has crossed the 80% or 100% threshold and emits
+ * Inngest events for webhook dispatch. Fire-and-forget — never blocks.
+ */
+export async function checkUsageThresholds(userId: string, monthlyLimit: number): Promise<void> {
+  try {
+    const { inngest } = await import('@/inngest/client');
+    const count = await getMonthlyUsageCount(userId);
+    const pct = count / monthlyLimit;
+
+    if (pct >= 1.0) {
+      void inngest.send({
+        name: 'docuextract/usage.limit.reached',
+        data: { userId, used: count, limit: monthlyLimit },
+      }).catch(() => {});
+    } else if (pct >= 0.8) {
+      void inngest.send({
+        name: 'docuextract/usage.limit.approaching',
+        data: { userId, used: count, limit: monthlyLimit, percentage: Math.round(pct * 100) },
+      }).catch(() => {});
+    }
+  } catch {
+    // Non-blocking — usage threshold check should never break extractions
+  }
+}
+
+/**
  * Sanitizes a usage record before database insertion.
  * Ensures no NaN, Infinity, or out-of-range values reach PostgreSQL.
  * A bad field becomes null rather than crashing the insert.

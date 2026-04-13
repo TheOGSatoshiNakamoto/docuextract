@@ -53,7 +53,7 @@ function EmptyState({ onAdd }: { onAdd: () => void }) {
 
       <h2 className="text-3xl font-headline font-bold text-on-surface mb-4 tracking-tight">Configure Webhooks</h2>
       <p className="text-on-surface-variant max-w-lg mb-10 leading-relaxed">
-        Webhooks send real-time notifications to your server when events happen — extractions complete, usage limits approach, payments process.
+        Receive real-time HTTP POST notifications when extractions complete, usage limits approach, or payments process. HMAC-SHA256 signed for security.
       </p>
 
       {/* Payload preview */}
@@ -272,10 +272,11 @@ function SecretModal({ secret, onClose }: { secret: string; onClose: () => void 
 
 // ── Endpoint Card ─────────────────────────────────────────────────────────────
 
-function EndpointCard({ endpoint, onToggle, onDelete }: {
+function EndpointCard({ endpoint, onToggle, onDelete, onTest }: {
   endpoint: WebhookEndpoint;
   onToggle: (id: string, enabled: boolean) => void;
   onDelete: (id: string) => void;
+  onTest: (id: string) => void;
 }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
 
@@ -310,16 +311,26 @@ function EndpointCard({ endpoint, onToggle, onDelete }: {
 
       <div className="flex items-center justify-between text-[10px] text-on-surface-variant/40">
         <span>Created {new Date(endpoint.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-        {confirmDelete ? (
-          <div className="flex gap-2">
-            <button onClick={() => setConfirmDelete(false)} className="text-on-surface-variant hover:text-on-surface">Cancel</button>
-            <button onClick={() => onDelete(endpoint.id)} className="text-error hover:text-error/80">Confirm Delete</button>
-          </div>
-        ) : (
-          <button onClick={() => setConfirmDelete(true)} className="text-on-surface-variant/40 hover:text-error transition-colors">
-            <span className="material-symbols-outlined text-sm">delete</span>
-          </button>
-        )}
+        <div className="flex items-center gap-3">
+          {endpoint.enabled && (
+            <button
+              onClick={() => onTest(endpoint.id)}
+              className="text-primary hover:text-primary/80 transition-colors font-headline font-bold uppercase tracking-[0.1em]"
+            >
+              Send Test
+            </button>
+          )}
+          {confirmDelete ? (
+            <div className="flex gap-2">
+              <button onClick={() => setConfirmDelete(false)} className="text-on-surface-variant hover:text-on-surface">Cancel</button>
+              <button onClick={() => onDelete(endpoint.id)} className="text-error hover:text-error/80">Confirm Delete</button>
+            </div>
+          ) : (
+            <button onClick={() => setConfirmDelete(true)} className="text-on-surface-variant/40 hover:text-error transition-colors">
+              <span className="material-symbols-outlined text-sm">delete</span>
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -364,6 +375,20 @@ export default function WebhooksPage() {
     setShowAddPanel(false);
     setNewSecret(secret);
     setEndpoints(prev => [endpoint, ...prev]);
+  }
+
+  async function testEndpoint(id: string) {
+    try {
+      const res = await fetch(`/api/webhooks/${id}/test`, { method: 'POST' });
+      if (res.ok) {
+        alert('Test event sent! Check your endpoint for the delivery.');
+      } else {
+        const data = await res.json();
+        alert(`Test failed: ${data.error ?? 'Unknown error'}`);
+      }
+    } catch {
+      alert('Failed to send test event. Please try again.');
+    }
   }
 
   // Loading
@@ -411,6 +436,7 @@ export default function WebhooksPage() {
             endpoint={ep}
             onToggle={toggleEndpoint}
             onDelete={deleteEndpoint}
+            onTest={testEndpoint}
           />
         ))}
       </div>

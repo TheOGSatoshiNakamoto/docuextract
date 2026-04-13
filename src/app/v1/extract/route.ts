@@ -4,7 +4,7 @@ import { checkRateLimit, rateLimitHeaders } from '@/lib/ratelimit';
 import { processDocumentInput, ValidationError } from '@/lib/documents/input';
 import { detectDocumentType } from '@/lib/documents/detect';
 import { extractDocument, ExtractionError } from '@/lib/extraction/engine';
-import { logUsage, getMonthlyUsageCount } from '@/lib/usage';
+import { logUsage, getMonthlyUsageCount, checkUsageThresholds } from '@/lib/usage';
 import { reportUsageToStripe } from '@/lib/billing';
 import {
   errorResponse,
@@ -14,6 +14,7 @@ import {
   errorInternal,
 } from '@/lib/errors';
 import { captureException } from '@/lib/sentry';
+import { inngest } from '@/inngest/client';
 import type { ExtractRequest, DocumentType, ModelMode } from '@/lib/types';
 import { PLANS, SONNET_MULTIPLIER } from '@/lib/plans';
 
@@ -172,6 +173,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       input_tokens: null, output_tokens: null, processing_time_ms: Date.now() - requestStart,
       confidence_score: null, status: 'error', error_message: errMsg,
     });
+    void inngest.send({
+      name: 'docuextract/extraction.failed',
+      data: { userId: user.id, status: 'failed', error: errMsg, documentType },
+    }).catch(() => {});
     if (err instanceof ExtractionError) {
       return errorResponse('extraction_failed', 'Document extraction failed. Please try again.');
     }
@@ -191,6 +196,23 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     status: 'success',
     error_message: null,
   });
+
+  // Emit webhook event via Inngest (~5ms, non-blocking queue)
+  void inngest.send({
+    name: 'docuextract/extraction.completed',
+    data: {
+      userId: user.id,
+      extractionId: externalId,
+      status: 'success',
+      confidence: result.confidence,
+      documentType,
+    },
+  }).catch((err) => {
+    console.error(JSON.stringify({ level: 'error', message: 'Inngest send failed', error: String(err) }));
+  });
+
+  // Check usage thresholds for webhook notifications (fire-and-forget)
+  void checkUsageThresholds(user.id, user.monthly_limit);
 
   // Sonnet calls deduct 3 extractions from the plan allocation
   const usageDeduction = modelMode === 'accurate' ? SONNET_MULTIPLIER : 1;

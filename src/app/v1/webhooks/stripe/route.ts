@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { invalidateAuthCache, invalidateAuthCacheByUserId } from '@/lib/auth';
 import { captureException } from '@/lib/sentry';
+import { inngest } from '@/inngest/client';
 import type { Plan } from '@/lib/types';
 
 export const runtime = 'nodejs';
@@ -163,33 +164,62 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     payload: event as unknown as Record<string, unknown>,
   });
 
+  // ── Helper: resolve userId from Stripe customer ID ───────────────────────
+  async function getUserIdFromCustomer(customerId: string): Promise<string | null> {
+    const { data } = await supabase.from('users').select('id').eq('stripe_customer_id', customerId).single();
+    return data?.id ?? null;
+  }
+
   // ── 4. Route to handler ──────────────────────────────────────────────────
   try {
     switch (event.type) {
       case 'customer.subscription.created':
-      case 'customer.subscription.updated':
-        await handleSubscriptionUpsert(event.data.object as Stripe.Subscription, supabase);
+      case 'customer.subscription.updated': {
+        const sub = event.data.object as Stripe.Subscription;
+        await handleSubscriptionUpsert(sub, supabase);
+        const custId = typeof sub.customer === 'string' ? sub.customer : sub.customer.id;
+        const uid = await getUserIdFromCustomer(custId);
+        if (uid) {
+          const eventName = event.type === 'customer.subscription.created'
+            ? 'docuextract/subscription.created' as const
+            : 'docuextract/subscription.updated' as const;
+          void inngest.send({ name: eventName, data: { userId: uid, subscriptionId: sub.id } }).catch(() => {});
+        }
         break;
+      }
 
-      case 'customer.subscription.deleted':
-        await handleSubscriptionDeleted(event.data.object as Stripe.Subscription, supabase);
+      case 'customer.subscription.deleted': {
+        const sub = event.data.object as Stripe.Subscription;
+        await handleSubscriptionDeleted(sub, supabase);
+        const custId = typeof sub.customer === 'string' ? sub.customer : sub.customer.id;
+        const uid = await getUserIdFromCustomer(custId);
+        if (uid) {
+          void inngest.send({ name: 'docuextract/subscription.cancelled', data: { userId: uid, subscriptionId: sub.id } }).catch(() => {});
+        }
         break;
+      }
 
-      case 'invoice.payment_succeeded':
-        console.log(JSON.stringify({
-          level: 'info',
-          message: 'Invoice payment succeeded',
-          invoiceId: (event.data.object as Stripe.Invoice).id,
-        }));
+      case 'invoice.payment_succeeded': {
+        const inv = event.data.object as Stripe.Invoice;
+        console.log(JSON.stringify({ level: 'info', message: 'Invoice payment succeeded', invoiceId: inv.id }));
+        const custId = typeof inv.customer === 'string' ? inv.customer : inv.customer?.id;
+        if (custId) {
+          const uid = await getUserIdFromCustomer(custId);
+          if (uid) void inngest.send({ name: 'docuextract/invoice.payment_succeeded', data: { userId: uid, invoiceId: inv.id } }).catch(() => {});
+        }
         break;
+      }
 
-      case 'invoice.payment_failed':
-        console.log(JSON.stringify({
-          level: 'warn',
-          message: 'Invoice payment failed',
-          invoiceId: (event.data.object as Stripe.Invoice).id,
-        }));
+      case 'invoice.payment_failed': {
+        const inv = event.data.object as Stripe.Invoice;
+        console.log(JSON.stringify({ level: 'warn', message: 'Invoice payment failed', invoiceId: inv.id }));
+        const custId = typeof inv.customer === 'string' ? inv.customer : inv.customer?.id;
+        if (custId) {
+          const uid = await getUserIdFromCustomer(custId);
+          if (uid) void inngest.send({ name: 'docuextract/invoice.payment_failed', data: { userId: uid, invoiceId: inv.id } }).catch(() => {});
+        }
         break;
+      }
 
       default:
         console.log(JSON.stringify({ level: 'info', message: 'Unhandled event type', type: event.type }));
