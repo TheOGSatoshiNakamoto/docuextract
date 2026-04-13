@@ -49,7 +49,7 @@ export const dispatchWebhook = inngest.createFunction(
   {
     id: 'webhook-dispatch',
     retries: 3,
-    concurrency: [{ limit: 10, key: 'event.data.endpointId' }],
+    concurrency: [{ limit: 5, key: 'event.data.endpointId' }],
     triggers: ALL_EVENTS.map(name => ({ event: name })),
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
