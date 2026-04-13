@@ -59,6 +59,24 @@ a:hover { text-decoration: underline; }
 
 const ENTRIES = [
   {
+    date: 'April 13, 2026',
+    title: 'v1.5: Webhook dispatch engine, multi-key API keys, and data integrity',
+    major: true,
+    badges: ['feature', 'fix'],
+    body: `<ul>
+      <li>Webhook dispatch engine powered by <a href="https://www.inngest.com">Inngest</a> — real-time HTTP POST notifications with HMAC-SHA256 signing, 3 automatic retries, and per-endpoint concurrency limits</li>
+      <li>9 webhook event types: <code>extraction.completed</code>, <code>extraction.failed</code>, usage alerts, and billing events</li>
+      <li>Per-plan webhook limits — Free: 1 endpoint, Starter: 3, Pro: 5, Scale: 10</li>
+      <li>"Send Test" button on each webhook endpoint for instant verification</li>
+      <li>Comprehensive webhook docs at <code>/docs#webhooks</code> with Node.js and Python signature verification samples</li>
+      <li>Multi-key API key management — create, name, and revoke multiple keys per account with per-plan limits</li>
+      <li>Fixed <code>gen_random_bytes</code> error that prevented API key regeneration (pgcrypto search_path fix)</li>
+      <li>User-facing extraction IDs (<code>ext_&lt;shortid&gt;</code>) in API responses and dashboard — consistent with webhook payloads</li>
+      <li>Unified usage counting via <code>/api/usage/current</code> — dashboard numbers now match billing exactly</li>
+      <li>Instant plan changes — auth cache invalidation on Stripe webhook events eliminates the 60-second delay after upgrading</li>
+    </ul>`,
+  },
+  {
     date: 'April 12, 2026',
     title: 'v1.4: Unified navigation, hydration fixes, and site-wide polish',
     major: true,
